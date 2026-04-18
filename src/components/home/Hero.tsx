@@ -60,6 +60,7 @@ const Hero = () => {
                 alt="Futuristic digital portal"
                 fill
                 className="object-cover transform group-hover:scale-105 transition-transform duration-700"
+                sizes="(max-width: 768px) 100vw, 50vw"
               />
               {/* Subtle glow effect */}
               <div className="absolute -inset-4 bg-teal/20 blur-3xl rounded-full opacity-30 group-hover:opacity-50 transition-opacity duration-1000 -z-10" />
