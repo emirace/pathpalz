@@ -28,7 +28,7 @@ const FinalCTA = () => {
               </Link>
 
               <Link
-                href="/services"
+                href="/#services"
                 className="inline-flex items-center justify-center h-14 px-10 font-bold text-white transition-all duration-300 border-2 border-white/20 rounded-xl hover:bg-white/10 hover:border-white/40 hover:-translate-y-0.5 active:translate-y-0 min-w-[200px]"
               >
                 Explore Our Services
