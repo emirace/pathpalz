@@ -30,7 +30,7 @@ const StatsSection = () => {
   ];
 
   return (
-    <section className="py-24 bg-[#F7F9FC] overflow-hidden">
+    <section id="stats" className="py-24 bg-[#F7F9FC] overflow-hidden">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}

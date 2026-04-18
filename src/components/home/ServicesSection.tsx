@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const ServicesSection = () => {
   return (
-    <section className="py-24 bg-white">
+    <section id="services" className="py-24 bg-white">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mb-16">
@@ -46,7 +46,7 @@ const ServicesSection = () => {
             </div>
 
             <Link
-              href="/software-development"
+              href="/#"
               className="inline-flex items-center text-teal font-bold text-lg hover:underline underline-offset-4 group"
             >
               Learn More
