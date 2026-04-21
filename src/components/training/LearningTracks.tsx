@@ -1,7 +1,15 @@
+import { useGetTracks } from "@/query/training/tracks";
 import Link from "next/link";
+import { ReactNode } from "react";
 
-const tracks = [
-  {
+interface ITrackStaticData {
+  icon: ReactNode;
+  level: string;
+  href: string;
+}
+
+const STATIC_TRACK_DATA: Record<string, ITrackStaticData> = {
+  "software-development": {
     icon: (
       <svg
         width="28"
@@ -18,15 +26,10 @@ const tracks = [
         <polyline points="8 6 2 12 8 18" />
       </svg>
     ),
-    title: "Software Development",
-    duration: "16 weeks",
     level: "Beginner to advanced",
-    price: "£349",
-    pricePrefix: "",
-    status: "open",
     href: "/training/apply",
   },
-  {
+  "data-ai": {
     icon: (
       <svg
         width="28"
@@ -45,15 +48,10 @@ const tracks = [
         <path d="M9 9.5A3 3 0 0115 9" />
       </svg>
     ),
-    title: "Data & AI",
-    duration: "14 weeks",
     level: "Beginner welcome",
-    price: "From £299",
-    pricePrefix: "",
-    status: "coming-soon",
     href: "/training/waitlist",
   },
-  {
+  devops: {
     icon: (
       <svg
         width="28"
@@ -71,17 +69,43 @@ const tracks = [
         <polyline points="7 8 10 11 7 14" />
       </svg>
     ),
-    title: "DevOps Engineering",
-    duration: "14 weeks",
     level: "Beginner welcome",
-    price: "From £299",
-    pricePrefix: "",
-    status: "coming-soon",
     href: "/training/waitlist",
   },
-];
+};
+
+const DEFAULT_ICON = (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="text-teal"
+  >
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+  </svg>
+);
 
 const LearningTracks = () => {
+  const { data: tracks, isLoading } = useGetTracks();
+
+  if (isLoading) {
+    return (
+      <section className="py-20 bg-[#F3F3F8]">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-20 bg-[#F3F3F8]">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,12 +124,18 @@ const LearningTracks = () => {
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {tracks.map((track) => {
+          {tracks?.map((track) => {
             const isOpen = track.status === "open";
+            const staticData = STATIC_TRACK_DATA[track.slug] || {
+              icon: DEFAULT_ICON,
+              level: "Beginner welcome",
+              href: `/training/${track.slug}`,
+            };
+
             return (
               <div
-                key={track.title}
-                className="bg-white rounded-2xl p-7 flex flex-col space-y-6  relative overflow-hidden"
+                key={track.id}
+                className="bg-white rounded-2xl p-7 flex flex-col space-y-6 relative overflow-hidden"
               >
                 {/* Status Badge */}
                 <div
@@ -124,13 +154,15 @@ const LearningTracks = () => {
                     isOpen ? "bg-teal/10" : "bg-gray-100"
                   }`}
                 >
-                  {track.icon}
+                  {staticData.icon}
                 </div>
 
                 {/* Title & Meta */}
                 <div className="space-y-3 flex-1">
                   <h3
-                    className={`text-xl font-bold font-manrope ${isOpen ? "text-[#00284F]" : "text-[#424750]"}`}
+                    className={`text-xl font-bold font-manrope ${
+                      isOpen ? "text-[#00284F]" : "text-[#424750]"
+                    }`}
                   >
                     {track.title}
                   </h3>
@@ -148,7 +180,7 @@ const LearningTracks = () => {
                         <circle cx="12" cy="12" r="10" />
                         <polyline points="12 6 12 12 16 14" />
                       </svg>
-                      {track.duration}
+                      {track.duration_weeks} weeks
                     </li>
                     <li className="flex items-center gap-2 text-sm text-[#424750]">
                       <svg
@@ -163,7 +195,7 @@ const LearningTracks = () => {
                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
                         <polyline points="17 6 23 6 23 12" />
                       </svg>
-                      {track.level}
+                      {staticData.level}
                     </li>
                   </ul>
                 </div>
@@ -171,13 +203,15 @@ const LearningTracks = () => {
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                   <span
-                    className={`text-2xl font-extrabold font-manrope ${isOpen ? "text-[#00284F]" : "text-[#737781]"}`}
+                    className={`text-2xl font-extrabold font-manrope ${
+                      isOpen ? "text-[#00284F]" : "text-[#737781]"
+                    }`}
                   >
-                    {track.price}
+                    £{track.price}
                   </span>
                   {isOpen && (
                     <Link
-                      href={track.href}
+                      href={staticData.href}
                       className="w-10 h-10 flex items-center justify-center rounded-full bg-[#00284F]/5 hover:bg-[#00284F]/10 transition-colors text-[#00284F]"
                       aria-label={`Apply for ${track.title}`}
                     >
