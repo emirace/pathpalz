@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { X, ChevronDown } from "lucide-react";
+import { useGetTracks } from "@/query/training/tracks";
+import { useSubmitEnquiry } from "@/query/training/enquiry";
+import { IEnquiryRequest } from "@/types/training/enquiry";
+import { useTraining } from "@/context/TrainingContext";
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -14,13 +18,18 @@ const ApplicationModal = ({
   onClose,
   defaultTab = "apply",
 }: ApplicationModalProps) => {
+  const { selectedTrackId } = useTraining();
   const [activeTab, setActiveTab] = useState<"apply" | "waitlist">(defaultTab);
+
+  const { data: tracks } = useGetTracks();
+  const submitEnquiry = useSubmitEnquiry();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     country: "",
-    track: "Software Development",
+    trackId: "",
     experience: "Never",
     commitment: "Yes, I can commit to this",
     working: "Full-time",
@@ -32,14 +41,23 @@ const ApplicationModal = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setActiveTab(defaultTab);
-    if (defaultTab === "apply") {
-      setFormData((prev) => ({ ...prev, track: "Software Development" }));
-    }
   }, [defaultTab, isOpen]);
+
+  // Handle setting track ID when modal opens or tracks load
+  useEffect(() => {
+    if (isOpen && tracks && tracks.length > 0) {
+      if (selectedTrackId) {
+        setFormData((prev) => ({ ...prev, trackId: selectedTrackId }));
+      } else if (!formData.trackId) {
+        const defaultTrack =
+          tracks.find((t) => t.slug === "software-development") || tracks[0];
+        setFormData((prev) => ({ ...prev, trackId: defaultTrack.id.toString() }));
+      }
+    }
+  }, [isOpen, tracks, selectedTrackId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -63,6 +81,7 @@ const ApplicationModal = ({
     }
     if (!formData.country) newErrors.country = "Required";
     if (!formData.motivation.trim()) newErrors.motivation = "Required";
+    if (!formData.trackId) newErrors.trackId = "Required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -72,12 +91,47 @@ const ApplicationModal = ({
     e.preventDefault();
     if (!validate()) return;
 
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Application submitted successfully!");
-      onClose();
-    }, 1500);
+    const payload: IEnquiryRequest = {
+      full_name: `${formData.firstName} ${formData.lastName}`,
+      email: formData.email,
+      type: activeTab,
+      training_track_id: parseInt(formData.trackId),
+      motivation: formData.motivation,
+      experience_level: formData.experience,
+      goal: "Become a professional developer", // Default goal
+      availability: formData.availability,
+      timeline: "Ready to start", // Default timeline
+      extra_notes: formData.additionalInfo,
+    };
+
+    submitEnquiry.mutate(payload, {
+      onSuccess: () => {
+        alert("Application submitted successfully!");
+        onClose();
+        // Reset form
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          country: "",
+          trackId: tracks?.[0]?.id.toString() || "",
+          experience: "Never",
+          commitment: "Yes, I can commit to this",
+          working: "Full-time",
+          hardware: "Yes to both",
+          source: "LinkedIn/WhatsApp",
+          availability: "Weekend Mornings",
+          motivation: "",
+          additionalInfo: "",
+        });
+      },
+      onError: (error: any) => {
+        alert(
+          error?.response?.data?.message ||
+            "Something went wrong. Please try again.",
+        );
+      },
+    });
   };
 
   const handleChange = (
@@ -101,6 +155,8 @@ const ApplicationModal = ({
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
+
+  const isSubmitting = submitEnquiry.isPending;
 
   return (
     <div
@@ -146,6 +202,12 @@ const ApplicationModal = ({
 
         <div className="flex-1 overflow-y-auto p-6 sm:p-10 custom-scrollbar">
           <form className="space-y-8" onSubmit={handleSubmit}>
+            {submitEnquiry.isError && (
+              <div className="p-4 bg-red-50 text-red-600 text-sm rounded-lg">
+                Something went wrong. Please check your connection or try again.
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-[11px] font-bold tracking-widest text-[#424750] uppercase">
@@ -234,16 +296,17 @@ const ApplicationModal = ({
                 </label>
                 <div className="relative">
                   <select
-                    name="track"
-                    value={formData.track}
+                    name="trackId"
+                    value={formData.trackId}
                     onChange={handleChange}
                     className="w-full h-12 px-4 bg-[#EAEFF1] rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-teal/20 transition-all text-[#00284F] cursor-pointer pr-10"
                   >
-                    <option value="Software Development">
-                      Software Development
-                    </option>
-                    <option value="Data & AI">Data & AI</option>
-                    <option value="DevOps">DevOps</option>
+                    {tracks?.map((track) => (
+                      <option key={track.id} value={track.id.toString()}>
+                        {track.title}
+                      </option>
+                    ))}
+                    {!tracks && <option disabled>Loading tracks...</option>}
                   </select>
                   <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
