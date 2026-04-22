@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useTraining } from "@/context/TrainingContext";
 import { useRouter } from "next/navigation";
 import { useGetUser } from "@/query/auth";
+import { User as UserIcon } from "lucide-react";
 
 const TrainingNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,13 +66,23 @@ const TrainingNavbar = () => {
             ))}
           </div>
 
-          <div className="hidden md:block">
-            <button
-              onClick={() => handleAuthRedirect("apply")}
-              className="inline-flex items-center h-12 px-8 font-bold text-[#00284F] transition-all duration-300 rounded-xl shadow-lg bg-teal hover:bg-teal/90 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              Get Started
-            </button>
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10 group"
+                aria-label="Go to Dashboard"
+              >
+                <UserIcon size={22} className="group-hover:scale-110 transition-transform" />
+              </Link>
+            ) : (
+              <button
+                onClick={() => handleAuthRedirect("apply")}
+                className="inline-flex items-center h-12 px-8 font-bold text-[#00284F] transition-all duration-300 rounded-xl shadow-lg bg-teal hover:bg-teal/90 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Get Started
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -132,15 +143,26 @@ const TrainingNavbar = () => {
             </Link>
           ))}
           <div className="pt-4">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                handleAuthRedirect("apply");
-              }}
-              className="block w-full text-center py-4 px-6 font-bold text-[#00284F] rounded-xl bg-teal hover:bg-teal/90 transition-all font-manrope"
-            >
-              Get Started
-            </button>
+            {user ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center justify-center w-full py-4 px-6 font-bold text-white rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all gap-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <UserIcon size={20} />
+                Go to Dashboard
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  handleAuthRedirect("apply");
+                }}
+                className="block w-full text-center py-4 px-6 font-bold text-[#00284F] rounded-xl bg-teal hover:bg-teal/90 transition-all font-manrope"
+              >
+                Get Started
+              </button>
+            )}
           </div>
         </div>
       </div>
