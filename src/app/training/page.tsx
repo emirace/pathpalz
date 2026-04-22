@@ -19,9 +19,12 @@ export default function TrainingPage() {
   const { openModal } = useTraining();
   const { data: user } = useGetUser();
 
-  const handleAuthRedirect = (type: "apply" | "waitlist") => {
+  const handleAuthRedirect = (
+    type: "apply" | "waitlist",
+    trackId?: string | number,
+  ) => {
     if (user) {
-      openModal(type);
+      openModal(type, trackId);
     } else {
       router.push("/login");
     }
@@ -39,8 +42,8 @@ export default function TrainingPage() {
       <HighPerformanceRhythm />
       <SupportSystem />
       <TransparentPricing
-        onApply={() => handleAuthRedirect("apply")}
-        onWaitlist={() => handleAuthRedirect("waitlist")}
+        onApply={(trackId) => handleAuthRedirect("apply", trackId)}
+        onWaitlist={(trackId) => handleAuthRedirect("waitlist", trackId)}
       />
       <ReadyToStart onApply={() => handleAuthRedirect("apply")} />
       <FAQ />

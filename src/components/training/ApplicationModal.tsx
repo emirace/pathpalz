@@ -5,6 +5,7 @@ import { X, ChevronDown } from "lucide-react";
 import { useGetTracks } from "@/query/training/tracks";
 import { useSubmitEnquiry } from "@/query/training/enquiry";
 import { IEnquiryRequest } from "@/types/training/enquiry";
+import { useTraining } from "@/context/TrainingContext";
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const ApplicationModal = ({
   onClose,
   defaultTab = "apply",
 }: ApplicationModalProps) => {
+  const { selectedTrackId } = useTraining();
   const [activeTab, setActiveTab] = useState<"apply" | "waitlist">(defaultTab);
 
   const { data: tracks } = useGetTracks();
@@ -44,13 +46,18 @@ const ApplicationModal = ({
     setActiveTab(defaultTab);
   }, [defaultTab, isOpen]);
 
+  // Handle setting track ID when modal opens or tracks load
   useEffect(() => {
-    if (tracks && tracks.length > 0 && !formData.trackId) {
-      const defaultTrack =
-        tracks.find((t) => t.slug === "software-development") || tracks[0];
-      setFormData((prev) => ({ ...prev, trackId: defaultTrack.id.toString() }));
+    if (isOpen && tracks && tracks.length > 0) {
+      if (selectedTrackId) {
+        setFormData((prev) => ({ ...prev, trackId: selectedTrackId }));
+      } else if (!formData.trackId) {
+        const defaultTrack =
+          tracks.find((t) => t.slug === "software-development") || tracks[0];
+        setFormData((prev) => ({ ...prev, trackId: defaultTrack.id.toString() }));
+      }
     }
-  }, [tracks, formData.trackId]);
+  }, [isOpen, tracks, selectedTrackId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -87,7 +94,7 @@ const ApplicationModal = ({
     const payload: IEnquiryRequest = {
       full_name: `${formData.firstName} ${formData.lastName}`,
       email: formData.email,
-      type: "guidance",
+      type: activeTab,
       training_track_id: parseInt(formData.trackId),
       motivation: formData.motivation,
       experience_level: formData.experience,

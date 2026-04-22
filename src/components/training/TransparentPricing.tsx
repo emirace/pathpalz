@@ -37,8 +37,8 @@ const STATIC_METADATA: Record<string, ITrackStaticMetadata> = {
 };
 
 interface TransparentPricingProps {
-  onApply: () => void;
-  onWaitlist: () => void;
+  onApply: (trackId: string | number) => void;
+  onWaitlist: (trackId: string | number) => void;
 }
 
 const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) => {
@@ -107,7 +107,7 @@ const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) =>
                   {/* Price */}
                   <div className="flex items-baseline mb-8">
                     <span className="text-5xl font-extrabold font-manrope text-[#00284F] tracking-tight">
-                      £{track.price}
+                      £{parseInt(track.price)}
                     </span>
                     <span className="text-gray-500 font-medium ml-2">
                       {isOpen ? "total" : "starting"}
@@ -133,7 +133,7 @@ const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) =>
 
                   {/* Action Button */}
                   <button
-                    onClick={isOpen ? onApply : onWaitlist}
+                    onClick={() => isOpen ? onApply(track.id) : onWaitlist(track.id)}
                     className={`w-full flex justify-center items-center h-14 rounded-xl font-bold transition-all duration-200 cursor-pointer ${
                       metadata.popular
                         ? "bg-[#032042] text-white hover:bg-[#032042]/90 shadow-md"

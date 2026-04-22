@@ -1,11 +1,13 @@
+"use client";
+
 import { useGetTracks } from "@/query/training/tracks";
 import Link from "next/link";
 import { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 
 interface ITrackStaticData {
   icon: ReactNode;
   level: string;
-  href: string;
 }
 
 const STATIC_TRACK_DATA: Record<string, ITrackStaticData> = {
@@ -27,7 +29,6 @@ const STATIC_TRACK_DATA: Record<string, ITrackStaticData> = {
       </svg>
     ),
     level: "Beginner to advanced",
-    href: "/training/apply",
   },
   "data-ai": {
     icon: (
@@ -49,7 +50,6 @@ const STATIC_TRACK_DATA: Record<string, ITrackStaticData> = {
       </svg>
     ),
     level: "Beginner welcome",
-    href: "/training/waitlist",
   },
   devops: {
     icon: (
@@ -70,7 +70,6 @@ const STATIC_TRACK_DATA: Record<string, ITrackStaticData> = {
       </svg>
     ),
     level: "Beginner welcome",
-    href: "/training/waitlist",
   },
 };
 
@@ -91,16 +90,16 @@ const DEFAULT_ICON = (
   </svg>
 );
 
-const LearningTracks = () => {
+interface LearningTracksProps {}
+
+const LearningTracks = ({}: LearningTracksProps) => {
   const { data: tracks, isLoading } = useGetTracks();
 
   if (isLoading) {
     return (
       <section className="py-20 bg-[#F3F3F8]">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal"></div>
-          </div>
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal mx-auto"></div>
         </div>
       </section>
     );
@@ -129,13 +128,12 @@ const LearningTracks = () => {
             const staticData = STATIC_TRACK_DATA[track.slug] || {
               icon: DEFAULT_ICON,
               level: "Beginner welcome",
-              href: `/training/${track.slug}`,
             };
 
             return (
               <div
                 key={track.id}
-                className="bg-white rounded-2xl p-7 flex flex-col space-y-6 relative overflow-hidden"
+                className="bg-white rounded-2xl p-7 flex flex-col space-y-6 relative overflow-hidden group hover:shadow-xl transition-all duration-300"
               >
                 {/* Status Badge */}
                 <div
@@ -157,15 +155,16 @@ const LearningTracks = () => {
                   {staticData.icon}
                 </div>
 
-                {/* Title & Meta */}
                 <div className="space-y-3 flex-1">
-                  <h3
-                    className={`text-xl font-bold font-manrope ${
+                  <Link
+                    href={`/training/${track.slug}`}
+                    className={`text-xl font-bold font-manrope hover:text-teal transition-colors flex items-center gap-2 ${
                       isOpen ? "text-[#00284F]" : "text-[#424750]"
                     }`}
                   >
                     {track.title}
-                  </h3>
+                    {/* <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" /> */}
+                  </Link>
                   <ul className="space-y-1.5">
                     <li className="flex items-center gap-2 text-sm text-[#424750]">
                       <svg
@@ -207,27 +206,26 @@ const LearningTracks = () => {
                       isOpen ? "text-[#00284F]" : "text-[#737781]"
                     }`}
                   >
-                    £{track.price}
+                    £{parseInt(track.price)}
                   </span>
-                  {isOpen && (
-                    <Link
-                      href={staticData.href}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-[#00284F]/5 hover:bg-[#00284F]/10 transition-colors text-[#00284F]"
-                      aria-label={`Apply for ${track.title}`}
+
+                  <Link
+                    href={`/training/${track.slug}`}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#00284F]/5 hover:bg-[#00284F]/10 transition-colors text-[#00284F]"
+                    aria-label={`${isOpen ? "Apply" : "Join Waitlist"} for ${track.title}`}
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  )}
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             );

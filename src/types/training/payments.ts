@@ -10,6 +10,8 @@ export interface IPaymentOption {
 export interface ICheckoutRequest {
   track_id: number;
   gateway: "stripe" | "paystack";
+  success_url?: string;
+  cancel_url?: string;
 }
 
 export interface ICheckoutResponse {
