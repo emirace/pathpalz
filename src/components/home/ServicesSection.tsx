@@ -37,7 +37,7 @@ const ServicesSection = () => {
 
             <div className="space-y-4">
               <h3 className="text-2xl md:text-3xl font-bold font-manrope text-navy">
-                Custom Software Development
+                Tech Solutions
               </h3>
               <p className="text-gray-600 text-lg leading-relaxed max-w-md">
                 We architect and build scalable, secure, and user-centric
