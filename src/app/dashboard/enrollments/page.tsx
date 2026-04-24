@@ -152,7 +152,6 @@ export default function MyEnrollmentsPage() {
   );
 }
 
-// Sub-component Helper
 const BookOpen = ({
   className,
   size,

@@ -1,5 +1,6 @@
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import Announcement from "@/components/home/Announcement";
 
 export default function HomeLayout({
   children,
@@ -8,6 +9,7 @@ export default function HomeLayout({
 }) {
   return (
     <>
+      <Announcement />
       <Navbar />
       {children}
       <Footer />

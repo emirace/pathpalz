@@ -40,16 +40,28 @@ const ContactPage = () => {
     {
       icon: <Phone className="w-6 h-6" />,
       title: "Call Us",
-      details: "(+44)123456789",
+      details: "(+44) 750 321 1801",
       subtext: "Mon-Fri from 9am to 6pm.",
-      link: "tel:+44123456789",
+      link: "tel:+447503211801",
     },
     {
       icon: <MapPin className="w-6 h-6" />,
       title: "Visit Us",
-      details: "London, United Kingdom",
-      subtext: "88 London Road, London, United Kingdom.",
+      details:
+        "UK Address: London, United Kingdom || Nigeria Address: Lagos, Nigeria",
+      // subtext: "Nigeria Address: Lagos, Nigeria",
       link: "#",
+    },
+  ];
+
+  const socialLink = [
+    {
+      name: "Linkdln",
+      link: "https://www.linkedin.com/company/pathpalz/",
+    },
+    {
+      name: "Instagram",
+      link: "https://www.instagram.com/pathpalz?igsh=czN3NTF1ZTkyanV5",
     },
   ];
 
@@ -120,16 +132,17 @@ const ContactPage = () => {
                   Follow Us
                 </p>
                 <div className="flex gap-4">
-                  {["LinkedIn", "GitHub", "Twitter", "Instagram"].map(
-                    (social) => (
-                      <button
-                        key={social}
-                        className="px-5 py-2 rounded-full border border-gray-200 text-sm font-bold text-[#00284F] hover:bg-[#00284F] hover:text-white transition-all"
-                      >
-                        {social}
-                      </button>
-                    ),
-                  )}
+                  {socialLink.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-2 rounded-full border border-gray-200 text-sm font-bold text-[#00284F] hover:bg-[#00284F] hover:text-white transition-all"
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
