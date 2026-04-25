@@ -1,14 +1,10 @@
-name: Frontend CI/CD to cPanel (main)
+name: Web CI/CD to cPanel (main)
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
-
-# 🔥 Manual cache buster: bump this when CI acts weird
-env:
-  CACHE_BUST: v1
 
 jobs:
   build-and-deploy:
