@@ -61,18 +61,18 @@ jobs:
 
       - name: Setup SSH Agent with SSH_ASKPASS
         env:
-          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE_PATHPALZ }}
-          SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY_PATHPALZ }}
+          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+          SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
         run: |
           if [ -z "$SSH_PRIVATE_KEY" ]; then
-            echo "❌ ERROR: SSH_PRIVATE_KEY is empty. Please set CPANEL_SSH_PRIVATE_KEY_PATHPALZ in GitHub Secrets."
+            echo "❌ ERROR: SSH_PRIVATE_KEY is empty. Please set CPANEL_SSH_PRIVATE_KEY in GitHub Secrets."
             exit 1
           fi
           
           mkdir -p ~/.ssh
-          PORT="${{ secrets.CPANEL_SSH_PORT_PATHPALZ }}"
+          PORT="${{ secrets.CPANEL_SSH_PORT }}"
           if [ -z "$PORT" ]; then PORT="22"; fi
-          ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST_PATHPALZ }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
           eval $(ssh-agent -s)
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
@@ -84,8 +84,8 @@ jobs:
 
       - name: Create Backup of Live App (keep only latest)
         run: |
-          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
-          ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
+          ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
             set -e
 
             APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
@@ -109,8 +109,8 @@ jobs:
       - name: Deploy to cPanel directly
         run: |
           # 1) Wipe existing files except protected dirs
-          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
-            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
+            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
               set -e
               APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
 
@@ -123,14 +123,14 @@ jobs:
           EOF
 
           # 2) Upload build directly into app dir
-          scp -P ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} -r out/* \
-            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }}:${{ secrets.CPANEL_TARGET_DIR }}/
+          scp -P ${{ secrets.CPANEL_SSH_PORT }} -r out/* \
+            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}:${{ secrets.CPANEL_TARGET_DIR }}/
 
       # ✅ Verify deployment — confirm all critical files are on the server
       - name: Verify deployment on server
         run: |
-          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
-            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
+            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
               set -e
               APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
 
