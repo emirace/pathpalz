@@ -65,7 +65,9 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY_PATHPALZ }}
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} >> ~/.ssh/known_hosts
+          PORT="${{ secrets.CPANEL_SSH_PORT_PATHPALZ }}"
+          if [ -z "$PORT" ]; then PORT="22"; fi
+          ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST_PATHPALZ }}" >> ~/.ssh/known_hosts
           eval $(ssh-agent -s)
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
