@@ -10,6 +10,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    # 🔥 MANUAL CACHE BUSTER: Bump this when CI acts weird
+    env:
+      CACHE_BUST: v2
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
