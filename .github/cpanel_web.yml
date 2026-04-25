@@ -1,0 +1,154 @@
+name: Frontend CI/CD to cPanel (pre-prod)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# 🔥 Manual cache buster: bump this when CI acts weird
+env:
+  CACHE_BUST: v1
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # ✅ Cache npm + bustable via CACHE_BUST
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
+          restore-keys: |
+            npm-${{ runner.os }}-node22-
+
+      # ✅ Cache Next.js build cache (speeds up builds)
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
+          restore-keys: |
+            next-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ✅ Inject a deploy build id (cache-busting / debugging)
+      - name: Create build version file
+        run: |
+          echo "{
+            \"branch\": \"${GITHUB_REF_NAME}\",
+            \"sha\": \"${GITHUB_SHA}\",
+            \"run_id\": \"${GITHUB_RUN_ID}\",
+            \"run_number\": \"${GITHUB_RUN_NUMBER}\",
+            \"built_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
+          }" > public/version.json
+
+      - name: Build Next.js static export
+        run: npm run build
+
+      - name: Setup SSH Agent with SSH_ASKPASS
+        env:
+          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE_PATHPALZ }}
+          SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY_PATHPALZ }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} >> ~/.ssh/known_hosts
+          eval $(ssh-agent -s)
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass
+          chmod +x ~/.ssh_askpass
+          export SSH_ASKPASS=~/.ssh_askpass
+          export DISPLAY=:0
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+      - name: Create Backup of Live App (keep only latest)
+        run: |
+          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
+          ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+            set -e
+
+            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            APP_BASE_DIR=$(dirname "$APP_DIR")
+            APP_DIR_NAME=$(basename "$APP_DIR")
+            BACKUP_DIR="$APP_DIR/backups"
+            TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+
+            mkdir -p "$BACKUP_DIR"
+            cd "$APP_BASE_DIR"
+
+            zip -r "$BACKUP_DIR/${APP_DIR_NAME}_$TIMESTAMP.zip" "$APP_DIR_NAME" \
+              -x "$APP_DIR_NAME/backups/*"
+
+            # Keep only the latest 2 backups
+            ls -tp "$BACKUP_DIR"/*.zip | tail -n +3 | xargs -r rm --
+
+            echo "✅ Backup created at $BACKUP_DIR/${APP_DIR_NAME}_$TIMESTAMP.zip"
+          EOF
+
+      - name: Deploy to cPanel directly
+        run: |
+          # 1) Wipe existing files except protected dirs
+          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
+            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+              set -e
+              APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+
+              # Wipe everything except protected dirs and .htaccess
+              find "$APP_DIR" -maxdepth 1 \
+                ! -name "backups" \
+                ! -name ".htaccess" \
+                ! -path "$APP_DIR" \
+                -exec rm -rf {} +
+          EOF
+
+          # 2) Upload build directly into app dir
+          scp -P ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} -r out/* \
+            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }}:${{ secrets.CPANEL_TARGET_DIR }}/
+
+      # ✅ Verify deployment — confirm all critical files are on the server
+      - name: Verify deployment on server
+        run: |
+          ssh -p ${{ secrets.CPANEL_SSH_PORT_PATHPALZ }} \
+            ${{ secrets.CPANEL_SSH_USER_PATHPALZ }}@${{ secrets.CPANEL_SSH_HOST_PATHPALZ }} << 'EOF'
+              set -e
+              APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+
+              echo "========================================"
+              echo "        DEPLOYMENT VERIFICATION        "
+              echo "========================================"
+
+              echo ""
+              echo "--- index.html / 404.html ---"
+              ls -la "$APP_DIR/index.html" || ls -la "$APP_DIR/404.html" || true
+
+              echo ""
+              echo "--- .htaccess ---"
+              ls -la "$APP_DIR/.htaccess"
+
+              echo ""
+              echo "--- version.json ---"
+              cat "$APP_DIR/version.json"
+
+              echo ""
+              echo "--- .htaccess cache rules (sanity check) ---"
+              grep -i "cache-control\|no-cache\|max-age" "$APP_DIR/.htaccess" || true
+
+              echo ""
+              echo "========================================"
+              echo "✅ Deployment verification complete"
+              echo "========================================"
+          EOF
