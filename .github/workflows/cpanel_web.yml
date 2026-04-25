@@ -64,6 +64,11 @@ jobs:
           SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE_PATHPALZ }}
           SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY_PATHPALZ }}
         run: |
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "❌ ERROR: SSH_PRIVATE_KEY is empty. Please set CPANEL_SSH_PRIVATE_KEY_PATHPALZ in GitHub Secrets."
+            exit 1
+          fi
+          
           mkdir -p ~/.ssh
           PORT="${{ secrets.CPANEL_SSH_PORT_PATHPALZ }}"
           if [ -z "$PORT" ]; then PORT="22"; fi
