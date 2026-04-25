@@ -1,4 +1,4 @@
-name: Web CI/CD to cPanel (main)
+name: Web CI/CD to cPanel (main_pathpalz)
 
 on:
   push:
@@ -68,7 +68,7 @@ jobs:
             echo "❌ ERROR: SSH_PRIVATE_KEY is empty. Please set CPANEL_SSH_PRIVATE_KEY in GitHub Secrets."
             exit 1
           fi
-          
+
           mkdir -p ~/.ssh
           PORT="${{ secrets.CPANEL_SSH_PORT }}"
           if [ -z "$PORT" ]; then PORT="22"; fi
