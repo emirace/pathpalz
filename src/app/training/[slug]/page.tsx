@@ -16,6 +16,7 @@ import {
   Zap,
   ArrowRight,
   BookOpen,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -137,10 +138,12 @@ export default function TrackDetailPage() {
   const { slug } = useParams();
   const router = useRouter();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const [guestData, setGuestData] = useState({ fullName: "", email: "" });
+
   const { data: user } = useGetUser();
   const { data: tracks, isLoading: isTracksLoading } = useGetTracks();
-  
+
   const foundTrack = useMemo(() => {
     return tracks?.find((t) => t.slug === slug);
   }, [tracks, slug]);
@@ -211,13 +214,26 @@ export default function TrackDetailPage() {
         setIsPaymentModalOpen(true);
       }
     } else {
-      router.push("/login");
+      setIsGuestModalOpen(true);
     }
+  };
+
+  const handleGuestSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!guestData.fullName || !guestData.email) return;
+    setIsGuestModalOpen(false);
+    setIsPaymentModalOpen(true);
   };
 
   const handleGatewaySelect = (gateway: "stripe" | "paystack") => {
     checkoutMutation.mutate(
-      { track_id: track.id, gateway },
+      {
+        track_id: track.id,
+        gateway,
+        ...(!user
+          ? { email: guestData.email, full_name: guestData.fullName }
+          : {}),
+      },
       {
         onSuccess: (data) => {
           if (data.checkout_url) {
@@ -225,9 +241,12 @@ export default function TrackDetailPage() {
           }
         },
         onError: (error: any) => {
-          alert(error?.response?.data?.message || "Failed to initialize checkout. Please try again.");
-        }
-      }
+          alert(
+            error?.response?.data?.message ||
+              "Failed to initialize checkout. Please try again.",
+          );
+        },
+      },
     );
   };
 
@@ -473,6 +492,84 @@ export default function TrackDetailPage() {
         onSelect={handleGatewaySelect}
         isSubmitting={checkoutMutation.isPending}
       />
+
+      {isGuestModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00284f]/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <div>
+                <h3 className="text-xl font-bold text-[#00284F]">
+                  Guest Checkout
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Please enter your details to proceed
+                </p>
+              </div>
+              <button
+                onClick={() => setIsGuestModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleGuestSubmit} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#00284F]">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="John Doe"
+                  value={guestData.fullName}
+                  onChange={(e) =>
+                    setGuestData({ ...guestData, fullName: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#00284F]">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="john@example.com"
+                  value={guestData.email}
+                  onChange={(e) =>
+                    setGuestData({ ...guestData, email: e.target.value })
+                  }
+                  className="w-full px-4 py-3 text-black rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                />
+              </div>
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  className="w-full h-12 bg-[#00284F] text-white rounded-xl font-bold hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                >
+                  Continue to Payment
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+
+              <div className="text-center pt-2">
+                <p className="text-sm text-gray-500">
+                  Already have an account?{" "}
+                  <Link
+                    href={`/login?redirect=/training/${slug}`}
+                    className="text-teal font-semibold hover:underline"
+                  >
+                    Log in
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

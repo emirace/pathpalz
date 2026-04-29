@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useGetUser } from "@/query/auth";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   LayoutDashboard,
   BookOpen,
@@ -32,8 +33,15 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const { data: user, isLoading } = useGetUser();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    queryClient.clear();
+    router.push("/login");
+  };
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -133,7 +141,10 @@ export default function DashboardLayout({
           </nav>
 
           <div className="p-4 mt-auto">
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-white/60 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+            >
               <LogOut size={20} />
               <span className="font-bold text-sm uppercase tracking-widest">
                 Sign Out
