@@ -23,11 +23,11 @@ export default function TrainingPage() {
     type: "apply" | "waitlist",
     trackId?: string | number,
   ) => {
-    if (user) {
-      openModal(type, trackId);
-    } else {
-      router.push("/login");
-    }
+    // if (user) {
+    openModal(type, trackId);
+    // } else {
+    // router.push("/login");
+    // }
   };
 
   return (

@@ -23,11 +23,11 @@ const TrainingNavbar = () => {
   ];
 
   const handleAuthRedirect = (type: "apply" | "waitlist") => {
-    if (user) {
-      openModal(type);
-    } else {
-      router.push("/login");
-    }
+    // if (user) {
+    openModal(type);
+    // } else {
+    // router.push("/login");
+    // }
   };
 
   return (
@@ -73,7 +73,10 @@ const TrainingNavbar = () => {
                 className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10 group"
                 aria-label="Go to Dashboard"
               >
-                <UserIcon size={22} className="group-hover:scale-110 transition-transform" />
+                <UserIcon
+                  size={22}
+                  className="group-hover:scale-110 transition-transform"
+                />
               </Link>
             ) : (
               <button
