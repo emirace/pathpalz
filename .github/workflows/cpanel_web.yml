@@ -10,7 +10,6 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    # 🔥 MANUAL CACHE BUSTER: Bump this when CI acts weird
     env:
       CACHE_BUST: v2
 
@@ -23,7 +22,9 @@ jobs:
         with:
           node-version: 22
 
-      # ✅ Cache npm + bustable via CACHE_BUST
+      # =========================
+      # CACHE
+      # =========================
       - name: Cache npm
         uses: actions/cache@v4
         with:
@@ -32,20 +33,20 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-node22-
 
-      # ✅ Cache Next.js build cache (speeds up builds)
-      - name: Cache Next.js
+      - name: Cache Next.js build
         uses: actions/cache@v4
         with:
-          path: |
-            .next/cache
+          path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
           restore-keys: |
             next-${{ runner.os }}-
 
+      # =========================
+      # INSTALL + BUILD
+      # =========================
       - name: Install dependencies
         run: npm ci
 
-      # ✅ Inject a deploy build id (cache-busting / debugging)
       - name: Create build version file
         run: |
           echo "{
@@ -59,103 +60,135 @@ jobs:
       - name: Build Next.js static export
         run: npm run build
 
-      - name: Setup SSH Agent with SSH_ASKPASS
+      # =========================
+      # SSH SETUP
+      # =========================
+      - name: Setup SSH
         env:
-          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
           SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
         run: |
+          set -e
+
           if [ -z "$SSH_PRIVATE_KEY" ]; then
-            echo "❌ ERROR: SSH_PRIVATE_KEY is empty. Please set CPANEL_SSH_PRIVATE_KEY in GitHub Secrets."
+            echo "❌ Missing SSH key"
             exit 1
           fi
 
           mkdir -p ~/.ssh
           PORT="${{ secrets.CPANEL_SSH_PORT }}"
-          if [ -z "$PORT" ]; then PORT="22"; fi
+          if [ -z "$PORT" ]; then PORT=22; fi
+
           ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
+
           eval $(ssh-agent -s)
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
-          echo 'echo $SSH_PASSPHRASE' > ~/.ssh_askpass
-          chmod +x ~/.ssh_askpass
-          export SSH_ASKPASS=~/.ssh_askpass
-          export DISPLAY=:0
           echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
-      - name: Create Backup of Live App (keep only latest)
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+
+      # =========================
+      # BACKUP LIVE SITE
+      # =========================
+      - name: Backup current production
         run: |
           ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
           ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
             set -e
 
             APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
-            APP_BASE_DIR=$(dirname "$APP_DIR")
-            APP_DIR_NAME=$(basename "$APP_DIR")
             BACKUP_DIR="$APP_DIR/backups"
             TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
             mkdir -p "$BACKUP_DIR"
-            cd "$APP_BASE_DIR"
 
-            zip -r "$BACKUP_DIR/${APP_DIR_NAME}_$TIMESTAMP.zip" "$APP_DIR_NAME" \
-              -x "$APP_DIR_NAME/backups/*"
+            if [ -d "$APP_DIR" ]; then
+              zip -r "$BACKUP_DIR/live_$TIMESTAMP.zip" "$APP_DIR" \
+                -x "$APP_DIR/backups/*" >/dev/null 2>&1 || true
+            fi
 
-            # Keep only the latest 2 backups
-            ls -tp "$BACKUP_DIR"/*.zip | tail -n +3 | xargs -r rm --
+            # Keep last 2 backups only
+            ls -tp "$BACKUP_DIR"/*.zip 2>/dev/null | tail -n +3 | xargs -r rm --
 
-            echo "✅ Backup created at $BACKUP_DIR/${APP_DIR_NAME}_$TIMESTAMP.zip"
+            echo "✅ Backup complete"
           EOF
 
-      - name: Deploy to cPanel directly
+      # =========================
+      # SAFE DEPLOY (RSYNC + STAGING)
+      # =========================
+      - name: Deploy (safe atomic release)
         run: |
-          # 1) Wipe existing files except protected dirs
-          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
-            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
-              set -e
-              APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+          set -e
 
-              # Wipe everything except protected dirs and .htaccess
-              find "$APP_DIR" -maxdepth 1 \
-                ! -name "backups" \
-                ! -name ".htaccess" \
-                ! -path "$APP_DIR" \
-                -exec rm -rf {} +
+          SERVER="${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}"
+          PORT="${{ secrets.CPANEL_SSH_PORT }}"
+          APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+          STAGING_DIR="${APP_DIR}_staging"
+
+          echo "📦 Creating staging folder..."
+          ssh -p $PORT $SERVER "mkdir -p $STAGING_DIR"
+
+          echo "🚀 Syncing build to staging (safe mode)..."
+
+          rsync -avz -e "ssh -p $PORT" \
+            --delete \
+            --exclude=".htaccess" \
+            --exclude="backups" \
+            --exclude=".env" \
+            out/ \
+            "$SERVER:$STAGING_DIR/"
+
+          echo "🔄 Swapping staging → live..."
+
+          ssh -p $PORT $SERVER << EOF
+            set -e
+
+            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            STAGING_DIR="${APP_DIR}_staging"
+            BACKUP_DIR="$APP_DIR/backups"
+
+            # Ensure backup dir exists
+            mkdir -p "$BACKUP_DIR"
+
+            # Remove old live (except protected files)
+            find "$APP_DIR" -mindepth 1 \
+              ! -name "backups" \
+              ! -name ".htaccess" \
+              -exec rm -rf {} +
+
+            # Move staging into live
+            rsync -a "$STAGING_DIR/" "$APP_DIR/"
+
+            # Clean staging
+            rm -rf "$STAGING_DIR"
+
+            echo "✅ Deployment complete"
           EOF
 
-          # 2) Upload build directly into app dir
-          scp -P ${{ secrets.CPANEL_SSH_PORT }} -r out/* \
-            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}:${{ secrets.CPANEL_TARGET_DIR }}/
-
-      # ✅ Verify deployment — confirm all critical files are on the server
-      - name: Verify deployment on server
+      # =========================
+      # VERIFY DEPLOYMENT
+      # =========================
+      - name: Verify deployment
         run: |
           ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
-            ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
-              set -e
-              APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+          ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} << 'EOF'
+            set -e
 
-              echo "========================================"
-              echo "        DEPLOYMENT VERIFICATION        "
-              echo "========================================"
+            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
 
-              echo ""
-              echo "--- index.html / 404.html ---"
-              ls -la "$APP_DIR/index.html" || ls -la "$APP_DIR/404.html" || true
+            echo "========================================"
+            echo " DEPLOYMENT VERIFICATION "
+            echo "========================================"
 
-              echo ""
-              echo "--- .htaccess ---"
-              ls -la "$APP_DIR/.htaccess"
+            echo "index.html:"
+            ls -la "$APP_DIR/index.html" || echo "missing"
 
-              echo ""
-              echo "--- version.json ---"
-              cat "$APP_DIR/version.json"
+            echo ".htaccess (protected):"
+            ls -la "$APP_DIR/.htaccess" || echo "missing"
 
-              echo ""
-              echo "--- .htaccess cache rules (sanity check) ---"
-              grep -i "cache-control\|no-cache\|max-age" "$APP_DIR/.htaccess" || true
+            echo "version.json:"
+            cat "$APP_DIR/version.json" || echo "missing"
 
-              echo ""
-              echo "========================================"
-              echo "✅ Deployment verification complete"
-              echo "========================================"
+            echo "========================================"
+            echo "DONE"
           EOF
