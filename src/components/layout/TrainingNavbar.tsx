@@ -24,9 +24,9 @@ const TrainingNavbar = () => {
 
   const handleAuthRedirect = (type: "apply" | "waitlist") => {
     // if (user) {
-    openModal(type);
+    // openModal(type);
     // } else {
-    // router.push("/login");
+    router.push("/login");
     // }
   };
 
