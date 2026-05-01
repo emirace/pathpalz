@@ -1,9 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getUser, login, register, verifyOtp } from "@/services/auth";
+import { getUser, login, register, verifyOtp, forgotPassword, resetPassword } from "@/services/auth";
 
 export const useLogin = () => {
   return useMutation({
     mutationFn: login,
+  });
+};
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: forgotPassword,
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: resetPassword,
   });
 };
 

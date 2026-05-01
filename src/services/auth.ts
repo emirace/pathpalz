@@ -16,6 +16,20 @@ export const register = async (data: IRegisterFormData) => {
   return response.data.data;
 };
 
+export const forgotPassword = async (data: { email: string }) => {
+  const response = await apiClient.post("/forgot-password", data);
+  return response.data;
+};
+
+export const resetPassword = async (data: {
+  confirmPassword: string;
+  password: string;
+  token: string;
+}) => {
+  const response = await apiClient.post("/reset-password", data);
+  return response.data;
+};
+
 export const getUser = async (): Promise<any> => {
   try {
     const token = localStorage.getItem("authToken");
