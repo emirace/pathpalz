@@ -51,14 +51,11 @@ jobs:
             next-${{ runner.os }}-
 
       # =========================
-      # INSTALL DEPENDENCIES
+      # INSTALL + BUILD
       # =========================
       - name: Install dependencies
         run: npm ci
 
-      # =========================
-      # BUILD VERSION FILE
-      # =========================
       - name: Create build version file
         run: |
           echo "{
@@ -69,9 +66,6 @@ jobs:
             \"built_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
           }" > public/version.json
 
-      # =========================
-      # BUILD NEXT.JS
-      # =========================
       - name: Build Next.js static export
         run: npm run build
 
@@ -95,7 +89,6 @@ jobs:
 
           eval "$(ssh-agent -s)"
 
-          # Create SSH ASKPASS helper
           echo '#!/bin/sh' > ~/.ssh_askpass
           echo 'echo "$SSH_PASSPHRASE"' >> ~/.ssh_askpass
 
@@ -105,7 +98,6 @@ jobs:
           export DISPLAY=:0
           export SSH_ASKPASS_REQUIRE=force
 
-          # Add SSH key (non-interactive)
           setsid ssh-add <(echo "$SSH_PRIVATE_KEY") </dev/null
 
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
@@ -138,9 +130,9 @@ jobs:
           '
 
       # =========================
-      # DEPLOY (STAGING + RSYNC)
+      # DEPLOY (SCP + STAGING)
       # =========================
-      - name: Deploy to cPanel (safe atomic deploy)
+      - name: Deploy to cPanel (SCP safe deploy)
         run: |
           set -e
 
@@ -149,17 +141,11 @@ jobs:
           APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          # Create staging folder
+          # Create staging directory
           ssh -p $PORT $SERVER "mkdir -p $STAGING_DIR"
 
-          # Sync build to staging
-          rsync -avz -e "ssh -p $PORT" \
-            --delete \
-            --exclude=".htaccess" \
-            --exclude="backups" \
-            --exclude=".env" \
-            out/ \
-            "$SERVER:$STAGING_DIR/"
+          # Upload build to staging
+          scp -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
 
           # Swap staging → live
           ssh -p $PORT $SERVER '
@@ -171,15 +157,16 @@ jobs:
 
             mkdir -p "$BACKUP_DIR"
 
-            # Clean live (protect .htaccess + backups)
+            # Clean live but protect .htaccess + backups
             find "$APP_DIR" -mindepth 1 \
               ! -name "backups" \
               ! -name ".htaccess" \
               -exec rm -rf {} +
 
-            # Move staging into live
-            rsync -a "$STAGING_DIR/" "$APP_DIR/"
+            # Move staging to live
+            cp -r "$STAGING_DIR/"* "$APP_DIR/"
 
+            # Remove staging
             rm -rf "$STAGING_DIR"
 
             echo "✅ Deployment complete"
