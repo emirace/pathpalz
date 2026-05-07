@@ -138,6 +138,31 @@ export default function DashboardLayout({
                 )}
               </Link>
             )}
+
+            {user?.usertype?.includes("platform") && (
+              <Link
+                href="/dashboard/admin/course-tracks"
+                className={`
+                  flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-blue-500/30
+                  ${
+                    pathname.startsWith("/dashboard/admin")
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                      : "text-blue-400 hover:text-white hover:bg-blue-500/20"
+                  }
+                `}
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <div className="flex items-center gap-3">
+                  <Settings size={20} />
+                  <span className="font-bold text-sm uppercase tracking-widest">
+                    Admin Portal
+                  </span>
+                </div>
+                {pathname.startsWith("/dashboard/admin") && (
+                  <ChevronRight size={16} />
+                )}
+              </Link>
+            )}
           </nav>
 
           <div className="p-4 mt-auto">
