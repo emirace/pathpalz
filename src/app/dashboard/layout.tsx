@@ -13,6 +13,9 @@ import {
   ChevronRight,
   Menu,
   X,
+  ShieldCheck,
+  ArrowLeft,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -23,7 +26,21 @@ const SIDEBAR_ITEMS = [
     icon: <BookOpen size={20} />,
     href: "/dashboard/enrollments",
   },
+  { name: "Attendance", icon: <ShieldCheck size={20} />, href: "/dashboard/student/attendance" },
   { name: "Profile", icon: <User size={20} />, href: "/dashboard/profile" },
+];
+
+const ADMIN_SIDEBAR_ITEMS = [
+  {
+    name: "Course Tracks",
+    icon: <Settings size={20} />,
+    href: "/dashboard/admin/course-tracks",
+  },
+  {
+    name: "Instructors",
+    icon: <Users size={20} />,
+    href: "/dashboard/admin/instructors",
+  },
 ];
 
 export default function DashboardLayout({
@@ -36,6 +53,7 @@ export default function DashboardLayout({
   const queryClient = useQueryClient();
   const { data: user, isLoading } = useGetUser();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
+  const isAdminPath = pathname.startsWith("/dashboard/admin");
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -72,7 +90,9 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={`
-        fixed lg:static inset-y-0 left-0 w-72 bg-[#00284F] text-white z-50 transition-transform duration-300 transform
+        fixed lg:static inset-y-0 left-0 w-72 ${
+          isAdminPath ? "bg-[#001529]" : "bg-[#00284F]"
+        } text-white z-50 transition-transform duration-300 transform
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
@@ -87,56 +107,121 @@ export default function DashboardLayout({
           </div>
 
           <nav className="flex-1 px-4 space-y-2">
-            {SIDEBAR_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`
-                    flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
-                    ${
-                      isActive
-                        ? "bg-teal text-white shadow-lg shadow-teal/20"
-                        : "text-white/60 hover:text-white hover:bg-white/5"
-                    }
-                  `}
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <div className="flex items-center gap-3">
-                    {item.icon}
-                    <span className="font-bold text-sm uppercase tracking-widest">
-                      {item.name}
-                    </span>
-                  </div>
-                  {isActive && <ChevronRight size={16} />}
-                </Link>
-              );
-            })}
+            {!isAdminPath ? (
+              <>
+                {SIDEBAR_ITEMS.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`
+                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
+                        ${
+                          isActive
+                            ? "bg-teal text-white shadow-lg shadow-teal/20"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        }
+                      `}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span className="font-bold text-sm uppercase tracking-widest">
+                          {item.name}
+                        </span>
+                      </div>
+                      {isActive && <ChevronRight size={16} />}
+                    </Link>
+                  );
+                })}
 
-            {user?.usertype?.includes("instructor") && (
-              <Link
-                href="/dashboard/instructor/progress"
-                className={`
-                  flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-teal/30
-                  ${
-                    pathname === "/dashboard/instructor/progress"
-                      ? "bg-teal text-white shadow-lg shadow-teal/20"
-                      : "text-teal hover:text-white hover:bg-teal/20"
-                  }
-                `}
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                <div className="flex items-center gap-3">
-                  <BookOpen size={20} />
-                  <span className="font-bold text-sm uppercase tracking-widest">
-                    Instructor Portal
+                {user?.usertype?.includes("instructor") && (
+                  <Link
+                    href="/dashboard/instructor/progress"
+                    className={`
+                      flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-teal/30
+                      ${
+                        pathname === "/dashboard/instructor/progress"
+                          ? "bg-teal text-white shadow-lg shadow-teal/20"
+                          : "text-teal hover:text-white hover:bg-teal/20"
+                      }
+                    `}
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <BookOpen size={20} />
+                      <span className="font-bold text-sm uppercase tracking-widest">
+                        Instructor Portal
+                      </span>
+                    </div>
+                    {pathname === "/dashboard/instructor/progress" && (
+                      <ChevronRight size={16} />
+                    )}
+                  </Link>
+                )}
+
+                {user?.usertype?.includes("platform") && (
+                  <Link
+                    href="/dashboard/admin/course-tracks"
+                    className="flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-blue-500/30 text-blue-400 hover:text-white hover:bg-blue-500/20"
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <ShieldCheck size={20} />
+                      <span className="font-bold text-sm uppercase tracking-widest">
+                        Admin Portal
+                      </span>
+                    </div>
+                    <ChevronRight size={16} />
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="px-4 py-2 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400/50">
+                    Admin Management
                   </span>
                 </div>
-                {pathname === "/dashboard/instructor/progress" && (
-                  <ChevronRight size={16} />
-                )}
-              </Link>
+                {ADMIN_SIDEBAR_ITEMS.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`
+                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
+                        ${
+                          isActive
+                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        }
+                      `}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span className="font-bold text-sm uppercase tracking-widest">
+                          {item.name}
+                        </span>
+                      </div>
+                      {isActive && <ChevronRight size={16} />}
+                    </Link>
+                  );
+                })}
+
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <ArrowLeft size={20} />
+                  <span className="font-bold text-sm uppercase tracking-widest">
+                    Exit Admin
+                  </span>
+                </Link>
+              </>
             )}
           </nav>
 
