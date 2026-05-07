@@ -6,9 +6,11 @@ export const trainingServiceUrl = "https://elearning.pathpalz.com/api/training";
 const setupInterceptors = (instance: any) => {
   instance.interceptors.request.use(
     (config: any) => {
-      const authToken = localStorage.getItem("authToken");
-      if (authToken) {
-        config.headers.Authorization = `Bearer ${authToken}`;
+      if (typeof window !== "undefined") {
+        const authToken = localStorage.getItem("authToken");
+        if (authToken) {
+          config.headers.Authorization = `Bearer ${authToken}`;
+        }
       }
       return config;
     },
@@ -23,7 +25,7 @@ const setupInterceptors = (instance: any) => {
     },
     async (error: any) => {
       const OriginalRequest = error.config;
-      if (error.response?.status === 401 && !OriginalRequest._retry) {
+      if (error.response?.status === 401 && !OriginalRequest._retry && typeof window !== "undefined") {
         OriginalRequest._retry = true;
         const refresh_token = localStorage.getItem("refreshToken");
         if (refresh_token) {

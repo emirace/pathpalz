@@ -1,12 +1,18 @@
 import React from "react";
 import TrackDetailClient from "@/components/training/TrackDetailClient";
 
+import { getTracks } from "@/services/training/tracks";
+
 export async function generateStaticParams() {
-  return [
-    { slug: "software-development" },
-    { slug: "data-ai" },
-    { slug: "devops" },
-  ];
+  try {
+    const tracks = await getTracks();
+    return tracks.map((track) => ({
+      slug: track.slug,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch tracks for generateStaticParams:", error);
+    return [];
+  }
 }
 
 export default function TrackDetailPage() {
