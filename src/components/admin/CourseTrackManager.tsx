@@ -182,7 +182,7 @@ export default function CourseTrackManager() {
       item ? "Edit Training Track" : "Create Training Track",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "slug", label: "Slug", type: "text", required: !item }, // Slug required on create
+        { name: "slug", label: "Slug", type: "text", required: !item, autoSlug: !item }, // Slug required on create
         { name: "description", label: "Description", type: "textarea", required: true },
         { name: "duration_weeks", label: "Duration (Weeks)", type: "number", required: true },
         { name: "price", label: "Price", type: "number", required: true },

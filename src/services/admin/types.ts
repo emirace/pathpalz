@@ -4,7 +4,7 @@ import {
   IType,
   ITypeCreatePayload,
   ITypeUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const createType = async (
   data: ITypeCreatePayload,

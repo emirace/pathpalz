@@ -8,7 +8,7 @@ import {
 import {
   ICourseModuleCreatePayload,
   ICourseModuleUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const useGetAllCourseModules = () => {
   return useQuery({

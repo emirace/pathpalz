@@ -6,7 +6,7 @@ import {
   deleteType,
   getAllTypes,
 } from "@/services/admin/types";
-import { ITypeCreatePayload, ITypeUpdatePayload } from "@/types/admin";
+import { ITypeCreatePayload, ITypeUpdatePayload } from "@/types/admin/admin";
 
 export const useGetAllTypes = () => {
   return useQuery({

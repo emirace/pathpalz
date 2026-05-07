@@ -4,7 +4,7 @@ import {
   ISubType,
   ISubTypeCreatePayload,
   ISubTypeUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const createSubType = async (
   data: ISubTypeCreatePayload,

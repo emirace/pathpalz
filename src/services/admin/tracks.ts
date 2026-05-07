@@ -4,7 +4,7 @@ import {
   IApiResponse,
   IAdminTrackCreatePayload,
   IAdminTrackUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const createTrainingTrack = async (
   data: IAdminTrackCreatePayload,

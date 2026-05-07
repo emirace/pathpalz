@@ -5,7 +5,10 @@ import {
   updateSubType,
   getAllSubTypes,
 } from "@/services/admin/type-subs";
-import { ISubTypeCreatePayload, ISubTypeUpdatePayload } from "@/types/admin";
+import {
+  ISubTypeCreatePayload,
+  ISubTypeUpdatePayload,
+} from "@/types/admin/admin";
 
 export const useGetAllSubTypes = () => {
   return useQuery({

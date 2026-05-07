@@ -4,7 +4,7 @@ import {
   ICourseModuleHeader,
   ICourseModuleHeaderCreatePayload,
   ICourseModuleHeaderUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const createCourseModuleHeader = async (
   data: ICourseModuleHeaderCreatePayload,

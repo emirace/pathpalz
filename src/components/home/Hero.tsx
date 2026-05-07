@@ -13,7 +13,7 @@ const Hero = () => {
           className="object-cover mix-blend-overlay"
           priority
           sizes="100vw"
-          quality={90}
+          quality={75}
         />
       </div>
 

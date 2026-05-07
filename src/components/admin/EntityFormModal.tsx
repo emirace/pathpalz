@@ -8,6 +8,7 @@ export interface IFormField {
   options?: { label: string; value: string | number }[];
   required?: boolean;
   placeholder?: string;
+  autoSlug?: boolean;
 }
 
 interface EntityFormModalProps {
@@ -53,16 +54,37 @@ export default function EntityFormModal({
 
   if (!isOpen) return null;
 
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev: any) => ({
-      ...prev,
-      [name]: type === "number" ? Number(value) : value,
-    }));
+    setFormData((prev: any) => {
+      const newData = {
+        ...prev,
+        [name]: type === "number" ? Number(value) : value,
+      };
+
+      // Auto-update slug if title changes and slug field is marked as autoSlug
+      if (name === "title") {
+        const slugField = fields.find((f) => f.name === "slug");
+        if (slugField?.autoSlug) {
+          newData.slug = slugify(value);
+        }
+      }
+
+      return newData;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -108,7 +130,7 @@ export default function EntityFormModal({
                     onChange={handleChange}
                     required={field.required}
                     placeholder={field.placeholder}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none min-h-[100px] resize-y"
+                    className="w-full px-4 py-3 bg-gray-50 border text-black border-gray-200 rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none min-h-[100px] resize-y"
                   />
                 ) : field.type === "select" ? (
                   <select
@@ -116,7 +138,7 @@ export default function EntityFormModal({
                     value={formData[field.name] || ""}
                     onChange={handleChange}
                     required={field.required}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none"
+                    className="w-full px-4 py-3 text-black bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none"
                   >
                     <option value="" disabled>
                       Select an option
@@ -135,7 +157,7 @@ export default function EntityFormModal({
                     onChange={handleChange}
                     required={field.required}
                     placeholder={field.placeholder}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 text-black rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none"
                   />
                 )}
               </div>

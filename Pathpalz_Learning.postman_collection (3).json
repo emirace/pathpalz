@@ -2529,6 +2529,798 @@
       ]
     },
     {
+      "name": "Instructor",
+      "item": [
+        {
+          "name": "Get-all-module-by-traning-track-id",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/tracks/2/modules",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "tracks",
+                "2",
+                "modules"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get-all-module-by-traning-track-id",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": ""
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/tracks/2/modules",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "tracks",
+                    "2",
+                    "modules"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "242"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Wed, 06 May 2026 19:39:53 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Modules fetched successfully\",\n    \"training_track\": {\n        \"id\": 2,\n        \"title\": \"Software Development\",\n        \"description\": \"Learn full stack software engineering from beginner to foundamental level.\"\n    },\n    \"modules\": [\n        {\n            \"id\": 1,\n            \"training_track_id\": 2,\n            \"type_id\": 1,\n            \"sub_type_id\": 1,\n            \"course_module_header_id\": 1,\n            \"title\": \"Datatypes and variables and array\",\n            \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n            \"updated_at\": \"2026-05-05T15:12:36.000000Z\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Instructor-upload-meeting-traning-link",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"course_video_url\": \"https://youtube.com/watch?v=test123\",\r\n  \"instructor_marked\": \"traning_link_uploaded\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "progress",
+                "instructor"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Instructor-upload-meeting-traning-link",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"course_video_url\": \"https://youtube.com/watch?v=test123\",\r\n  \"instructor_marked\": \"traning_link_uploaded\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "progress",
+                    "instructor"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "450"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Wed, 06 May 2026 20:26:20 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Module updated successfully\",\n    \"module\": {\n        \"id\": 1,\n        \"training_track_id\": 2,\n        \"type_id\": 1,\n        \"sub_type_id\": 1,\n        \"course_module_header_id\": 1,\n        \"title\": \"Datatypes and variables and array\",\n        \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n        \"updated_at\": \"2026-05-05T15:12:36.000000Z\",\n        \"track\": {\n            \"id\": 2,\n            \"title\": \"Software Development\",\n            \"slug\": \"trk_tr44vcghzfky\",\n            \"description\": \"Learn full stack software engineering from beginner to foundamental level.\",\n            \"duration_weeks\": 12,\n            \"price\": \"345.00\",\n            \"status\": \"open\",\n            \"created_at\": \"2026-05-05T05:17:00.000000Z\",\n            \"updated_at\": \"2026-05-05T05:17:28.000000Z\"\n        }\n    },\n    \"progress\": {\n        \"user_id\": 1,\n        \"training_track_id\": 2,\n        \"course_module_id\": 1,\n        \"module_title\": \"Datatypes and variables and array\",\n        \"course_video_url\": \"https://youtube.com/watch?v=test123\",\n        \"instructor_marked\": \"traning_link_uploaded\",\n        \"update_status_datetime\": [\n            {\n                \"status\": \"traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:26:20\"\n            }\n        ],\n        \"completed_at\": null,\n        \"updated_at\": \"2026-05-06T20:26:20.000000Z\",\n        \"created_at\": \"2026-05-06T20:26:20.000000Z\",\n        \"id\": 1\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Instructor-upload-recorded-link",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"course_video_url\": \"https://youtube.com/watch?v=test1234\",\r\n  \"instructor_marked\": \"recorded_traning_link_uploaded\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "progress",
+                "instructor"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Instructor-upload-recorded-link",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"course_video_url\": \"https://youtube.com/watch?v=test1234\",\r\n  \"instructor_marked\": \"recorded_traning_link_uploaded\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "progress",
+                    "instructor"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "485"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Wed, 06 May 2026 20:29:06 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Module updated successfully\",\n    \"module\": {\n        \"id\": 1,\n        \"training_track_id\": 2,\n        \"type_id\": 1,\n        \"sub_type_id\": 1,\n        \"course_module_header_id\": 1,\n        \"title\": \"Datatypes and variables and array\",\n        \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n        \"updated_at\": \"2026-05-05T15:12:36.000000Z\",\n        \"track\": {\n            \"id\": 2,\n            \"title\": \"Software Development\",\n            \"slug\": \"trk_tr44vcghzfky\",\n            \"description\": \"Learn full stack software engineering from beginner to foundamental level.\",\n            \"duration_weeks\": 12,\n            \"price\": \"345.00\",\n            \"status\": \"open\",\n            \"created_at\": \"2026-05-05T05:17:00.000000Z\",\n            \"updated_at\": \"2026-05-05T05:17:28.000000Z\"\n        }\n    },\n    \"progress\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"training_track_id\": 2,\n        \"course_module_id\": 1,\n        \"module_title\": \"Datatypes and variables and array\",\n        \"course_video_url\": \"https://youtube.com/watch?v=test1234\",\n        \"student_completed\": null,\n        \"instructor_marked\": \"recorded_traning_link_uploaded\",\n        \"update_status_datetime\": [\n            {\n                \"status\": \"traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:26:20\"\n            },\n            {\n                \"status\": \"recorded_traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:29:06\"\n            }\n        ],\n        \"completed_at\": null,\n        \"created_at\": \"2026-05-06T20:26:20.000000Z\",\n        \"updated_at\": \"2026-05-06T20:29:06.000000Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Instructor-mark-session-complete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"course_module_id\": 1,\r\n // \"course_video_url\": \"https://youtube.com/watch?v=test1234\",\r\n  \"instructor_marked\": \"completed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "progress",
+                "instructor"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Instructor-mark-session-complete",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"course_module_id\": 1,\r\n // \"course_video_url\": \"https://youtube.com/watch?v=test1234\",\r\n  \"instructor_marked\": \"completed\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/progress/instructor",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "progress",
+                    "instructor"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "462"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Wed, 06 May 2026 20:32:32 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Module updated successfully\",\n    \"module\": {\n        \"id\": 1,\n        \"training_track_id\": 2,\n        \"type_id\": 1,\n        \"sub_type_id\": 1,\n        \"course_module_header_id\": 1,\n        \"title\": \"Datatypes and variables and array\",\n        \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n        \"updated_at\": \"2026-05-05T15:12:36.000000Z\",\n        \"track\": {\n            \"id\": 2,\n            \"title\": \"Software Development\",\n            \"slug\": \"trk_tr44vcghzfky\",\n            \"description\": \"Learn full stack software engineering from beginner to foundamental level.\",\n            \"duration_weeks\": 12,\n            \"price\": \"345.00\",\n            \"status\": \"open\",\n            \"created_at\": \"2026-05-05T05:17:00.000000Z\",\n            \"updated_at\": \"2026-05-05T05:17:28.000000Z\"\n        }\n    },\n    \"progress\": {\n        \"id\": 1,\n        \"user_id\": 1,\n        \"training_track_id\": 2,\n        \"course_module_id\": 1,\n        \"module_title\": \"Datatypes and variables and array\",\n        \"course_video_url\": null,\n        \"student_completed\": null,\n        \"instructor_marked\": \"completed\",\n        \"update_status_datetime\": [\n            {\n                \"status\": \"traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:26:20\"\n            },\n            {\n                \"status\": \"recorded_traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:29:06\"\n            },\n            {\n                \"status\": \"recorded_traning_link_uploaded\",\n                \"updated_at\": \"2026-05-06 20:31:53\"\n            },\n            {\n                \"status\": \"completed\",\n                \"updated_at\": \"2026-05-06 20:32:32\"\n            }\n        ],\n        \"completed_at\": \"2026-05-06T20:32:32.000000Z\",\n        \"created_at\": \"2026-05-06T20:26:20.000000Z\",\n        \"updated_at\": \"2026-05-06T20:32:32.000000Z\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "Student-mark-attendance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"attended\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/mark",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "mark"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Student-mark-attendance",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"course_module_id\": 1,\r\n  \"attended\": true\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/mark",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "mark"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "140"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 07 May 2026 07:15:26 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Attendance marked successfully\",\n    \"data\": {\n        \"course_module_id\": 1,\n        \"user_id\": 1,\n        \"attended\": true,\n        \"updated_at\": \"2026-05-07T07:15:26.000000Z\",\n        \"created_at\": \"2026-05-07T07:15:26.000000Z\",\n        \"id\": 1\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get-Student-Attedance-Per-Module",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2F1dGgucGF0aHBhbHouY29tL2FwaS9sb2dpbi9vdHAiLCJpYXQiOjE3Nzc5MjAwMDMsImV4cCI6MTc3ODUyNDgwMywibmJmIjoxNzc3OTIwMDAzLCJqdGkiOiJDdlZqbmlPdDluSXoyYTlXIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJ1c2VydHlwZSI6WyJwbGF0Zm9ybSJdfQ.m91dv-WvtN2lGq9jMyrPSlNkDZ4nGLDQPso1kROOYUQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "https://elearning.pathpalz.com/api/training/module/1",
+              "protocol": "https",
+              "host": [
+                "elearning",
+                "pathpalz",
+                "com"
+              ],
+              "path": [
+                "api",
+                "training",
+                "module",
+                "1"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Get-Student-Attedance-Per-Module",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "https://elearning.pathpalz.com/api/training/module/1",
+                  "protocol": "https",
+                  "host": [
+                    "elearning",
+                    "pathpalz",
+                    "com"
+                  ],
+                  "path": [
+                    "api",
+                    "training",
+                    "module",
+                    "1"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": ":status",
+                  "value": 200
+                },
+                {
+                  "key": "cache-control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "access-control-allow-origin",
+                  "value": "*"
+                },
+                {
+                  "key": "content-length",
+                  "value": "290"
+                },
+                {
+                  "key": "content-encoding",
+                  "value": "br"
+                },
+                {
+                  "key": "vary",
+                  "value": "Accept-Encoding"
+                },
+                {
+                  "key": "date",
+                  "value": "Thu, 07 May 2026 07:20:34 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "LiteSpeed"
+                },
+                {
+                  "key": "alt-svc",
+                  "value": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\""
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"total_students\": 1,\n    \"module\": {\n        \"id\": 1,\n        \"training_track_id\": 2,\n        \"type_id\": 1,\n        \"sub_type_id\": 1,\n        \"course_module_header_id\": 1,\n        \"title\": \"Datatypes and variables and array\",\n        \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n        \"updated_at\": \"2026-05-05T15:12:36.000000Z\"\n    },\n    \"attendance\": [\n        {\n            \"id\": 1,\n            \"course_module_id\": 1,\n            \"user_id\": 1,\n            \"attended\": true,\n            \"created_at\": \"2026-05-07T07:15:26.000000Z\",\n            \"updated_at\": \"2026-05-07T07:15:26.000000Z\",\n            \"user\": {\n                \"id\": 1,\n                \"external_id\": \"6\",\n                \"email\": \"info@pathpalz.com\",\n                \"first_name\": null,\n                \"last_name\": null,\n                \"usertype\": [\n                    \"user\"\n                ],\n                \"created_at\": \"2026-05-05T05:04:04.000000Z\",\n                \"updated_at\": \"2026-05-05T05:04:04.000000Z\"\n            },\n            \"module\": {\n                \"id\": 1,\n                \"training_track_id\": 2,\n                \"type_id\": 1,\n                \"sub_type_id\": 1,\n                \"course_module_header_id\": 1,\n                \"title\": \"Datatypes and variables and array\",\n                \"created_at\": \"2026-05-05T15:11:12.000000Z\",\n                \"updated_at\": \"2026-05-05T15:12:36.000000Z\"\n            }\n        }\n    ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Enquiry",
       "request": {
         "method": "POST",
@@ -4594,6 +5386,14 @@
           "body": "{\n    \"message\": \"Instructor account created successfully.\",\n    \"data\": {\n        \"phone_number\": \"+447911123456\",\n        \"email\": \"john.instructor@pathpalz.com\",\n        \"usertype\": [\n            \"instructor\"\n        ],\n        \"updated_at\": \"2026-05-04T18:48:24.000000Z\",\n        \"created_at\": \"2026-05-04T18:48:24.000000Z\",\n        \"id\": 193\n    }\n}"
         }
       ]
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
     }
   ]
 }

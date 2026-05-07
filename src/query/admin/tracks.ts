@@ -7,7 +7,7 @@ import {
 import {
   IAdminTrackCreatePayload,
   IAdminTrackUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const useCreateTrainingTrack = () => {
   const queryClient = useQueryClient();

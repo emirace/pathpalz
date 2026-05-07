@@ -8,7 +8,7 @@ import {
 import {
   ICourseModuleHeaderCreatePayload,
   ICourseModuleHeaderUpdatePayload,
-} from "@/types/admin";
+} from "@/types/admin/admin";
 
 export const useGetAllCourseModuleHeaders = () => {
   return useQuery({
