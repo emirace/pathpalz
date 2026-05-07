@@ -42,3 +42,14 @@ export const getAllCourseModuleHeaders = async (): Promise<
   const response = await trainingClient.get("/admin/course-module-headers");
   return response.data;
 };
+
+export const getSubTypeModuleHeaders = async ({
+  sub_type_id,
+}: {
+  sub_type_id: string;
+}): Promise<IApiResponse<ICourseModuleHeader[]>> => {
+  const response = await trainingClient.get(
+    `/course-module-headers/sub-type/${sub_type_id}`,
+  );
+  return response.data;
+};

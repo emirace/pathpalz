@@ -37,3 +37,14 @@ export const getAllCourseModules = async (): Promise<
   const response = await trainingClient.get("/admin/course-modules");
   return response.data;
 };
+
+export const getHeaderModules = async ({
+  header_id,
+}: {
+  header_id: string;
+}): Promise<IApiResponse<ICourseModule[]>> => {
+  const response = await trainingClient.get(
+    `/course-modules/header/${header_id}`,
+  );
+  return response.data;
+};

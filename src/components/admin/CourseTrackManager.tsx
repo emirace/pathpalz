@@ -8,23 +8,23 @@ import {
   useDeleteTrainingTrack,
 } from "@/query/admin/tracks";
 import {
-  useGetAllTypes,
+  useGetAllTrackTypes,
   useCreateType,
   useUpdateType,
   useDeleteType,
 } from "@/query/admin/types";
 import {
-  useGetAllSubTypes,
+  useGetTypeSubTypes,
   useCreateSubType,
   useUpdateSubType,
 } from "@/query/admin/type-subs";
 import {
-  useGetAllCourseModuleHeaders,
+  useGetSubTypeModuleHeaders,
   useCreateCourseModuleHeader,
   useUpdateCourseModuleHeader,
 } from "@/query/admin/course-module-headers";
 import {
-  useGetAllCourseModules,
+  useGetHeaderModules,
   useCreateCourseModule,
   useUpdateCourseModule,
 } from "@/query/admin/course-modules";
@@ -79,10 +79,19 @@ export default function CourseTrackManager() {
 
   // Queries
   const { data: tracks = [], isLoading: loadingTracks } = useGetTracks();
-  const { data: typesRes, isLoading: loadingTypes } = useGetAllTypes();
-  const { data: subTypesRes, isLoading: loadingSubTypes } = useGetAllSubTypes();
-  const { data: headersRes, isLoading: loadingHeaders } = useGetAllCourseModuleHeaders();
-  const { data: modulesRes, isLoading: loadingModules } = useGetAllCourseModules();
+  const { data: typesRes, isLoading: loadingTypes } = useGetAllTrackTypes({
+    track_id: String(selectedTrackId || ""),
+  });
+  const { data: subTypesRes, isLoading: loadingSubTypes } = useGetTypeSubTypes({
+    type_id: String(selectedTypeId || ""),
+  });
+  const { data: headersRes, isLoading: loadingHeaders } =
+    useGetSubTypeModuleHeaders({
+      sub_type_id: String(selectedSubTypeId || ""),
+    });
+  const { data: modulesRes, isLoading: loadingModules } = useGetHeaderModules({
+    header_id: String(selectedHeaderId || ""),
+  });
 
   const types = typesRes?.data || [];
   const subTypes = subTypesRes?.data || [];
@@ -107,11 +116,11 @@ export default function CourseTrackManager() {
   const createModule = useCreateCourseModule();
   const updateModule = useUpdateCourseModule();
 
-  // --- Filtering Data for Current Level ---
-  const currentTypes = types.filter((t: any) => t.training_track_id === selectedTrackId);
-  const currentSubTypes = subTypes.filter((s: any) => s.type_id === selectedTypeId);
-  const currentHeaders = headers.filter((h: any) => h.sub_type_id === selectedSubTypeId);
-  const currentModules = modules.filter((m: any) => m.course_module_header_id === selectedHeaderId);
+  // --- Data for Current Level ---
+  const currentTypes = types;
+  const currentSubTypes = subTypes;
+  const currentHeaders = headers;
+  const currentModules = modules;
 
   // --- Navigation ---
   const handleNavigate = (
@@ -214,6 +223,7 @@ export default function CourseTrackManager() {
       item ? "Edit Type" : "Create Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
+        { name: "price", label: "Price", type: "number", required: true },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -234,6 +244,7 @@ export default function CourseTrackManager() {
       item ? "Edit Sub Type" : "Create Sub Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
+        { name: "price", label: "Price", type: "number", required: true },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,

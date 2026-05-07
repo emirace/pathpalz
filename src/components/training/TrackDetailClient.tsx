@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useGetTracks, useGetTrackById } from "@/query/training/tracks";
 import { useCheckout } from "@/query/training/payments";
 import { useGetUser } from "@/query/auth";
@@ -135,7 +135,6 @@ const TRACK_CURRICULUM: Record<
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
-  const router = useRouter();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [guestData, setGuestData] = useState({ fullName: "", email: "" });
@@ -148,7 +147,7 @@ export default function TrackDetailClient() {
   }, [tracks, slug]);
 
   const { data: track, isLoading: isTrackLoading } = useGetTrackById(
-    foundTrack?.id || "",
+    foundTrack?.slug || "",
   );
 
   const checkoutMutation = useCheckout();

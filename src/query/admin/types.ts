@@ -5,6 +5,7 @@ import {
   updateType,
   deleteType,
   getAllTypes,
+  getTrackTypes,
 } from "@/services/admin/types";
 import { ITypeCreatePayload, ITypeUpdatePayload } from "@/types/admin/admin";
 
@@ -57,5 +58,13 @@ export const useDeleteType = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-types"] });
     },
+  });
+};
+
+export const useGetAllTrackTypes = ({ track_id }: { track_id: string }) => {
+  return useQuery({
+    queryKey: ["admin-types", track_id],
+    queryFn: () => getTrackTypes({ track_id }),
+    enabled: !!track_id,
   });
 };
