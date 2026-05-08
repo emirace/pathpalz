@@ -39,3 +39,12 @@ export const getAllTypes = async (): Promise<IApiResponse<IType[]>> => {
   const response = await trainingClient.get("/admin/types");
   return response.data;
 };
+
+export const getTrackTypes = async ({
+  track_id,
+}: {
+  track_id: string;
+}): Promise<IApiResponse<IType[]>> => {
+  const response = await trainingClient.get(`/types/track/${track_id}`);
+  return response.data;
+};

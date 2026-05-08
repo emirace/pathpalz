@@ -4,6 +4,7 @@ import {
   getCourseModuleHeaderById,
   updateCourseModuleHeader,
   getAllCourseModuleHeaders,
+  getSubTypeModuleHeaders,
 } from "@/services/admin/course-module-headers";
 import {
   ICourseModuleHeaderCreatePayload,
@@ -56,5 +57,17 @@ export const useUpdateCourseModuleHeader = () => {
         queryKey: ["admin-course-module-header", variables.id],
       });
     },
+  });
+};
+
+export const useGetSubTypeModuleHeaders = ({
+  sub_type_id,
+}: {
+  sub_type_id: string;
+}) => {
+  return useQuery({
+    queryKey: ["admin-course-module-headers", sub_type_id],
+    queryFn: () => getSubTypeModuleHeaders({ sub_type_id }),
+    enabled: !!sub_type_id,
   });
 };

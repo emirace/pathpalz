@@ -201,13 +201,23 @@ const LearningTracks = ({}: LearningTracksProps) => {
 
                 {/* Price & CTA */}
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                  <span
-                    className={`text-2xl font-extrabold font-manrope ${
-                      isOpen ? "text-[#00284F]" : "text-[#737781]"
-                    }`}
-                  >
-                    £{parseInt(track.price)}
-                  </span>
+                  {parseInt(track.price) > 0 ? (
+                    <span
+                      className={`text-2xl font-extrabold font-manrope ${
+                        isOpen ? "text-[#00284F]" : "text-[#737781]"
+                      }`}
+                    >
+                      £{parseInt(track.price)}
+                    </span>
+                  ) : (
+                    <span
+                      className={` font-extrabold font-manrope ${
+                        isOpen ? "text-[#00284F]" : "text-[#737781]"
+                      }`}
+                    >
+                      View details
+                    </span>
+                  )}
 
                   <Link
                     href={`/training/${track.slug}`}

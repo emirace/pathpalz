@@ -4,6 +4,7 @@ import {
   getSubTypeById,
   updateSubType,
   getAllSubTypes,
+  getTypeSubTypes,
 } from "@/services/admin/type-subs";
 import {
   ISubTypeCreatePayload,
@@ -51,5 +52,13 @@ export const useUpdateSubType = () => {
         queryKey: ["admin-type-sub", variables.id],
       });
     },
+  });
+};
+
+export const useGetTypeSubTypes = ({ type_id }: { type_id: string }) => {
+  return useQuery({
+    queryKey: ["admin-type-subs", type_id],
+    queryFn: () => getTypeSubTypes({ type_id }),
+    enabled: !!type_id,
   });
 };

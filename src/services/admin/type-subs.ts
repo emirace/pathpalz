@@ -32,3 +32,12 @@ export const getAllSubTypes = async (): Promise<IApiResponse<ISubType[]>> => {
   const response = await trainingClient.get("/admin/type-subs");
   return response.data;
 };
+
+export const getTypeSubTypes = async ({
+  type_id,
+}: {
+  type_id: string;
+}): Promise<IApiResponse<ISubType[]>> => {
+  const response = await trainingClient.get(`/type-subs/type/${type_id}`);
+  return response.data;
+};

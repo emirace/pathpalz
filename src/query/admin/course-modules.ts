@@ -4,6 +4,7 @@ import {
   getCourseModuleById,
   updateCourseModule,
   getAllCourseModules,
+  getHeaderModules,
 } from "@/services/admin/course-modules";
 import {
   ICourseModuleCreatePayload,
@@ -51,5 +52,13 @@ export const useUpdateCourseModule = () => {
         queryKey: ["admin-course-module", variables.id],
       });
     },
+  });
+};
+
+export const useGetHeaderModules = ({ header_id }: { header_id: string }) => {
+  return useQuery({
+    queryKey: ["admin-course-modules", header_id],
+    queryFn: () => getHeaderModules({ header_id }),
+    enabled: !!header_id,
   });
 };
