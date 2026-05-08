@@ -9,20 +9,22 @@ const tutors = [
     name: "Sarah Chen",
     role: "PRINCIPAL ENGINEER",
     bio: "Ex-Google Senior Architect with 12+ years experience in distributed systems and cloud infrastructure.",
-    image: "/images/tutors/sarah.png",
+    image: "/tutor1.png",
   },
   {
     name: "Marcus Rodriguez",
     role: "MOBILE DEVELOPER",
     bio: "Passionate about design systems and frontend performance. Contributor to major open-source UI libraries.",
-    image: "/images/tutors/marcus.png",
+    image: "/tutor2.png",
   },
 ];
 
 export default function TutorSection() {
   return (
     <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-10">
-      <h3 className="text-2xl font-bold text-[#00284F] font-manrope">Meet Your Tutors</h3>
+      <h3 className="text-2xl font-bold text-[#00284F] font-manrope">
+        Meet Your Tutors
+      </h3>
 
       <div className="space-y-12">
         {tutors.map((tutor, index) => (
@@ -66,7 +68,9 @@ export default function TutorSection() {
       </div>
 
       <div className="pt-6 space-y-4 text-center">
-        <p className="text-xs text-gray-400 font-bold">Ready to learn from the best?</p>
+        <p className="text-xs text-gray-400 font-bold">
+          Ready to learn from the best?
+        </p>
         <button className="w-full py-4 bg-[#00284F] text-white rounded-xl font-bold hover:bg-[#00284F]/90 transition-all shadow-xl shadow-[#00284F]/20 active:scale-[0.98]">
           Apply for a track
         </button>
