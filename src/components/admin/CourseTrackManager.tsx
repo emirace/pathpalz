@@ -59,7 +59,9 @@ export default function CourseTrackManager() {
   // Selection states
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null);
-  const [selectedSubTypeId, setSelectedSubTypeId] = useState<number | null>(null);
+  const [selectedSubTypeId, setSelectedSubTypeId] = useState<number | null>(
+    null,
+  );
   const [selectedHeaderId, setSelectedHeaderId] = useState<number | null>(null);
 
   // Modal State
@@ -127,12 +129,16 @@ export default function CourseTrackManager() {
     nextLevel: Level,
     id: number | string,
     name: string,
-    parentId?: number
+    level: Level,
   ) => {
     setLevel(nextLevel);
     setBreadcrumbs((prev) => [
       ...prev,
-      { id, name, level: nextLevel === "TYPES" ? "TRACKS" : prev[prev.length - 1].level },
+      {
+        id,
+        name,
+        level,
+      },
     ]);
 
     if (nextLevel === "TYPES") setSelectedTrackId(id as number);
@@ -142,9 +148,12 @@ export default function CourseTrackManager() {
   };
 
   const handleBreadcrumbClick = (bcIndex: number) => {
+    console.log(bcIndex, breadcrumbs);
     const targetLevel = breadcrumbs[bcIndex].level;
     const newBreadcrumbs = breadcrumbs.slice(0, bcIndex);
+    console.log("new", newBreadcrumbs);
     setBreadcrumbs(newBreadcrumbs);
+    console.log("level", targetLevel);
     setLevel(targetLevel);
 
     // Reset subsequent selections
@@ -176,7 +185,7 @@ export default function CourseTrackManager() {
     title: string,
     fields: IFormField[],
     initialData: any,
-    onSubmit: (data: any) => void
+    onSubmit: (data: any) => void,
   ) => {
     setModalConfig({ isOpen: true, title, fields, initialData, onSubmit });
   };
@@ -191,10 +200,26 @@ export default function CourseTrackManager() {
       item ? "Edit Training Track" : "Create Training Track",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "slug", label: "Slug", type: "text", required: !item, autoSlug: !item }, // Slug required on create
-        { name: "description", label: "Description", type: "textarea", required: true },
-        { name: "duration_weeks", label: "Duration (Weeks)", type: "number", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
+        {
+          name: "slug",
+          label: "Slug",
+          type: "text",
+          required: !item,
+          autoSlug: !item,
+        }, // Slug required on create
+        {
+          name: "description",
+          label: "Description",
+          type: "textarea",
+          required: true,
+        },
+        {
+          name: "duration_weeks",
+          label: "Duration (Weeks)",
+          type: "number",
+          required: true,
+        },
+        { name: "price", label: "Price", type: "number" },
         {
           name: "status",
           label: "Status",
@@ -213,7 +238,7 @@ export default function CourseTrackManager() {
           await createTrack.mutateAsync(data);
         }
         closeModal();
-      }
+      },
     );
   };
 
@@ -223,7 +248,7 @@ export default function CourseTrackManager() {
       item ? "Edit Type" : "Create Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
+        { name: "price", label: "Price", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -231,10 +256,13 @@ export default function CourseTrackManager() {
         if (item) {
           await updateType.mutateAsync({ id: item.id, data });
         } else {
-          await createType.mutateAsync({ ...data, training_track_id: selectedTrackId });
+          await createType.mutateAsync({
+            ...data,
+            training_track_id: selectedTrackId,
+          });
         }
         closeModal();
-      }
+      },
     );
   };
 
@@ -259,7 +287,7 @@ export default function CourseTrackManager() {
           });
         }
         closeModal();
-      }
+      },
     );
   };
 
@@ -281,7 +309,7 @@ export default function CourseTrackManager() {
           });
         }
         closeModal();
-      }
+      },
     );
   };
 
@@ -304,7 +332,7 @@ export default function CourseTrackManager() {
           });
         }
         closeModal();
-      }
+      },
     );
   };
 
@@ -333,7 +361,9 @@ export default function CourseTrackManager() {
             <button
               onClick={() => handleBreadcrumbClick(index)}
               className={`hover:text-teal transition-colors whitespace-nowrap ${
-                index === breadcrumbs.length - 1 ? "text-[#00284F] font-bold" : ""
+                index === breadcrumbs.length - 1
+                  ? "text-[#00284F] font-bold"
+                  : ""
               }`}
             >
               {bc.name}
@@ -349,7 +379,7 @@ export default function CourseTrackManager() {
     icon: React.ReactNode,
     onEdit: () => void,
     onDelete?: () => void,
-    onNavigate?: () => void
+    onNavigate?: () => void,
   ) => {
     return (
       <div
@@ -384,13 +414,23 @@ export default function CourseTrackManager() {
             )}
           </div>
         </div>
-
-        <h3 className="text-lg font-bold text-[#00284F] line-clamp-1">{item.title}</h3>
-        {item.description && (
-          <p className="text-sm text-gray-500 mt-2 line-clamp-2">
-            {item.description}
-          </p>
-        )}
+        <div className="flex gap-4 items-center justify-between w-full">
+          <div>
+            <h3 className="text-lg font-bold text-[#00284F] line-clamp-1">
+              {item.title}
+            </h3>
+            {item.description && (
+              <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+                {item.description}
+              </p>
+            )}
+          </div>
+          {onNavigate && (
+            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <ChevronRight size={24} className="text-gray-300" />
+            </div>
+          )}
+        </div>
 
         {item.price && (
           <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
@@ -398,12 +438,6 @@ export default function CourseTrackManager() {
             <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
               {item.status}
             </span>
-          </div>
-        )}
-
-        {onNavigate && (
-          <div className="absolute inset-y-0 right-4 flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <ChevronRight size={24} className="text-gray-300" />
           </div>
         )}
       </div>
@@ -462,8 +496,8 @@ export default function CourseTrackManager() {
                 <Folder size={20} />,
                 () => openTrackModal(track),
                 () => deleteTrack.mutate(track.slug),
-                () => handleNavigate("TYPES", track.id, track.title)
-              )
+                () => handleNavigate("TYPES", track.id, track.title, "TRACKS"),
+              ),
             )}
 
           {level === "TYPES" &&
@@ -473,8 +507,8 @@ export default function CourseTrackManager() {
                 <Layers size={20} />,
                 () => openTypeModal(type),
                 () => deleteType.mutate(type.id),
-                () => handleNavigate("SUB_TYPES", type.id, type.title)
-              )
+                () => handleNavigate("SUB_TYPES", type.id, type.title, "TYPES"),
+              ),
             )}
 
           {level === "SUB_TYPES" &&
@@ -484,8 +518,14 @@ export default function CourseTrackManager() {
                 <LayoutGrid size={20} />,
                 () => openSubTypeModal(subType),
                 undefined, // Assuming no delete subtype endpoint yet
-                () => handleNavigate("HEADERS", subType.id, subType.title)
-              )
+                () =>
+                  handleNavigate(
+                    "HEADERS",
+                    subType.id,
+                    subType.title,
+                    "SUB_TYPES",
+                  ),
+              ),
             )}
 
           {level === "HEADERS" &&
@@ -495,17 +535,16 @@ export default function CourseTrackManager() {
                 <FileText size={20} />,
                 () => openHeaderModal(header),
                 undefined,
-                () => handleNavigate("MODULES", header.id, header.title)
-              )
+                () =>
+                  handleNavigate("MODULES", header.id, header.title, "HEADERS"),
+              ),
             )}
 
           {level === "MODULES" &&
             currentModules.map((module: any) =>
-              renderCard(
-                module,
-                <BookOpen size={20} />,
-                () => openModuleModal(module)
-              )
+              renderCard(module, <BookOpen size={20} />, () =>
+                openModuleModal(module),
+              ),
             )}
         </div>
 

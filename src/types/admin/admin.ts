@@ -25,9 +25,10 @@ export interface IType {
   training_track_id: number;
   title: string;
   description: string;
+  price: string;
   created_at: string;
   updated_at: string;
-  sub_types?: any[];
+  sub_types?: ISubType[];
 }
 
 export interface ITypeCreatePayload {
@@ -50,6 +51,7 @@ export interface ISubType {
   type_id: number;
   title: string;
   description: string;
+  price: string;
   created_at: string;
   updated_at: string;
   type?: IType;

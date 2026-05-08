@@ -12,126 +12,16 @@ import {
   BarChart,
   ShieldCheck,
   Users,
-  Zap,
   ArrowRight,
-  BookOpen,
   X,
 } from "lucide-react";
 import Link from "next/link";
-
-const TRACK_CURRICULUM: Record<
-  string,
-  { modules: { title: string; topics: string[] }[] }
-> = {
-  "software-development": {
-    modules: [
-      {
-        title: "Foundations of the Web",
-        topics: [
-          "HTML5 Semantic Structure",
-          "Advanced CSS & Grid/Flexbox",
-          "Responsive Design Patterns",
-        ],
-      },
-      {
-        title: "Javascript Masterclass",
-        topics: [
-          "Asynchronous Programming",
-          "ES6+ Features",
-          "DOM Manipulation & Events",
-        ],
-      },
-      {
-        title: "Modern Frontend (React)",
-        topics: [
-          "Component Architecture",
-          "State Management (Ref, Context)",
-          "Hooks & Performance",
-        ],
-      },
-      {
-        title: "Backend & Systems",
-        topics: [
-          "Node.js & Express",
-          "Database Design (SQL/NoSQL)",
-          "API Development & Security",
-        ],
-      },
-    ],
-  },
-  "data-ai": {
-    modules: [
-      {
-        title: "Mathematics for Data Science",
-        topics: [
-          "Statistics & Probability",
-          "Linear Algebra Foundations",
-          "Calculus for Machine Learning",
-        ],
-      },
-      {
-        title: "Python for Data Analysis",
-        topics: [
-          "Pandas & NumPy Deep Dive",
-          "Data Cleaning Techniques",
-          "Exploratory Data Analysis",
-        ],
-      },
-      {
-        title: "Machine Learning Models",
-        topics: [
-          "Regression & Classification",
-          "Clustering Algorithms",
-          "Neural Networks Basics",
-        ],
-      },
-      {
-        title: "AI Deployment",
-        topics: [
-          "Model Evaluation",
-          "MLOps Foundations",
-          "Integrating AI into Products",
-        ],
-      },
-    ],
-  },
-  devops: {
-    modules: [
-      {
-        title: "Inftastructure as Code",
-        topics: [
-          "Terraform Foundations",
-          "Cloud Provider Mastery (AWS/GCP)",
-          "Network Security",
-        ],
-      },
-      {
-        title: "Containerization",
-        topics: [
-          "Docker Deep Dive",
-          "Kubernetes Orchestration",
-          "Microservices Patterns",
-        ],
-      },
-      {
-        title: "CI/CD Pipelines",
-        topics: [
-          "GitHub Actions",
-          "Jenkins & Automation",
-          "Blue/Green Deployments",
-        ],
-      },
-      {
-        title: "Monitoring & Reliability",
-        topics: [
-          "Prometheus & Grafana",
-          "Site Reliability Engineering",
-          "Log Management",
-        ],
-      },
-    ],
-  },
-};
+import TrainingPaths from "./TrainingPaths/index.ts";
+import SpecializedTracks from "./SpecializedTracks";
+import { useGetAllTrackTypes } from "@/query/admin/types";
+import { useGetTypeSubTypes } from "@/query/admin/type-subs";
+import Curriculum from "../Curriculum";
+import TutorSection from "../TutorSection";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
@@ -150,36 +40,21 @@ export default function TrackDetailClient() {
     foundTrack?.slug || "",
   );
 
-  const checkoutMutation = useCheckout();
+  const { data: typesRes } = useGetAllTrackTypes({
+    track_id: String(track?.id || ""),
+  });
+  const types = typesRes?.data || [];
 
-  const curriculum = useMemo(() => {
-    return (
-      TRACK_CURRICULUM[slug as string] || {
-        modules: [
-          {
-            title: "Fundamentals",
-            topics: [
-              "Core Concepts",
-              "Standard Practices",
-              "Introduction to Tools",
-            ],
-          },
-          {
-            title: "Intermediate Skills",
-            topics: ["Project Work", "Best Practices", "Complexity Management"],
-          },
-          {
-            title: "Professional Excellence",
-            topics: [
-              "Industry Standards",
-              "Advanced Techniques",
-              "Final Capstone",
-            ],
-          },
-        ],
-      }
-    );
-  }, [slug]);
+  const specializedType = types.find((t) =>
+    t.title.toLowerCase().includes("specialized"),
+  );
+
+  const { data: subTypesRes } = useGetTypeSubTypes({
+    type_id: String(specializedType?.id || ""),
+  });
+  const specializedSubTypes = subTypesRes?.data?.[0];
+
+  const checkoutMutation = useCheckout();
 
   if (isTracksLoading || (foundTrack && isTrackLoading)) {
     return (
@@ -249,7 +124,7 @@ export default function TrackDetailClient() {
   const isOpen = track.status === "open";
 
   return (
-    <div className="min-h-screen bg-[#F3F3F8] flex flex-col">
+    <div className="min-h-screen bg-[#F7F9FC] flex flex-col">
       {/* Hero Section */}
       <section className="bg-[#00284F] text-white pt-32 pb-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-teal/20 to-transparent pointer-events-none" />
@@ -316,11 +191,13 @@ export default function TrackDetailClient() {
               <div className="space-y-6">
                 <div className="flex justify-between items-center pb-6 border-b border-gray-100">
                   <span className="text-gray-500 font-medium">
-                    Standard Price
+                    Foundational and Specialized Track
                   </span>
-                  <span className="text-4xl font-extrabold font-manrope">
-                    £{parseInt(track.price)}
-                  </span>
+                  {parseInt(track.price) > 0 && (
+                    <span className="text-4xl font-extrabold font-manrope">
+                      £{parseInt(track.price)}
+                    </span>
+                  )}
                 </div>
 
                 <ul className="space-y-4">
@@ -356,50 +233,28 @@ export default function TrackDetailClient() {
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-          {/* Left: Curriculum & Modules */}
-          <div className="lg:col-span-2 space-y-12">
-            <div>
-              <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
-                <BookOpen className="w-8 h-8 text-teal" />
-                Learning Curriculum
-              </h2>
+      {/* Training Paths Section */}
+      <TrainingPaths trackId={String(track.id)} trackTitle={track.title} />
 
-              <div className="space-y-4">
-                {curriculum.modules.map((module, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-8 h-8 rounded-full bg-teal/10 text-teal flex items-center justify-center font-bold text-sm">
-                        {idx + 1}
-                      </div>
-                      <h3 className="text-xl font-bold text-[#00284F]">
-                        {module.title}
-                      </h3>
-                    </div>
-                    <div className="pl-12 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {module.topics.map((topic, tidx) => (
-                        <div
-                          key={tidx}
-                          className="flex items-center gap-2 text-gray-500 text-sm"
-                        >
-                          <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-                          {topic}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+      <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
+          {/* Left: Curriculum & Modules */}
+          <div className="lg:col-span-3 space-y-12">
+            {/* Specialized Tracks Section */}
+            <div className="lg:col-span-2 ">
+              <SpecializedTracks trackId={String(track.id)} />
             </div>
 
             <div>
               <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
-                <Zap className="w-8 h-8 text-teal" />
+                Curriculum Deep Dive
+              </h2>
+
+              <Curriculum subTypeId={String(specializedSubTypes?.id || "")} />
+            </div>
+
+            <div>
+              <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
                 What you'll achieve
               </h2>
               <div className="bg-white rounded-3xl p-10 border border-gray-100 relative overflow-hidden">
@@ -447,6 +302,9 @@ export default function TrackDetailClient() {
 
           {/* Right: Sidebar / Info */}
           <div className="space-y-8">
+            {/* Tutor */}
+            <TutorSection />
+
             <div className="bg-teal p-8 rounded-3xl text-white">
               <h3 className="text-xl font-bold mb-4">
                 Questions about this track?
