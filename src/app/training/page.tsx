@@ -41,10 +41,7 @@ export default function TrainingPage() {
       <PathToMastery />
       <HighPerformanceRhythm />
       <SupportSystem />
-      <TransparentPricing
-        onApply={(trackId) => handleAuthRedirect("apply", trackId)}
-        onWaitlist={(trackId) => handleAuthRedirect("waitlist", trackId)}
-      />
+      <TransparentPricing />
       <ReadyToStart onApply={() => handleAuthRedirect("apply")} />
       <FAQ />
     </div>

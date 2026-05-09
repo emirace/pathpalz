@@ -28,6 +28,10 @@ export default function TrackDetailClient() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [guestData, setGuestData] = useState({ fullName: "", email: "" });
+  const [selectedItem, setSelectedItem] = useState<{
+    type: "training_track" | "type" | "sub_type";
+    id: number;
+  } | null>(null);
 
   const { data: user } = useGetUser();
   const { data: tracks, isLoading: isTracksLoading } = useGetTracks();
@@ -77,13 +81,13 @@ export default function TrackDetailClient() {
     );
   }
 
-  const handleApply = () => {
+  const handleApply = (
+    itemType: "training_track" | "type" | "sub_type",
+    itemId: number,
+  ) => {
+    setSelectedItem({ type: itemType, id: itemId });
     if (user) {
-      if (track.status === "open") {
-        setIsPaymentModalOpen(true);
-      } else {
-        setIsPaymentModalOpen(true);
-      }
+      setIsPaymentModalOpen(true);
     } else {
       setIsGuestModalOpen(true);
     }
@@ -97,9 +101,13 @@ export default function TrackDetailClient() {
   };
 
   const handleGatewaySelect = (gateway: "stripe" | "paystack") => {
+    if (!selectedItem) return;
+
     checkoutMutation.mutate(
       {
         track_id: track.id,
+        item_type: selectedItem.type,
+        item_id: selectedItem.id,
         gateway,
         ...(!user
           ? { email: guestData.email, full_name: guestData.fullName }
@@ -215,7 +223,7 @@ export default function TrackDetailClient() {
                 </ul>
 
                 <button
-                  onClick={handleApply}
+                  onClick={() => handleApply("training_track", track.id)}
                   className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
                 >
                   {isOpen ? "Apply for this path" : "Join the Waitlist"}
@@ -234,7 +242,11 @@ export default function TrackDetailClient() {
       </section>
 
       {/* Training Paths Section */}
-      <TrainingPaths trackId={String(track.id)} trackTitle={track.title} />
+      <TrainingPaths
+        trackId={String(track.id)}
+        trackTitle={track.title}
+        onApply={handleApply}
+      />
 
       <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
@@ -242,7 +254,10 @@ export default function TrackDetailClient() {
           <div className="lg:col-span-3 space-y-12">
             {/* Specialized Tracks Section */}
             <div className="lg:col-span-2 ">
-              <SpecializedTracks trackId={String(track.id)} />
+              <SpecializedTracks
+                trackId={String(track.id)}
+                onApply={handleApply}
+              />
             </div>
 
             <div>
@@ -250,7 +265,11 @@ export default function TrackDetailClient() {
                 Curriculum Deep Dive
               </h2>
 
-              <Curriculum subTypeId={String(specializedSubTypes?.id || "")} />
+              <Curriculum
+                subTypeId={String(specializedSubTypes?.id || "")}
+                subType={specializedSubTypes}
+                onApply={handleApply}
+              />
             </div>
 
             <div>

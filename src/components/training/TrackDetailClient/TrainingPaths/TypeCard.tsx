@@ -2,7 +2,15 @@ import { useGetTypeSubTypes } from "@/query/admin/type-subs";
 import { IType } from "@/types/admin/admin";
 import { CheckCircle2, ChevronRight, GraduationCap, Award } from "lucide-react";
 
-const TypeCard = ({ type, index }: { type: IType; index: number }) => {
+const TypeCard = ({
+  type,
+  index,
+  onApply,
+}: {
+  type: IType;
+  index: number;
+  onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
+}) => {
   const { data: subTypesRes, isLoading: loadingSubTypes } = useGetTypeSubTypes({
     type_id: String(type.id),
   });
@@ -60,7 +68,10 @@ const TypeCard = ({ type, index }: { type: IType; index: number }) => {
               £{parseInt(type.price)}
             </span>
           )}
-          <button className="bg-[#00677D] text-white px-8 py-2 rounded-2xl font-bold hover:bg-[#00677D]-600 transition-all shadow-lg shadow-[#00677D]/20 hover:shadow-[#00677D]/40 active:scale-95">
+          <button
+            onClick={() => onApply("type", type.id)}
+            className="bg-[#00677D] text-white px-8 py-2 rounded-2xl font-bold hover:bg-[#00677D]-600 transition-all shadow-lg shadow-[#00677D]/20 hover:shadow-[#00677D]/40 active:scale-95"
+          >
             Apply
           </button>
         </div>

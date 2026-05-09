@@ -9,6 +9,8 @@ export interface IPaymentOption {
 
 export interface ICheckoutRequest {
   track_id: number;
+  item_type: "training_track" | "type" | "sub_type";
+  item_id: number;
   gateway: "stripe" | "paystack";
   email?: string;
   full_name?: string;

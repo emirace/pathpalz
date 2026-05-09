@@ -28,7 +28,6 @@ export interface IType {
   price: string;
   created_at: string;
   updated_at: string;
-  sub_types?: ISubType[];
 }
 
 export interface ITypeCreatePayload {
@@ -81,7 +80,6 @@ export interface ICourseModuleHeader {
   title: string;
   created_at: string;
   updated_at: string;
-  modules?: any[];
 }
 
 export interface ICourseModuleHeaderCreatePayload {
