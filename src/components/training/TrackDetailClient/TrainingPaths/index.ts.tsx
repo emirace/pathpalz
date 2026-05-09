@@ -6,6 +6,10 @@ import TypeCard from "./TypeCard";
 interface TrainingPathsProps {
   trackId: string;
   trackTitle: string;
+  onApply: (
+    type: "training_track" | "type" | "sub_type",
+    id: number,
+  ) => void;
 }
 const TypeCardSkeleton = () => (
   <div className="bg-white rounded-4xl p-8 sm:p-10 border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
@@ -35,6 +39,7 @@ const TypeCardSkeleton = () => (
 export default function TrainingPaths({
   trackId,
   trackTitle,
+  onApply,
 }: TrainingPathsProps) {
   const { data: typesRes, isLoading: loadingTypes } = useGetAllTrackTypes({
     track_id: trackId,
@@ -60,7 +65,12 @@ export default function TrainingPaths({
           {loadingTypes
             ? [1, 2].map((i) => <TypeCardSkeleton key={i} />)
             : types.map((type, index) => (
-                <TypeCard key={type.id} type={type} index={index} />
+                <TypeCard
+                  key={type.id}
+                  type={type}
+                  index={index}
+                  onApply={onApply}
+                />
               ))}
         </div>
       </div>

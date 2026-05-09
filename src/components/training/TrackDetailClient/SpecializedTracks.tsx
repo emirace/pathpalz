@@ -11,12 +11,22 @@ import {
 import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
 import { ISubType, IType } from "@/types/admin/admin";
+import SyllabusModal from "./SyllabusModal";
 
 interface SpecializedTracksProps {
   trackId: string;
+  onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
 }
 
-const SubTypeCard = ({ subType }: { subType: ISubType }) => {
+const SubTypeCard = ({
+  subType,
+  onApply,
+  onViewSyllabus,
+}: {
+  subType: ISubType;
+  onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
+  onViewSyllabus: (subType: ISubType) => void;
+}) => {
   const isFullStack = subType.title.toLowerCase().includes("full stack");
   
   const getIcon = (title: string) => {
@@ -65,11 +75,17 @@ const SubTypeCard = ({ subType }: { subType: ISubType }) => {
       </div>
 
       <div className="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
-        <button className="text-[#00677D] font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm">
+        <button
+          onClick={() => onViewSyllabus(subType)}
+          className="text-[#00677D] font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm"
+        >
           View Syllabus
           <ChevronRight className="w-4 h-4" />
         </button>
-        <button className="bg-[#00677D] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#00677D]/90 transition-colors shadow-lg shadow-[#00677D]/20">
+        <button
+          onClick={() => onApply("sub_type", subType.id)}
+          className="bg-[#00677D] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#00677D]/90 transition-colors shadow-lg shadow-[#00677D]/20"
+        >
           Apply
         </button>
       </div>
@@ -104,7 +120,15 @@ const SpecializedTracksSkeleton = () => (
   </div>
 );
 
-export default function SpecializedTracks({ trackId }: SpecializedTracksProps) {
+export default function SpecializedTracks({
+  trackId,
+  onApply,
+}: SpecializedTracksProps) {
+  const [isSyllabusModalOpen, setIsSyllabusModalOpen] = React.useState(false);
+  const [selectedSubType, setSelectedSubType] = React.useState<ISubType | null>(
+    null,
+  );
+
   const { data: typesRes, isLoading: loadingTypes } = useGetAllTrackTypes({
     track_id: trackId,
   });
@@ -136,9 +160,24 @@ export default function SpecializedTracks({ trackId }: SpecializedTracksProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {subTypes.map((subType) => (
-          <SubTypeCard key={subType.id} subType={subType} />
+          <SubTypeCard
+            key={subType.id}
+            subType={subType}
+            onApply={onApply}
+            onViewSyllabus={(sub) => {
+              setSelectedSubType(sub);
+              setIsSyllabusModalOpen(true);
+            }}
+          />
         ))}
       </div>
+
+      <SyllabusModal
+        isOpen={isSyllabusModalOpen}
+        onClose={() => setIsSyllabusModalOpen(false)}
+        subType={selectedSubType}
+        onApply={onApply}
+      />
     </div>
   );
 }

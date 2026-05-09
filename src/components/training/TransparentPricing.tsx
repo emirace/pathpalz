@@ -3,6 +3,7 @@
 import React from "react";
 import { CheckCircle2 } from "lucide-react";
 import { useGetTracks } from "@/query/training/tracks";
+import { useRouter } from "next/navigation";
 
 interface ITrackStaticMetadata {
   features: string[];
@@ -36,13 +37,11 @@ const STATIC_METADATA: Record<string, ITrackStaticMetadata> = {
   },
 };
 
-interface TransparentPricingProps {
-  onApply: (trackId: string | number) => void;
-  onWaitlist: (trackId: string | number) => void;
-}
+interface TransparentPricingProps {}
 
-const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) => {
+const TransparentPricing = () => {
   const { data: tracks, isLoading } = useGetTracks();
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -105,14 +104,14 @@ const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) =>
                   </h3>
 
                   {/* Price */}
-                  <div className="flex items-baseline mb-8">
+                  {/* <div className="flex items-baseline mb-8">
                     <span className="text-5xl font-extrabold font-manrope text-[#00284F] tracking-tight">
                       £{parseInt(track.price)}
                     </span>
                     <span className="text-gray-500 font-medium ml-2">
                       {isOpen ? "total" : "starting"}
                     </span>
-                  </div>
+                  </div> */}
 
                   {/* Features List */}
                   <ul className="space-y-4 mb-10 grow">
@@ -120,7 +119,9 @@ const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) =>
                       <li key={idx} className="flex items-start">
                         <CheckCircle2
                           className={`w-5 h-5 mr-3 shrink-0 mt-0.5 ${
-                            metadata.popular ? "text-[#00677D]" : "text-gray-400"
+                            metadata.popular
+                              ? "text-[#00677D]"
+                              : "text-gray-400"
                           }`}
                           strokeWidth={2}
                         />
@@ -133,7 +134,7 @@ const TransparentPricing = ({ onApply, onWaitlist }: TransparentPricingProps) =>
 
                   {/* Action Button */}
                   <button
-                    onClick={() => isOpen ? onApply(track.id) : onWaitlist(track.id)}
+                    onClick={() => router.push(`/training/${track.slug}`)}
                     className={`w-full flex justify-center items-center h-14 rounded-xl font-bold transition-all duration-200 cursor-pointer ${
                       metadata.popular
                         ? "bg-[#032042] text-white hover:bg-[#032042]/90 shadow-md"
