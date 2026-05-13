@@ -36,7 +36,7 @@ export const deleteType = async (
 };
 
 export const getAllTypes = async (): Promise<IApiResponse<IType[]>> => {
-  const response = await trainingClient.get("/admin/types");
+  const response = await trainingClient.get("/types");
   return response.data;
 };
 
