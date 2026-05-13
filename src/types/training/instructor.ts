@@ -1,6 +1,10 @@
 export interface IInstructorProgressRequest {
   course_module_id: number;
-  course_video_url?: string;
+  sub_type_id?: number;
+  type_id?: number;
+  training_date: string;
+  meeting_link?: string;
+  recorded_link?: string;
   instructor_marked?: string;
 }
 

@@ -83,11 +83,11 @@ export default function DashboardOverviewPage() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center text-teal font-bold">
-                    {item.training.title?.[0] || "-"}
+                    {item.purchased_course.title?.[0] || "-"}
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#00284F]">
-                      {item.training.title}
+                      {item.purchased_course.title}
                     </p>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
                       Enrolled {new Date(item.created_at).toLocaleDateString()}
@@ -96,12 +96,12 @@ export default function DashboardOverviewPage() {
                 </div>
                 <div
                   className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${
-                    item.payment.status === "paid"
+                    item.payment?.status === "paid"
                       ? "bg-emerald-50 text-emerald-600"
                       : "bg-amber-50 text-amber-600"
                   }`}
                 >
-                  {item.payment.status}
+                  {item.payment?.status}
                 </div>
               </div>
             )) || (

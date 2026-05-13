@@ -82,7 +82,7 @@ export default function MyEnrollmentsPage() {
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-[#00284F] group-hover:text-teal transition-colors">
-                      {item.training.title}
+                      {item.purchased_course.title}
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-400 font-medium font-manrope uppercase tracking-wider">
                       <Calendar size={12} />
@@ -108,7 +108,7 @@ export default function MyEnrollmentsPage() {
                       Amount
                     </p>
                     <p className="text-sm font-bold text-[#00284F]">
-                      £{item.training.price}
+                      £{item.purchased_course.price}
                     </p>
                   </div>
                   <div className="space-y-1 text-right">
@@ -125,7 +125,7 @@ export default function MyEnrollmentsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 text-xs text-[#424750] font-medium">
                       <Clock size={14} className="text-teal" />
-                      {item.training.duration_weeks} Weeks
+                      {item.purchased_course.duration_weeks} Weeks
                     </div>
                   </div>
 

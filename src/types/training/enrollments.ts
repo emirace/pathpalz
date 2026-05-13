@@ -6,11 +6,21 @@ export interface IEnrollment {
     first_name: string | null;
     last_name: string | null;
   };
-  training: {
+  purchased_course: {
     id: number;
+    type: string;
     title: string;
     price: string;
+    instructors: [];
     duration_weeks: number;
+    course_structure: {
+      header_id: number;
+      title: string;
+      modules: {
+        id: number;
+        title: string;
+      }[];
+    }[];
   };
   payment: {
     status: string;

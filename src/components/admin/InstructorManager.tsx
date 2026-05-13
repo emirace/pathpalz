@@ -1,14 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useGetInstructors, useAddInstructor } from "@/query/admin/instructor";
+import { useGetTracks } from "@/query/training/tracks";
+import { useGetAllTypes } from "@/query/admin/types";
+import { useGetAllSubTypes } from "@/query/admin/type-subs";
 import { Plus, Users, Mail, Phone, Shield, ArrowLeft } from "lucide-react";
 import EntityFormModal, { IFormField } from "./EntityFormModal";
 
 export default function InstructorManager() {
   const { data: instructorsRes, isLoading } = useGetInstructors();
+  const { data: tracks = [] } = useGetTracks();
+  const { data: typesRes } = useGetAllTypes();
+  const { data: subTypesRes } = useGetAllSubTypes();
   const addInstructor = useAddInstructor();
 
+  const types = typesRes?.data || [];
+  const subTypes = subTypesRes?.data || [];
   const instructors = instructorsRes?.data || [];
 
   const [modalConfig, setModalConfig] = useState<{
@@ -17,6 +25,7 @@ export default function InstructorManager() {
     fields: IFormField[];
     initialData: any;
     onSubmit: (data: any) => void;
+    onFormDataChange?: (data: any) => void;
   }>({
     isOpen: false,
     title: "",
@@ -29,9 +38,17 @@ export default function InstructorManager() {
     title: string,
     fields: IFormField[],
     initialData: any,
-    onSubmit: (data: any) => void
+    onSubmit: (data: any) => void,
+    onFormDataChange?: (data: any) => void,
   ) => {
-    setModalConfig({ isOpen: true, title, fields, initialData, onSubmit });
+    setModalConfig({
+      isOpen: true,
+      title,
+      fields,
+      initialData,
+      onSubmit,
+      onFormDataChange,
+    });
   };
 
   const closeModal = () => {
@@ -39,19 +56,94 @@ export default function InstructorManager() {
   };
 
   const openAddInstructorModal = () => {
+    const baseFields: IFormField[] = [
+      {
+        name: "email",
+        label: "Email Address",
+        type: "text",
+        required: true,
+        placeholder: "instructor@example.com",
+      },
+      {
+        name: "phone_number",
+        label: "Phone Number",
+        type: "text",
+        required: true,
+        placeholder: "+1234567890",
+      },
+      {
+        name: "description",
+        label: "Description",
+        type: "textarea",
+        required: true,
+      },
+      {
+        name: "teachable_type",
+        label: "Teachable Type",
+        type: "select",
+        required: true,
+        options: [
+          { label: "Training Track", value: "training_track" },
+          { label: "Type", value: "type" },
+          { label: "Sub Type", value: "sub_type" },
+        ],
+      },
+      {
+        name: "teachable_id",
+        label: "Teachable ID",
+        type: "select",
+        required: true,
+        options: [],
+      },
+      { name: "password", label: "Password", type: "text", required: true },
+      {
+        name: "password_confirmation",
+        label: "Confirm Password",
+        type: "text",
+        required: true,
+      },
+    ];
+
     openModal(
       "Add New Instructor",
-      [
-        { name: "email", label: "Email Address", type: "text", required: true, placeholder: "instructor@example.com" },
-        { name: "phone_number", label: "Phone Number", type: "text", required: true, placeholder: "+1234567890" },
-        { name: "password", label: "Password", type: "text", required: true },
-        { name: "password_confirmation", label: "Confirm Password", type: "text", required: true },
-      ],
+      baseFields,
       null,
       async (data) => {
         await addInstructor.mutateAsync(data);
         closeModal();
-      }
+      },
+      (formData) => {
+        const type = formData.teachable_type;
+        let idOptions: { label: string; value: string | number }[] = [];
+
+        if (type === "training_track") {
+          idOptions = tracks.map((t: any) => ({ label: t.title, value: t.id }));
+        } else if (type === "type") {
+          idOptions = types.map((t: any) => ({ label: t.title, value: t.id }));
+        } else if (type === "sub_type") {
+          idOptions = subTypes.map((t: any) => ({
+            label: t.title,
+            value: t.id,
+          }));
+        }
+
+        setModalConfig((prev) => {
+          const updatedFields = prev.fields.map((f) => {
+            if (f.name === "teachable_id") {
+              return { ...f, options: idOptions };
+            }
+            return f;
+          });
+          // Only update if options actually changed to avoid unnecessary re-renders
+          const currentOptions = prev.fields.find(
+            (f) => f.name === "teachable_id",
+          )?.options;
+          if (JSON.stringify(currentOptions) === JSON.stringify(idOptions)) {
+            return prev;
+          }
+          return { ...prev, fields: updatedFields };
+        });
+      },
     );
   };
 
@@ -77,7 +169,10 @@ export default function InstructorManager() {
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-gray-100 animate-pulse rounded-2xl" />
+              <div
+                key={i}
+                className="h-48 bg-gray-100 animate-pulse rounded-2xl"
+              />
             ))}
           </div>
         ) : instructors.length > 0 ? (
@@ -112,7 +207,10 @@ export default function InstructorManager() {
                   </div>
                   <div className="flex items-center gap-3 text-sm text-gray-500">
                     <Shield size={16} className="text-gray-400" />
-                    <span>Status: <span className="text-teal font-medium">Active</span></span>
+                    <span>
+                      Status:{" "}
+                      <span className="text-teal font-medium">Active</span>
+                    </span>
                   </div>
                 </div>
 
@@ -129,8 +227,12 @@ export default function InstructorManager() {
             <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
               <Users size={32} className="text-gray-300" />
             </div>
-            <p className="text-lg font-medium text-gray-500">No instructors found.</p>
-            <p className="text-sm">Click "Add Instructor" to create the first one.</p>
+            <p className="text-lg font-medium text-gray-500">
+              No instructors found.
+            </p>
+            <p className="text-sm">
+              Click "Add Instructor" to create the first one.
+            </p>
           </div>
         )}
       </div>
@@ -142,6 +244,7 @@ export default function InstructorManager() {
         initialData={modalConfig.initialData}
         onClose={closeModal}
         onSubmit={modalConfig.onSubmit}
+        onFormDataChange={modalConfig.onFormDataChange}
         isLoading={addInstructor.isPending}
       />
     </div>

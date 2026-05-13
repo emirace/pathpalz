@@ -18,6 +18,7 @@ interface EntityFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
+  onFormDataChange?: (data: any) => void;
   isLoading?: boolean;
 }
 
@@ -28,29 +29,39 @@ export default function EntityFormModal({
   isOpen,
   onClose,
   onSubmit,
+  onFormDataChange,
   isLoading = false,
 }: EntityFormModalProps) {
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
+    if (onFormDataChange) {
+      onFormDataChange(formData);
+    }
+  }, [formData, onFormDataChange]);
+
+  useEffect(() => {
     if (isOpen) {
+      // Only initialize if we haven't already or if initialData changed
       if (initialData) {
         setFormData(initialData);
-      } else {
+      } else if (Object.keys(formData).length === 0) {
         const defaultData: any = {};
         fields.forEach((f) => {
           if (f.type === "select" && f.options && f.options.length > 0) {
             defaultData[f.name] = f.options[0].value;
-          } else if (f.type === "number") {
-            defaultData[f.name] = "";
           } else {
             defaultData[f.name] = "";
           }
         });
         setFormData(defaultData);
       }
+    } else {
+      // Clear data when modal closes
+      setFormData({});
     }
-  }, [isOpen, initialData, fields]);
+  }, [isOpen, initialData]); // Remove fields from dependencies to prevent reset on option updates
+
 
   if (!isOpen) return null;
 
@@ -68,12 +79,16 @@ export default function EntityFormModal({
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
+    const fieldConfig = fields.find((f) => f.name === name);
+    const isNumberField = fieldConfig?.type === "number" || name.endsWith("_id");
+
     setFormData((prev: any) => {
       const newData = {
         ...prev,
-        [name]: type === "number" ? Number(value) : value,
+        [name]: isNumberField ? (value === "" ? "" : Number(value)) : value,
       };
+
 
       // Auto-update slug if title changes and slug field is marked as autoSlug
       if (name === "title") {

@@ -20,9 +20,12 @@ export default function InstructorProgressPage() {
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Partial<IInstructorProgressRequest>>({
-    course_video_url: "",
+    training_date: new Date().toISOString().split("T")[0],
+    meeting_link: "",
+    recorded_link: "",
     instructor_marked: "completed",
   });
+
   const [successMsg, setSuccessMsg] = useState("");
 
   const { data: tracks, isLoading: isLoadingTracks } = useGetTracks();
@@ -35,19 +38,32 @@ export default function InstructorProgressPage() {
 
     setSuccessMsg("");
     
-    updateProgress({
-      course_module_id: selectedModuleId,
-      course_video_url: formData.course_video_url,
-      instructor_marked: formData.instructor_marked,
-    } as IInstructorProgressRequest, {
-      onSuccess: () => {
-        setSuccessMsg("Progress updated successfully!");
-        setFormData({
-          course_video_url: "",
-          instructor_marked: "completed",
-        });
+    const selectedModule = modulesData?.modules?.find(
+      (m) => m.id === selectedModuleId,
+    );
+    updateProgress(
+      {
+        course_module_id: selectedModuleId,
+        type_id: selectedModule?.type_id,
+        sub_type_id: selectedModule?.sub_type_id,
+        training_date: formData.training_date,
+        meeting_link: formData.meeting_link,
+        recorded_link: formData.recorded_link,
+        instructor_marked: formData.instructor_marked,
+      } as IInstructorProgressRequest,
+      {
+        onSuccess: () => {
+          setSuccessMsg("Progress updated successfully!");
+          setFormData({
+            training_date: new Date().toISOString().split("T")[0],
+            meeting_link: "",
+            recorded_link: "",
+            instructor_marked: "completed",
+          });
+        },
       },
-    });
+    );
+
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -176,26 +192,72 @@ export default function InstructorProgressPage() {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                      <div>
-                        <label htmlFor="course_video_url" className="mb-2 block text-xs font-bold text-gray-500 uppercase">
-                          Training Video URL
-                        </label>
-                        <div className="relative">
-                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                            <Video className="h-4 w-4 text-gray-400" />
-                          </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label
+                            htmlFor="training_date"
+                            className="mb-2 block text-xs font-bold text-gray-500 uppercase"
+                          >
+                            Training Date
+                          </label>
                           <input
-                            type="url"
-                            id="course_video_url"
-                            name="course_video_url"
+                            type="date"
+                            id="training_date"
+                            name="training_date"
                             required
-                            value={formData.course_video_url}
+                            value={formData.training_date}
                             onChange={handleChange}
-                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 p-3 pl-10 text-sm text-gray-900 transition-colors focus:border-teal focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20"
-                            placeholder="https://youtube.com/..."
+                            className="block w-full rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 transition-colors focus:border-teal focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20"
                           />
                         </div>
+
+                        <div>
+                          <label
+                            htmlFor="meeting_link"
+                            className="mb-2 block text-xs font-bold text-gray-500 uppercase"
+                          >
+                            Meeting Link (Live)
+                          </label>
+                          <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                              <Video className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                              type="url"
+                              id="meeting_link"
+                              name="meeting_link"
+                              value={formData.meeting_link}
+                              onChange={handleChange}
+                              className="block w-full rounded-xl border border-gray-200 bg-gray-50 p-3 pl-10 text-sm text-gray-900 transition-colors focus:border-teal focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20"
+                              placeholder="https://zoom.us/..."
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="recorded_link"
+                            className="mb-2 block text-xs font-bold text-gray-500 uppercase"
+                          >
+                            Recorded Session Link
+                          </label>
+                          <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                              <LinkIcon className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <input
+                              type="url"
+                              id="recorded_link"
+                              name="recorded_link"
+                              value={formData.recorded_link}
+                              onChange={handleChange}
+                              className="block w-full rounded-xl border border-gray-200 bg-gray-50 p-3 pl-10 text-sm text-gray-900 transition-colors focus:border-teal focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20"
+                              placeholder="https://youtube.com/..."
+                            />
+                          </div>
+                        </div>
                       </div>
+
 
                       <div>
                         <label htmlFor="instructor_marked" className="mb-2 block text-xs font-bold text-gray-500 uppercase">

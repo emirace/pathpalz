@@ -29,7 +29,7 @@ export const updateSubType = async (
 };
 
 export const getAllSubTypes = async (): Promise<IApiResponse<ISubType[]>> => {
-  const response = await trainingClient.get("/admin/type-subs");
+  const response = await trainingClient.get("/type-subs");
   return response.data;
 };
 
