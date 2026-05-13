@@ -5,7 +5,7 @@ import { useGetInstructors, useAddInstructor } from "@/query/admin/instructor";
 import { useGetTracks } from "@/query/training/tracks";
 import { useGetAllTypes } from "@/query/admin/types";
 import { useGetAllSubTypes } from "@/query/admin/type-subs";
-import { Plus, Users, Mail, Phone, Shield, ArrowLeft } from "lucide-react";
+import { Plus, Users, Mail, Phone, Shield, ArrowLeft, CheckCircle } from "lucide-react";
 import EntityFormModal, { IFormField } from "./EntityFormModal";
 
 export default function InstructorManager() {
@@ -18,6 +18,7 @@ export default function InstructorManager() {
   const types = typesRes?.data || [];
   const subTypes = subTypesRes?.data || [];
   const instructors = instructorsRes?.data || [];
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -26,12 +27,14 @@ export default function InstructorManager() {
     initialData: any;
     onSubmit: (data: any) => void;
     onFormDataChange?: (data: any) => void;
+    error?: string | null;
   }>({
     isOpen: false,
     title: "",
     fields: [],
     initialData: null,
     onSubmit: () => {},
+    error: null,
   });
 
   const openModal = (
@@ -40,6 +43,7 @@ export default function InstructorManager() {
     initialData: any,
     onSubmit: (data: any) => void,
     onFormDataChange?: (data: any) => void,
+    error: string | null = null,
   ) => {
     setModalConfig({
       isOpen: true,
@@ -48,6 +52,7 @@ export default function InstructorManager() {
       initialData,
       onSubmit,
       onFormDataChange,
+      error,
     });
   };
 
@@ -95,11 +100,11 @@ export default function InstructorManager() {
         required: true,
         options: [],
       },
-      { name: "password", label: "Password", type: "text", required: true },
+      { name: "password", label: "Password", type: "password", required: true },
       {
         name: "password_confirmation",
         label: "Confirm Password",
-        type: "text",
+        type: "password",
         required: true,
       },
     ];
@@ -109,8 +114,19 @@ export default function InstructorManager() {
       baseFields,
       null,
       async (data) => {
-        await addInstructor.mutateAsync(data);
-        closeModal();
+        try {
+          setModalConfig((prev) => ({ ...prev, error: null }));
+          await addInstructor.mutateAsync(data);
+          setSuccessMessage("Instructor created successfully!");
+          setTimeout(() => setSuccessMessage(null), 5000);
+          closeModal();
+        } catch (err: any) {
+          const errorMessage =
+            err?.response?.data?.message ||
+            err?.message ||
+            "Failed to add instructor";
+          setModalConfig((prev) => ({ ...prev, error: errorMessage }));
+        }
       },
       (formData) => {
         const type = formData.teachable_type;
@@ -164,6 +180,15 @@ export default function InstructorManager() {
           <Plus size={18} /> Add Instructor
         </button>
       </div>
+
+      {successMessage && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
+          <div className="text-green-500">
+            <CheckCircle size={20} />
+          </div>
+          <p className="text-sm font-bold text-green-700">{successMessage}</p>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto pr-2 pb-10">
         {isLoading ? (
@@ -246,6 +271,7 @@ export default function InstructorManager() {
         onSubmit={modalConfig.onSubmit}
         onFormDataChange={modalConfig.onFormDataChange}
         isLoading={addInstructor.isPending}
+        error={modalConfig.error}
       />
     </div>
   );

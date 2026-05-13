@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 
 export interface IFormField {
   name: string;
   label: string;
-  type: "text" | "number" | "textarea" | "select";
+  type: "text" | "number" | "textarea" | "select" | "password";
   options?: { label: string; value: string | number }[];
   required?: boolean;
   placeholder?: string;
   autoSlug?: boolean;
+  className?: string;
 }
 
 interface EntityFormModalProps {
@@ -20,6 +21,7 @@ interface EntityFormModalProps {
   onSubmit: (data: any) => void;
   onFormDataChange?: (data: any) => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
 export default function EntityFormModal({
@@ -31,6 +33,7 @@ export default function EntityFormModal({
   onSubmit,
   onFormDataChange,
   isLoading = false,
+  error = null,
 }: EntityFormModalProps) {
   const [formData, setFormData] = useState<any>({});
 
@@ -62,7 +65,6 @@ export default function EntityFormModal({
     }
   }, [isOpen, initialData]); // Remove fields from dependencies to prevent reset on option updates
 
-
   if (!isOpen) return null;
 
   const slugify = (text: string) => {
@@ -81,14 +83,14 @@ export default function EntityFormModal({
   ) => {
     const { name, value } = e.target;
     const fieldConfig = fields.find((f) => f.name === name);
-    const isNumberField = fieldConfig?.type === "number" || name.endsWith("_id");
+    const isNumberField =
+      fieldConfig?.type === "number" || name.endsWith("_id");
 
     setFormData((prev: any) => {
       const newData = {
         ...prev,
         [name]: isNumberField ? (value === "" ? "" : Number(value)) : value,
       };
-
 
       // Auto-update slug if title changes and slug field is marked as autoSlug
       if (name === "title") {
@@ -179,6 +181,15 @@ export default function EntityFormModal({
             ))}
           </form>
         </div>
+
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+            <div className="mt-0.5 text-red-500">
+              <AlertCircle size={18} />
+            </div>
+            <p className="text-sm font-medium text-red-600">{error}</p>
+          </div>
+        )}
 
         <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
           <button

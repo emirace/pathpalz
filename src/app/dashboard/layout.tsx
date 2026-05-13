@@ -43,6 +43,19 @@ const ADMIN_SIDEBAR_ITEMS = [
   },
 ];
 
+const INSTRUCTOR_SIDEBAR_ITEMS = [
+  {
+    name: "Module Progress",
+    icon: <Settings size={20} />,
+    href: "/dashboard/instructor/progress",
+  },
+  {
+    name: "Attendance",
+    icon: <ShieldCheck size={20} />,
+    href: "/dashboard/instructor/attendance",
+  },
+];
+
 export default function DashboardLayout({
   children,
 }: {
@@ -54,6 +67,7 @@ export default function DashboardLayout({
   const { data: user, isLoading } = useGetUser();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const isAdminPath = pathname.startsWith("/dashboard/admin");
+  const isInstructorPath = pathname.startsWith("/dashboard/instructor");
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -91,7 +105,7 @@ export default function DashboardLayout({
       <aside
         className={`
         fixed lg:static inset-y-0 left-0 w-72 ${
-          isAdminPath ? "bg-[#001529]" : "bg-[#00284F]"
+          isAdminPath ? "bg-[#001529]" : isInstructorPath ? "bg-[#00284F]" : "bg-[#00284F]"
         } text-white z-50 transition-transform duration-300 transform
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
@@ -107,7 +121,7 @@ export default function DashboardLayout({
           </div>
 
           <nav className="flex-1 px-4 space-y-2">
-            {!isAdminPath ? (
+            {!isAdminPath && !isInstructorPath ? (
               <>
                 {SIDEBAR_ITEMS.map((item) => {
                   const isActive = pathname === item.href;
@@ -177,7 +191,7 @@ export default function DashboardLayout({
                   </Link>
                 )}
               </>
-            ) : (
+            ) : isAdminPath ? (
               <>
                 <div className="px-4 py-2 mb-4">
                   <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400/50">
@@ -222,7 +236,53 @@ export default function DashboardLayout({
                   </span>
                 </Link>
               </>
+            ) : (
+              <>
+                <div className="px-4 py-2 mb-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-teal/50">
+                    Instructor Management
+                  </span>
+                </div>
+                {INSTRUCTOR_SIDEBAR_ITEMS.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`
+                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
+                        ${
+                          isActive
+                            ? "bg-teal text-white shadow-lg shadow-teal/20"
+                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        }
+                      `}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon}
+                        <span className="font-bold text-sm uppercase tracking-widest">
+                          {item.name}
+                        </span>
+                      </div>
+                      {isActive && <ChevronRight size={16} />}
+                    </Link>
+                  );
+                })}
+
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <ArrowLeft size={20} />
+                  <span className="font-bold text-sm uppercase tracking-widest">
+                    Exit Instructor
+                  </span>
+                </Link>
+              </>
             )}
+
           </nav>
 
           <div className="p-4 mt-auto">
