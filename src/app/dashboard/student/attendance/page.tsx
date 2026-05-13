@@ -3,16 +3,19 @@
 import React, { useState } from "react";
 import { useGetMyEnrollments } from "@/query/training/enrollments";
 import { useGetTrackModules } from "@/query/training/instructor";
-import { useMarkAttendance, useGetModuleAttendance } from "@/query/training/student";
-import { 
-  CheckCircle, 
-  Circle, 
-  Calendar, 
-  Loader2, 
-  AlertCircle, 
+import {
+  useMarkAttendance,
+  useGetModuleAttendance,
+} from "@/query/training/student";
+import {
+  CheckCircle,
+  Circle,
+  Calendar,
+  Loader2,
+  AlertCircle,
   BookOpen,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
 } from "lucide-react";
 import { useGetUser } from "@/query/auth";
 
@@ -21,26 +24,33 @@ export default function StudentAttendancePage() {
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
 
-  const { data: enrollments, isLoading: isLoadingEnrollments } = useGetMyEnrollments();
-  
+  const { data: enrollments, isLoading: isLoadingEnrollments } =
+    useGetMyEnrollments();
+
   // Extract unique tracks from enrollments
-  const enrolledTracks = enrollments?.map(e => e.training) || [];
-  
-  const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(selectedTrackId as number);
+  const enrolledTracks = enrollments?.map((e) => e.purchased_course) || [];
+
+  const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(
+    selectedTrackId as number,
+  );
   const { mutate: markAttendance, isPending: isMarking } = useMarkAttendance();
-  const { data: attendanceData, isLoading: isLoadingAttendance } = useGetModuleAttendance(selectedModuleId as number);
+  const { data: attendanceData, isLoading: isLoadingAttendance } =
+    useGetModuleAttendance(selectedModuleId as number);
 
   const handleMarkAttendance = (moduleId: number) => {
     markAttendance({
       course_module_id: moduleId,
-      attended: true
+      attended: true,
     });
   };
 
   const isAttended = (moduleId: number) => {
     // Check if the current user has attended this module
     return attendanceData?.attendance?.some(
-      (record) => record.course_module_id === moduleId && record.user_id === user?.id && record.attended
+      (record) =>
+        record.course_module_id === moduleId &&
+        record.user_id === user?.id &&
+        record.attended,
     );
   };
 
@@ -51,14 +61,18 @@ export default function StudentAttendancePage() {
           <ShieldCheck className="text-teal" />
           Attendance Tracking
         </h1>
-        <p className="mt-2 text-gray-500">Mark your presence and keep track of your learning consistency.</p>
+        <p className="mt-2 text-gray-500">
+          Mark your presence and keep track of your learning consistency.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Track Selection */}
         <div className="lg:col-span-1 space-y-6">
           <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Select Your Track</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
+              Select Your Track
+            </h2>
             {isLoadingEnrollments ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="animate-spin text-teal" />
@@ -79,18 +93,31 @@ export default function StudentAttendancePage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${selectedTrackId === track.id ? "bg-teal text-white" : "bg-gray-100 text-gray-400 group-hover:bg-teal/10 group-hover:text-teal"}`}>
+                      <div
+                        className={`p-2 rounded-lg ${selectedTrackId === track.id ? "bg-teal text-white" : "bg-gray-100 text-gray-400 group-hover:bg-teal/10 group-hover:text-teal"}`}
+                      >
                         <BookOpen size={18} />
                       </div>
-                      <span className="font-semibold text-sm">{track.title}</span>
+                      <span className="font-semibold text-sm">
+                        {track.title}
+                      </span>
                     </div>
-                    <ChevronRight size={16} className={selectedTrackId === track.id ? "opacity-100" : "opacity-0 group-hover:opacity-100 transition-opacity"} />
+                    <ChevronRight
+                      size={16}
+                      className={
+                        selectedTrackId === track.id
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100 transition-opacity"
+                      }
+                    />
                   </button>
                 ))}
-                
+
                 {enrolledTracks?.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-sm text-gray-400">You are not enrolled in any tracks yet.</p>
+                    <p className="text-sm text-gray-400">
+                      You are not enrolled in any tracks yet.
+                    </p>
                   </div>
                 )}
               </div>
@@ -105,14 +132,24 @@ export default function StudentAttendancePage() {
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Calendar size={32} className="text-gray-300" />
               </div>
-              <h3 className="text-lg font-bold text-gray-500">No Track Selected</h3>
-              <p className="text-gray-400 max-w-xs">Select a training track from the left to view modules and mark attendance.</p>
+              <h3 className="text-lg font-bold text-gray-500">
+                No Track Selected
+              </h3>
+              <p className="text-gray-400 max-w-xs">
+                Select a training track from the left to view modules and mark
+                attendance.
+              </p>
             </div>
           ) : (
             <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
               <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                <h2 className="text-xl font-bold text-gray-900">Modules for {enrolledTracks?.find(t => t.id === selectedTrackId)?.title}</h2>
-                <p className="text-sm text-gray-500">Click to mark attendance or view details.</p>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Modules for{" "}
+                  {enrolledTracks?.find((t) => t.id === selectedTrackId)?.title}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Click to mark attendance or view details.
+                </p>
               </div>
 
               {isLoadingModules ? (
@@ -122,26 +159,35 @@ export default function StudentAttendancePage() {
               ) : (
                 <div className="divide-y divide-gray-50">
                   {modulesData?.modules?.map((module) => (
-                    <div 
-                      key={module.id} 
+                    <div
+                      key={module.id}
                       className={`p-6 transition-colors flex items-center justify-between group ${selectedModuleId === module.id ? "bg-teal/5" : "hover:bg-gray-50/50"}`}
                       onClick={() => setSelectedModuleId(module.id)}
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                          isAttended(module.id) 
-                            ? "bg-green-50 border-green-200 text-green-600 shadow-sm" 
-                            : "bg-gray-50 border-gray-100 text-gray-300 group-hover:border-teal/20"
-                        }`}>
-                          {isAttended(module.id) ? <CheckCircle size={20} /> : <Circle size={20} />}
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+                            isAttended(module.id)
+                              ? "bg-green-50 border-green-200 text-green-600 shadow-sm"
+                              : "bg-gray-50 border-gray-100 text-gray-300 group-hover:border-teal/20"
+                          }`}
+                        >
+                          {isAttended(module.id) ? (
+                            <CheckCircle size={20} />
+                          ) : (
+                            <Circle size={20} />
+                          )}
                         </div>
                         <div>
-                          <h4 className={`font-bold transition-colors ${selectedModuleId === module.id ? "text-teal" : "text-gray-900"}`}>
+                          <h4
+                            className={`font-bold transition-colors ${selectedModuleId === module.id ? "text-teal" : "text-gray-900"}`}
+                          >
                             {module.title}
                           </h4>
                           <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
                             <Calendar size={12} />
-                            Updated: {new Date(module.updated_at).toLocaleDateString()}
+                            Updated:{" "}
+                            {new Date(module.updated_at).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
@@ -170,11 +216,16 @@ export default function StudentAttendancePage() {
                       </div>
                     </div>
                   ))}
-                  
+
                   {modulesData?.modules?.length === 0 && (
                     <div className="py-20 text-center">
-                      <BookOpen size={48} className="mx-auto text-gray-200 mb-4" />
-                      <p className="text-gray-400">No modules found for this track.</p>
+                      <BookOpen
+                        size={48}
+                        className="mx-auto text-gray-200 mb-4"
+                      />
+                      <p className="text-gray-400">
+                        No modules found for this track.
+                      </p>
                     </div>
                   )}
                 </div>
