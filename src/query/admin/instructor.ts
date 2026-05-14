@@ -5,6 +5,7 @@ export const useGetInstructors = () => {
   return useQuery({
     queryKey: ["instructor"],
     queryFn: getInstructors,
+    select: (data) => data.data,
   });
 };
 

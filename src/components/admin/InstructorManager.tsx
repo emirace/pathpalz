@@ -5,7 +5,7 @@ import { useGetInstructors, useAddInstructor } from "@/query/admin/instructor";
 import { useGetTracks } from "@/query/training/tracks";
 import { useGetAllTypes } from "@/query/admin/types";
 import { useGetAllSubTypes } from "@/query/admin/type-subs";
-import { Plus, Users, Mail, Phone, Shield, ArrowLeft, CheckCircle } from "lucide-react";
+import { Plus, Users, Mail, Phone, CheckCircle } from "lucide-react";
 import EntityFormModal, { IFormField } from "./EntityFormModal";
 
 export default function InstructorManager() {
@@ -17,7 +17,7 @@ export default function InstructorManager() {
 
   const types = typesRes?.data || [];
   const subTypes = subTypesRes?.data || [];
-  const instructors = instructorsRes?.data || [];
+  const instructors = instructorsRes || [];
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [modalConfig, setModalConfig] = useState<{
@@ -190,76 +190,142 @@ export default function InstructorManager() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto pr-2 pb-10">
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-48 bg-gray-100 animate-pulse rounded-2xl"
-              />
-            ))}
-          </div>
-        ) : instructors.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {instructors.map((instructor: any) => (
-              <div
-                key={instructor.id}
-                className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Users size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#00284F] text-lg">
-                      {instructor.first_name} {instructor.last_name}
-                    </h3>
-                    <span className="text-xs font-bold text-blue-500 uppercase tracking-wider bg-blue-50 px-2 py-0.5 rounded">
-                      {instructor.usertype}
-                    </span>
-                  </div>
-                </div>
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col flex-1">
+          {/* Table Header */}
+          <div className="overflow-x-auto flex-1">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b border-gray-100">
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Instructor
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Assignment
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {isLoading ? (
+                  [1, 2, 3, 4, 5].map((i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gray-100 shrink-0" />
+                          <div className="h-4 bg-gray-100 rounded w-32" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-gray-100 rounded w-40" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-gray-100 rounded w-28" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-5 bg-gray-100 rounded w-24" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-5 bg-gray-100 rounded-full w-16" />
+                      </td>
+                    </tr>
+                  ))
+                ) : instructors.length > 0 ? (
+                  instructors.map((instructor) => (
+                    <tr
+                      key={instructor.instructor_id}
+                      className="hover:bg-gray-50/60 transition-colors duration-150 group"
+                    >
+                      {/* Name */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                            <Users size={16} />
+                          </div>
+                          <span className="font-semibold text-[#00284F]">
+                            {instructor.user.first_name}{" "}
+                            {instructor.user.last_name}
+                          </span>
+                        </div>
+                      </td>
 
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                    <Mail size={16} className="text-gray-400" />
-                    <span className="truncate">{instructor.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                    <Phone size={16} className="text-gray-400" />
-                    <span>{instructor.phone_number || "No phone number"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                    <Shield size={16} className="text-gray-400" />
-                    <span>
-                      Status:{" "}
-                      <span className="text-teal font-medium">Active</span>
-                    </span>
-                  </div>
-                </div>
+                      {/* Email */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Mail size={14} className="text-gray-300 shrink-0" />
+                          <span className="truncate max-w-[200px]">
+                            {instructor.user.email}
+                          </span>
+                        </div>
+                      </td>
 
-                <div className="mt-6 pt-6 border-t border-gray-50 flex justify-end">
-                  <button className="text-sm font-bold text-gray-400 hover:text-[#00284F] transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
+                      {/* Phone */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Phone size={14} className="text-gray-300 shrink-0" />
+                          <span>
+                            {instructor.user.phone_number || (
+                              <span className="text-gray-300 italic">
+                                Not set
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Assignment */}
+                      <td className="px-6 py-4">
+                        {instructor.assigned_course ? (
+                          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-wide">
+                            {instructor.assigned_course.type}:{" "}
+                            {instructor.assigned_course.title}
+                          </span>
+                        ) : (
+                          <span className="text-gray-300 italic text-xs">
+                            Unassigned
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Active
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                          <Users size={32} className="text-gray-300" />
+                        </div>
+                        <p className="text-lg font-medium text-gray-500">
+                          No instructors found.
+                        </p>
+                        <p className="text-sm">
+                          Click &quot;Add Instructor&quot; to create the first
+                          one.
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Users size={32} className="text-gray-300" />
-            </div>
-            <p className="text-lg font-medium text-gray-500">
-              No instructors found.
-            </p>
-            <p className="text-sm">
-              Click "Add Instructor" to create the first one.
-            </p>
-          </div>
-        )}
+        </div>
       </div>
 
       <EntityFormModal

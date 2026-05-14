@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, AlertCircle } from "lucide-react";
+import { X, AlertCircle, Eye, EyeOff } from "lucide-react";
 
 export interface IFormField {
   name: string;
@@ -36,6 +36,11 @@ export default function EntityFormModal({
   error = null,
 }: EntityFormModalProps) {
   const [formData, setFormData] = useState<any>({});
+  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
+
+  const togglePasswordVisibility = (fieldName: string) => {
+    setShowPasswords((prev) => ({ ...prev, [fieldName]: !prev[fieldName] }));
+  };
 
   useEffect(() => {
     if (onFormDataChange) {
@@ -166,6 +171,27 @@ export default function EntityFormModal({
                       </option>
                     ))}
                   </select>
+                ) : field.type === "password" ? (
+                  <div className="relative">
+                    <input
+                      type={showPasswords[field.name] ? "text" : "password"}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleChange}
+                      required={field.required}
+                      placeholder={field.placeholder}
+                      className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 text-black rounded-xl focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility(field.name)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-[#00284F] transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPasswords[field.name] ? "Hide password" : "Show password"}
+                    >
+                      {showPasswords[field.name] ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 ) : (
                   <input
                     type={field.type}

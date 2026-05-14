@@ -2,25 +2,25 @@ import React from "react";
 
 const scheduleCards = [
   {
-    day: "TUESDAY",
+    id: "1",
     title: "Pair Lab challenge",
     description: "build something with your partner",
     highlight: false,
   },
   {
-    day: "THURSDAY",
+    id: "2",
     title: "Peer Code Review",
     description: "Critique and be critiqued. Building communication via code.",
     highlight: false,
   },
   {
-    day: "SATURDAY",
+    id: "3",
     title: "Core Lesson",
     description: "concept + worked example",
     highlight: false,
   },
   {
-    day: "SUNDAY",
+    id: "4",
     title: "Core Lesson",
     description: "concept + worked example",
     highlight: true,
@@ -68,20 +68,20 @@ const HighPerformanceRhythm = () => {
           <div className="lg:col-span-7 h-full grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
             {scheduleCards.map((card) => (
               <div
-                key={card.day}
+                key={card.id}
                 className={`flex flex-col p-8 rounded-[20px] transition-all duration-300 ${
                   card.highlight
                     ? "bg-[#0094B2] text-white hover:-translate-y-1"
                     : "bg-[#0D3B6E80]/50 hover:bg-[#0D3B6E80]/70"
                 }`}
               >
-                <span
+                {/* <span
                   className={`text-xs font-medium tracking-[0.05em] uppercase mb-4 ${
                     card.highlight ? "text-white/90" : "text-[#7B8B9E]"
                   }`}
                 >
                   {card.day}
-                </span>
+                </span> */}
                 <h4 className="text-xl font-bold font-manrope mb-2">
                   {card.title}
                 </h4>
