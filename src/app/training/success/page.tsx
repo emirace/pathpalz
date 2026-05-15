@@ -11,7 +11,7 @@ function PaymentVerifyContent() {
   const router = useRouter();
   const verifyMutation = useVerifyPayment();
   const [status, setStatus] = useState<"verifying" | "success" | "error">(
-    "verifying"
+    "verifying",
   );
   const hasVerified = useRef(false);
 
@@ -39,7 +39,7 @@ function PaymentVerifyContent() {
           console.error("Payment verification failed", err);
           setStatus("error");
         },
-      }
+      },
     );
   }, [searchParams, verifyMutation]);
 

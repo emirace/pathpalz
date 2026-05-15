@@ -30,8 +30,8 @@ export const useCheckout = () => {
     mutationFn: (data: ICheckoutRequest) =>
       checkout({
         ...data,
-        success_url: `${window.location.origin}/training/success?payment_status=success`,
-        cancel_url: `${window.location.origin}/training/success?payment_status=failed`,
+        success_url: `${window.location.origin}/training/success`,
+        cancel_url: `${window.location.origin}/training/success`,
       }),
   });
 };
