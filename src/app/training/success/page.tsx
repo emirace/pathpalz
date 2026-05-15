@@ -95,7 +95,7 @@ function PaymentVerifyContent() {
               We couldn't verify your payment. The transaction might have failed
               or the reference is invalid.
             </p>
-            <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col gap-3 w-full ">
               <button
                 onClick={() => window.location.reload()}
                 className="w-full h-14 bg-[#00284F] text-white rounded-xl font-bold hover:bg-[#00284F]/90 transition-all flex items-center justify-center"
@@ -120,7 +120,7 @@ export default function PaymentVerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F3F3F8] flex items-center justify-center p-4">
+        <div className="min-h-screen  bg-[#F3F3F8] flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden text-center p-8">
             <div className="flex flex-col items-center">
               <div className="w-20 h-20 bg-teal/10 rounded-full flex items-center justify-center mb-6">
