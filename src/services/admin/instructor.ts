@@ -1,8 +1,14 @@
-import { IInstructorCreatePayload } from "@/types/admin/instructor";
-import apiClient from "../api";
+import {
+  IInstructor,
+  IInstructorCreatePayload,
+} from "@/types/admin/instructor";
+import apiClient, { trainingClient } from "../api";
 
-export const getInstructors = async () => {
-  const response = await apiClient.get("/instructor");
+export const getInstructors = async (): Promise<{
+  data: IInstructor[];
+  success: boolean;
+}> => {
+  const response = await trainingClient.get("/admin/instructors");
   return response.data;
 };
 export const addInstructor = async (data: IInstructorCreatePayload) => {

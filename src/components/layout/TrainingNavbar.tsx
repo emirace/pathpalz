@@ -16,8 +16,8 @@ const TrainingNavbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Software Development", href: "/software-development" },
+    { name: "About", href: "/#about" },
+    // { name: "Software Development", href: "/software-development" },
     { name: "Training", href: "/training", active: true },
     { name: "Contact", href: "/contact" },
   ];
@@ -83,7 +83,7 @@ const TrainingNavbar = () => {
                 onClick={() => handleAuthRedirect("apply")}
                 className="inline-flex items-center h-12 px-8 font-bold text-[#00284F] transition-all duration-300 rounded-xl shadow-lg bg-teal hover:bg-teal/90 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Get Started
+                Login
               </button>
             )}
           </div>
@@ -163,7 +163,7 @@ const TrainingNavbar = () => {
                 }}
                 className="block w-full text-center py-4 px-6 font-bold text-[#00284F] rounded-xl bg-teal hover:bg-teal/90 transition-all font-manrope"
               >
-                Get Started
+                Login
               </button>
             )}
           </div>
