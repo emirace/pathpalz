@@ -12,6 +12,16 @@ export const updateInstructorProgress = async (
   return response.data;
 };
 
+export const getInstructorProgress = async () => {
+  const response = await trainingClient.get(`/instructor/progress`);
+  return response.data;
+};
+
+export const getInstructorAssignedTracks = async () => {
+  const response = await trainingClient.get(`/instructor/my-assigns`);
+  return response.data;
+};
+
 export const getTrackModules = async (
   trackId: number,
 ): Promise<IInstructorModuleResponse> => {

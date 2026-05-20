@@ -1,6 +1,6 @@
 export interface IEnrollment {
   enrollment_id: number;
-  user: {
+  student: {
     id: number;
     email: string;
     first_name: string | null;
@@ -11,8 +11,16 @@ export interface IEnrollment {
     type: string;
     title: string;
     price: string;
-    instructors: [];
-    duration_weeks: number;
+    instructors: {
+      id: number;
+      description: string | null;
+      user: {
+        id: number;
+        email: string;
+        first_name: string | null;
+        last_name: string | null;
+      };
+    }[];
     course_structure: {
       header_id: number;
       title: string;

@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { useGetTracks } from "@/query/training/tracks";
 import {
+  useGetInstructorAssignedTracks,
+  useGetInstructorProgress,
   useGetTrackModules,
   useUpdateInstructorProgress,
 } from "@/query/training/instructor";
@@ -34,6 +36,11 @@ export default function InstructorProgressPage() {
   const [successMsg, setSuccessMsg] = useState("");
 
   const { data: tracks, isLoading: isLoadingTracks } = useGetTracks();
+  const { data: assignedTracks, isLoading: isAssignedTracks } =
+    useGetInstructorAssignedTracks();
+  const { data: moduleProgress, isLoading: isLoadingProgress } =
+    useGetInstructorProgress();
+  console.log(moduleProgress);
   const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(
     selectedTrackId as number,
   );

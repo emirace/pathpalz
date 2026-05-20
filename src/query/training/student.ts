@@ -3,6 +3,7 @@ import {
   markAttendance,
   getModuleAttendance,
   markCourseAsCompleted,
+  getModuleSessions,
 } from "@/services/training/student";
 import { IStudentAttendanceRequest } from "@/types/training/student";
 
@@ -33,5 +34,13 @@ export const useMarkCourseAsCompleted = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-attendance"] });
     },
+  });
+};
+
+export const useGetModuleSessions = (moduleId: number) => {
+  return useQuery({
+    queryKey: ["module-sessions", moduleId],
+    queryFn: () => getModuleSessions(moduleId),
+    enabled: !!moduleId,
   });
 };

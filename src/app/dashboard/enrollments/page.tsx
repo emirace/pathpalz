@@ -125,7 +125,7 @@ export default function MyEnrollmentsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 text-xs text-[#424750] font-medium">
                       <Clock size={14} className="text-teal" />
-                      {item.purchased_course.duration_weeks} Weeks
+                      Weeks
                     </div>
                   </div>
 

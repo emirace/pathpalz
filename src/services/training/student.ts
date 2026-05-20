@@ -1,4 +1,5 @@
 import {
+  IModuleSession,
   IStudentAttendanceRequest,
   IStudentAttendanceResponse,
   IStudentModuleAttendanceResponse,
@@ -23,5 +24,14 @@ export const markCourseAsCompleted = async (module_title: string) => {
   const response = await trainingClient.post(`/training/progress/student`, {
     module_title,
   });
+  return response.data;
+};
+
+export const getModuleSessions = async (
+  moduleId: number,
+): Promise<IModuleSession> => {
+  const response = await trainingClient.get(
+    `/student/module/${moduleId}/sessions`,
+  );
   return response.data;
 };
