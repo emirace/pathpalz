@@ -42,3 +42,12 @@ export const getUser = async (): Promise<any> => {
     return null;
   }
 };
+
+export const updateProfile = async (profileData: any): Promise<any> => {
+  const response = await apiClient.post(`/user/profile`, profileData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data.data;
+};
