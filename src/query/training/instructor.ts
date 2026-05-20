@@ -6,6 +6,8 @@ import {
   getAllStudentAttendance,
   getStudentAttendance,
   getStudentAttendancePerModule,
+  getInstructorProgress,
+  getInstructorAssignedTracks,
 } from "@/services/training/instructor";
 import { IInstructorProgressRequest } from "@/types/training/instructor";
 
@@ -17,7 +19,22 @@ export const useUpdateInstructorProgress = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["progress"] });
+      queryClient.invalidateQueries({ queryKey: ["instructor-progress"] });
     },
+  });
+};
+
+export const useGetInstructorProgress = () => {
+  return useQuery({
+    queryKey: ["instructor-progress"],
+    queryFn: getInstructorProgress,
+  });
+};
+
+export const useGetInstructorAssignedTracks = () => {
+  return useQuery({
+    queryKey: ["instructor-assigned-tracks"],
+    queryFn: getInstructorAssignedTracks,
   });
 };
 

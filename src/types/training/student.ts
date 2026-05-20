@@ -49,3 +49,20 @@ export interface IStudentModuleAttendanceResponse {
     module: any;
   }>;
 }
+
+export interface IModuleSession {
+  success: boolean;
+  module: {
+    id: number;
+    title: string;
+  };
+  sessions: [
+    {
+      training_date: string;
+      meeting_link: string | null;
+      recorded_link: string | null;
+      status: string;
+      updated_at: string;
+    },
+  ];
+}

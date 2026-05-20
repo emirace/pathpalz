@@ -124,7 +124,7 @@ export default function DashboardLayout({
             {!isAdminPath && !isInstructorPath ? (
               <>
                 {SIDEBAR_ITEMS.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
                   return (
                     <Link
                       key={item.name}
@@ -156,7 +156,7 @@ export default function DashboardLayout({
                     className={`
                       flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-teal/30
                       ${
-                        pathname === "/dashboard/instructor/progress"
+                        pathname.startsWith("/dashboard/instructor")
                           ? "bg-teal text-white shadow-lg shadow-teal/20"
                           : "text-teal hover:text-white hover:bg-teal/20"
                       }
@@ -169,7 +169,7 @@ export default function DashboardLayout({
                         Instructor Portal
                       </span>
                     </div>
-                    {pathname === "/dashboard/instructor/progress" && (
+                    {pathname.startsWith("/dashboard/instructor") && (
                       <ChevronRight size={16} />
                     )}
                   </Link>
@@ -199,7 +199,7 @@ export default function DashboardLayout({
                   </span>
                 </div>
                 {ADMIN_SIDEBAR_ITEMS.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname.startsWith(item.href);
                   return (
                     <Link
                       key={item.name}
@@ -244,7 +244,7 @@ export default function DashboardLayout({
                   </span>
                 </div>
                 {INSTRUCTOR_SIDEBAR_ITEMS.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname.startsWith(item.href);
                   return (
                     <Link
                       key={item.name}
