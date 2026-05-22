@@ -5,6 +5,7 @@ import {
   updateCourseModuleHeader,
   getAllCourseModuleHeaders,
   getSubTypeModuleHeaders,
+  deleteCourseModuleHeader,
 } from "@/services/admin/course-module-headers";
 import {
   ICourseModuleHeaderCreatePayload,
@@ -69,5 +70,17 @@ export const useGetSubTypeModuleHeaders = ({
     queryKey: ["admin-course-module-headers", sub_type_id],
     queryFn: () => getSubTypeModuleHeaders({ sub_type_id }),
     enabled: !!sub_type_id,
+  });
+};
+
+export const useDeleteCourseModuleHeader = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => deleteCourseModuleHeader(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["admin-course-module-headers"],
+      });
+    },
   });
 };

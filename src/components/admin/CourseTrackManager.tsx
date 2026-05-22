@@ -17,16 +17,19 @@ import {
   useGetTypeSubTypes,
   useCreateSubType,
   useUpdateSubType,
+  useDeleteSubType,
 } from "@/query/admin/type-subs";
 import {
   useGetSubTypeModuleHeaders,
   useCreateCourseModuleHeader,
   useUpdateCourseModuleHeader,
+  useDeleteCourseModuleHeader,
 } from "@/query/admin/course-module-headers";
 import {
   useGetHeaderModules,
   useCreateCourseModule,
   useUpdateCourseModule,
+  useDeleteCourseModule,
 } from "@/query/admin/course-modules";
 
 import {
@@ -111,12 +114,15 @@ export default function CourseTrackManager() {
 
   const createSubType = useCreateSubType();
   const updateSubType = useUpdateSubType();
+  const deleteSubType = useDeleteSubType();
 
   const createHeader = useCreateCourseModuleHeader();
   const updateHeader = useUpdateCourseModuleHeader();
+  const deleteHeader = useDeleteCourseModuleHeader();
 
   const createModule = useCreateCourseModule();
   const updateModule = useUpdateCourseModule();
+  const deleteModule = useDeleteCourseModule();
 
   // --- Data for Current Level ---
   const currentTypes = types;
@@ -247,7 +253,16 @@ export default function CourseTrackManager() {
     openModal(
       item ? "Edit Type" : "Create Type",
       [
-        { name: "title", label: "Title", type: "text", required: true },
+        {
+          name: "title",
+          label: "Title",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Fundamental Track", value: "Fundamental Track" },
+            { label: "Specialized Track", value: "Specialized Track" },
+          ],
+        },
         { name: "price", label: "Price", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
       ],
@@ -434,7 +449,7 @@ export default function CourseTrackManager() {
 
         {item.price && (
           <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
-            <span className="font-semibold text-teal">${item.price}</span>
+            <span className="font-semibold text-teal">£{item.price}</span>
             <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
               {item.status}
             </span>
@@ -517,7 +532,7 @@ export default function CourseTrackManager() {
                 subType,
                 <LayoutGrid size={20} />,
                 () => openSubTypeModal(subType),
-                undefined, // Assuming no delete subtype endpoint yet
+                () => deleteSubType.mutate(subType.id),
                 () =>
                   handleNavigate(
                     "HEADERS",
@@ -534,7 +549,7 @@ export default function CourseTrackManager() {
                 header,
                 <FileText size={20} />,
                 () => openHeaderModal(header),
-                undefined,
+                () => deleteHeader.mutate(header.id),
                 () =>
                   handleNavigate("MODULES", header.id, header.title, "HEADERS"),
               ),
@@ -542,8 +557,11 @@ export default function CourseTrackManager() {
 
           {level === "MODULES" &&
             currentModules.map((module: any) =>
-              renderCard(module, <BookOpen size={20} />, () =>
-                openModuleModal(module),
+              renderCard(
+                module,
+                <BookOpen size={20} />,
+                () => openModuleModal(module),
+                () => deleteModule.mutate(module.id),
               ),
             )}
         </div>

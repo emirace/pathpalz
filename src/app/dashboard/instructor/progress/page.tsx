@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetTracks } from "@/query/training/tracks";
 import {
   useGetInstructorAssignedTracks,
   useGetInstructorProgress,
@@ -35,7 +34,6 @@ export default function InstructorProgressPage() {
 
   const [successMsg, setSuccessMsg] = useState("");
 
-  const { data: tracks, isLoading: isLoadingTracks } = useGetTracks();
   const { data: assignedTracks, isLoading: isAssignedTracks } =
     useGetInstructorAssignedTracks();
   const { data: moduleProgress, isLoading: isLoadingProgress } =
@@ -112,32 +110,32 @@ export default function InstructorProgressPage() {
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
               Your Tracks
             </h2>
-            {isLoadingTracks ? (
+            {isAssignedTracks ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="animate-spin text-teal" />
               </div>
             ) : (
               <div className="space-y-2">
-                {tracks?.map((track) => (
+                {assignedTracks?.map((assign) => (
                   <button
-                    key={track.id}
+                    key={assign.track.id}
                     onClick={() => {
-                      setSelectedTrackId(track.id);
+                      setSelectedTrackId(assign.track.id);
                       setSelectedModuleId(null);
                     }}
                     className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      selectedTrackId === track.id
+                      selectedTrackId === assign.track.id
                         ? "border-teal bg-teal/5 text-teal shadow-sm"
                         : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
                     }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
-                      {track.title}
+                      {assign.track.title}
                     </span>
                     <ChevronRight
                       size={14}
                       className={
-                        selectedTrackId === track.id
+                        selectedTrackId === assign.track.id
                           ? "opacity-100"
                           : "opacity-0 group-hover:opacity-100"
                       }

@@ -48,3 +48,10 @@ export const getHeaderModules = async ({
   );
   return response.data;
 };
+
+export const deleteCourseModule = async (
+  id: number | string,
+): Promise<IApiResponse<{ message: string }>> => {
+  const response = await trainingClient.delete(`/admin/course-modules/${id}`);
+  return response.data;
+};

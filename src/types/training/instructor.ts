@@ -55,3 +55,26 @@ export interface IInstructorModuleResponse {
     updated_at: string;
   }>;
 }
+
+export interface IAssignedTrack {
+  instructor_id: number;
+  description: string;
+  assigned_to: string;
+  track: {
+    id: number;
+    title: string;
+    type: {
+      id: number;
+      title: string;
+    };
+    sub_type: {
+      id: number;
+      title: string;
+    };
+  };
+}
+
+export interface IGetInstructorAssignedTracksResponse {
+  success: boolean;
+  data: IAssignedTrack[];
+}
