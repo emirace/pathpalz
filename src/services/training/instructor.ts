@@ -2,6 +2,8 @@ import {
   IInstructorProgressRequest,
   IInstructorProgressResponse,
   IInstructorModuleResponse,
+  IAssignedTrack,
+  IGetInstructorAssignedTracksResponse,
 } from "@/types/training/instructor";
 import { trainingClient } from "../api";
 
@@ -17,9 +19,11 @@ export const getInstructorProgress = async () => {
   return response.data;
 };
 
-export const getInstructorAssignedTracks = async () => {
+export const getInstructorAssignedTracks = async (): Promise<
+  IAssignedTrack[]
+> => {
   const response = await trainingClient.get(`/instructor/my-assigns`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getTrackModules = async (

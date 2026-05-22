@@ -5,6 +5,7 @@ import {
   updateCourseModule,
   getAllCourseModules,
   getHeaderModules,
+  deleteCourseModule,
 } from "@/services/admin/course-modules";
 import {
   ICourseModuleCreatePayload,
@@ -60,5 +61,15 @@ export const useGetHeaderModules = ({ header_id }: { header_id: string }) => {
     queryKey: ["admin-course-modules", header_id],
     queryFn: () => getHeaderModules({ header_id }),
     enabled: !!header_id,
+  });
+};
+
+export const useDeleteCourseModule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => deleteCourseModule(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-course-modules"] });
+    },
   });
 };
