@@ -63,7 +63,7 @@ export const updateStudentAttendance = async ({
   course_module_id: number;
   attendance: boolean;
 }) => {
-  const response = await trainingClient.post(
+  const response = await trainingClient.patch(
     `/instructor/attendance/students/${studentId}`,
     { course_module_id, attended: attendance },
   );
