@@ -3,6 +3,16 @@ export interface IStudentAttendanceRequest {
   attended: boolean;
 }
 
+export interface IStudent {
+  id: number;
+  external_id: string;
+  first_name: string;
+  last_name: string | null;
+  email: string;
+  roles: string[];
+  joined_at: string;
+}
+
 export interface IStudentAttendanceResponse {
   success: boolean;
   message: string;

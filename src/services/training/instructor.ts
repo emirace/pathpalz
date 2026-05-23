@@ -63,9 +63,23 @@ export const updateStudentAttendance = async ({
   course_module_id: number;
   attendance: boolean;
 }) => {
-  const response = await trainingClient.post(
+  const response = await trainingClient.patch(
     `/instructor/attendance/students/${studentId}`,
-    { course_module_id, attendance },
+    { course_module_id, attended: attendance },
   );
+  return response.data;
+};
+
+export const getTypeModules = async ({ typeId }: { typeId: number }) => {
+  const response = await trainingClient.get(`/types/${typeId}/modules`);
+  return response.data;
+};
+
+export const getSubTypeModules = async ({
+  subTypeId,
+}: {
+  subTypeId: number;
+}) => {
+  const response = await trainingClient.get(`/sub-types/${subTypeId}/modules`);
   return response.data;
 };

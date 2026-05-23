@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import {
   useGetInstructorAssignedTracks,
   useGetInstructorProgress,
+  useGetSubTypeModules,
   useGetTrackModules,
+  useGetTypeModules,
   useUpdateInstructorProgress,
 } from "@/query/training/instructor";
 import {
@@ -39,9 +41,39 @@ export default function InstructorProgressPage() {
   const { data: moduleProgress, isLoading: isLoadingProgress } =
     useGetInstructorProgress();
   console.log(moduleProgress);
-  const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(
-    selectedTrackId as number,
+  // determine the selected assigned track (contains assigned_to, type, sub_type)
+  const selectedAssign = assignedTracks?.find(
+    (a) => a.track.id === selectedTrackId,
   );
+
+  const selectedTrackIdSafe = selectedAssign?.track?.id ?? 0;
+  const selectedTypeId = selectedAssign?.track?.type?.id ?? 0;
+  const selectedSubTypeId = selectedAssign?.track?.sub_type?.id ?? 0;
+
+  // call all hooks but pass safe ids (0 when not available). hooks' `enabled` flags prevent unwanted fetches.
+  const { data: trackModulesData, isLoading: isLoadingModules } =
+    useGetTrackModules(selectedTrackIdSafe as number);
+  const { data: typeModulesData, isLoading: isLoadingTypeModules } =
+    useGetTypeModules(selectedTypeId as number);
+  const { data: subTypeModulesData, isLoading: isLoadingSubTypeModules } =
+    useGetSubTypeModules(selectedSubTypeId as number);
+
+  // resolve the actual modules list and loading state depending on assignment type
+  const modules =
+    (selectedAssign?.assigned_to === "TrainingTrack" &&
+      trackModulesData?.modules) ||
+    (selectedAssign?.assigned_to === "Type" && typeModulesData) ||
+    (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
+    [];
+
+  const isLoadingSelectedModules =
+    selectedAssign?.assigned_to === "TrainingTrack"
+      ? isLoadingModules
+      : selectedAssign?.assigned_to === "Type"
+        ? isLoadingTypeModules
+        : selectedAssign?.assigned_to === "TypeSub"
+          ? isLoadingSubTypeModules
+          : false;
   const {
     mutate: updateProgress,
     isPending,
@@ -55,9 +87,7 @@ export default function InstructorProgressPage() {
 
     setSuccessMsg("");
 
-    const selectedModule = modulesData?.modules?.find(
-      (m) => m.id === selectedModuleId,
-    );
+    const selectedModule = modules.find((m: any) => m.id === selectedModuleId);
     updateProgress(
       {
         course_module_id: selectedModuleId,
@@ -168,14 +198,14 @@ export default function InstructorProgressPage() {
                     Select Module
                   </h2>
                 </div>
-                <div className="flex-1 overflow-y-auto max-h-[500px]">
-                  {isLoadingModules ? (
+                <div className="flex-1 overflow-y-auto max-h-125">
+                  {isLoadingSelectedModules ? (
                     <div className="flex justify-center py-10">
                       <Loader2 className="animate-spin text-teal" />
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-50">
-                      {modulesData?.modules?.map((module) => (
+                      {modules.map((module: any) => (
                         <button
                           key={module.id}
                           onClick={() => setSelectedModuleId(module.id)}

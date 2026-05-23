@@ -45,6 +45,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import EntityFormModal, { IFormField } from "./EntityFormModal";
+import { useGetPayments } from "@/query/admin/payment";
+import { useGetStudents } from "@/query/admin/student";
 
 // --- Types ---
 type Level = "TRACKS" | "TYPES" | "SUB_TYPES" | "HEADERS" | "MODULES";
@@ -56,6 +58,9 @@ interface IBreadcrumb {
 }
 
 export default function CourseTrackManager() {
+  const { data: payments } = useGetPayments();
+  const { data: students } = useGetStudents();
+  console.log("Payments:", payments, students);
   const [level, setLevel] = useState<Level>("TRACKS");
   const [breadcrumbs, setBreadcrumbs] = useState<IBreadcrumb[]>([]);
 

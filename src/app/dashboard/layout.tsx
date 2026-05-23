@@ -10,6 +10,7 @@ import {
   User,
   Settings,
   LogOut,
+  CreditCard,
   ChevronRight,
   Menu,
   X,
@@ -40,6 +41,16 @@ const ADMIN_SIDEBAR_ITEMS = [
     name: "Instructors",
     icon: <Users size={20} />,
     href: "/dashboard/admin/instructors",
+  },
+  {
+    name: "Students",
+    icon: <User size={20} />,
+    href: "/dashboard/admin/students",
+  },
+  {
+    name: "Payments",
+    icon: <CreditCard size={20} />,
+    href: "/dashboard/admin/payments",
   },
 ];
 

@@ -8,6 +8,8 @@ import {
   getStudentAttendancePerModule,
   getInstructorProgress,
   getInstructorAssignedTracks,
+  getTypeModules,
+  getSubTypeModules,
 } from "@/services/training/instructor";
 import { IInstructorProgressRequest } from "@/types/training/instructor";
 
@@ -77,5 +79,23 @@ export const useUpdateStudentAttendance = () => {
       queryClient.invalidateQueries({ queryKey: ["all-student-attendance"] });
       queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
     },
+  });
+};
+
+export const useGetTypeModules = (typeId: number) => {
+  return useQuery({
+    queryKey: ["type-modules", typeId],
+    queryFn: () => getTypeModules({ typeId }),
+    enabled: !!typeId,
+    select: (response) => response.data,
+  });
+};
+
+export const useGetSubTypeModules = (subTypeId: number) => {
+  return useQuery({
+    queryKey: ["sub-type-modules", subTypeId],
+    queryFn: () => getSubTypeModules({ subTypeId }),
+    enabled: !!subTypeId,
+    select: (response) => response.data,
   });
 };
