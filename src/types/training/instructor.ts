@@ -59,15 +59,15 @@ export interface IInstructorModuleResponse {
 export interface IAssignedTrack {
   instructor_id: number;
   description: string;
-  assigned_to: string;
+  assigned_to: "TypeSub" | "Type" | "TrainingTrack";
   track: {
     id: number;
     title: string;
-    type: {
+    type?: {
       id: number;
       title: string;
     };
-    sub_type: {
+    sub_type?: {
       id: number;
       title: string;
     };

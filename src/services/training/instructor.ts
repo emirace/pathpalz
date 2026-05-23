@@ -69,3 +69,17 @@ export const updateStudentAttendance = async ({
   );
   return response.data;
 };
+
+export const getTypeModules = async ({ typeId }: { typeId: number }) => {
+  const response = await trainingClient.get(`/types/${typeId}/modules`);
+  return response.data;
+};
+
+export const getSubTypeModules = async ({
+  subTypeId,
+}: {
+  subTypeId: number;
+}) => {
+  const response = await trainingClient.get(`/sub-types/${subTypeId}/modules`);
+  return response.data;
+};
