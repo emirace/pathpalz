@@ -5,5 +5,6 @@ export const useGetStudents = () => {
   return useQuery({
     queryKey: ["admin-students"],
     queryFn: getStudents,
+    select: (response) => response.data,
   });
 };

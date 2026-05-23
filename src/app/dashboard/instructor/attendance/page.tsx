@@ -6,13 +6,15 @@ import {
   useGetTrackModules,
   useGetStudentAttendancePerModule,
   useUpdateStudentAttendance,
+  useGetInstructorAssignedTracks,
+  useGetTypeModules,
+  useGetSubTypeModules,
 } from "@/query/training/instructor";
 import {
   CheckCircle,
   Circle,
   Calendar,
   Loader2,
-  AlertCircle,
   BookOpen,
   ChevronRight,
   ShieldCheck,
@@ -25,14 +27,46 @@ export default function InstructorAttendancePage() {
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: tracks, isLoading: isLoadingTracks } = useGetTracks();
-  const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(
-    selectedTrackId as number,
+  const { data: assignedTracks, isLoading: isAssignedTracks } =
+    useGetInstructorAssignedTracks();
+
+  // determine the selected assigned track (contains assigned_to, type, sub_type)
+  const selectedAssign = assignedTracks?.find(
+    (a) => a.track.id === selectedTrackId,
   );
+
+  const selectedTrackIdSafe = selectedAssign?.track?.id ?? 0;
+  const selectedTypeId = selectedAssign?.track?.type?.id ?? 0;
+  const selectedSubTypeId = selectedAssign?.track?.sub_type?.id ?? 0;
+
+  const { data: trackModulesData, isLoading: isLoadingModules } =
+    useGetTrackModules(selectedTrackIdSafe as number);
+  const { data: typeModulesData, isLoading: isLoadingTypeModules } =
+    useGetTypeModules(selectedTypeId as number);
+  const { data: subTypeModulesData, isLoading: isLoadingSubTypeModules } =
+    useGetSubTypeModules(selectedSubTypeId as number);
+
   const { data: moduleAttendance, isLoading: isLoadingAttendance } =
     useGetStudentAttendancePerModule(selectedModuleId as number);
   const { mutate: updateAttendance, isPending: isUpdating } =
     useUpdateStudentAttendance();
+
+  // resolve the actual modules list and loading state depending on assignment type
+  const modules =
+    (selectedAssign?.assigned_to === "TrainingTrack" &&
+      trackModulesData?.modules) ||
+    (selectedAssign?.assigned_to === "Type" && typeModulesData) ||
+    (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
+    [];
+
+  const isLoadingSelectedModules =
+    selectedAssign?.assigned_to === "TrainingTrack"
+      ? isLoadingModules
+      : selectedAssign?.assigned_to === "Type"
+        ? isLoadingTypeModules
+        : selectedAssign?.assigned_to === "TypeSub"
+          ? isLoadingSubTypeModules
+          : false;
 
   const handleToggleAttendance = (
     studentId: number,
@@ -82,32 +116,32 @@ export default function InstructorAttendancePage() {
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
               <BookOpen size={16} /> Select Track
             </h2>
-            {isLoadingTracks ? (
+            {isLoadingSelectedModules ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="animate-spin text-teal" />
               </div>
             ) : (
               <div className="space-y-2">
-                {tracks?.map((track) => (
+                {assignedTracks?.map((track) => (
                   <button
-                    key={track.id}
+                    key={track.track.id}
                     onClick={() => {
-                      setSelectedTrackId(track.id);
+                      setSelectedTrackId(track.track.id);
                       setSelectedModuleId(null);
                     }}
                     className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      selectedTrackId === track.id
+                      selectedTrackId === track.track.id
                         ? "border-teal bg-teal/5 text-teal shadow-sm"
                         : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
                     }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
-                      {track.title}
+                      {track.track.title}
                     </span>
                     <ChevronRight
                       size={14}
                       className={
-                        selectedTrackId === track.id
+                        selectedTrackId === track.track.id
                           ? "opacity-100"
                           : "opacity-0 group-hover:opacity-100"
                       }
@@ -128,8 +162,8 @@ export default function InstructorAttendancePage() {
                   <Loader2 className="animate-spin text-teal" />
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                  {modulesData?.modules?.map((module) => (
+                <div className="space-y-2 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
+                  {modules?.map((module: any) => (
                     <button
                       key={module.id}
                       onClick={() => setSelectedModuleId(module.id)}
@@ -156,7 +190,7 @@ export default function InstructorAttendancePage() {
         {/* Students List */}
         <div className="lg:col-span-3">
           {!selectedModuleId ? (
-            <div className="h-full min-h-[400px] rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12 text-center bg-white/50">
+            <div className="h-full min-h-100 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12 text-center bg-white/50">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
                 <Users size={40} className="text-gray-300" />
               </div>
@@ -241,25 +275,22 @@ export default function InstructorAttendancePage() {
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-full bg-teal/10 flex items-center justify-center text-teal font-bold border border-teal/20">
-                                    {student.user?.first_name?.[0] ||
-                                      student.user?.email?.[0].toUpperCase()}
+                                    {student?.first_name?.[0] ||
+                                      student?.email?.[0].toUpperCase()}
                                   </div>
                                   <div>
                                     <p className="text-sm font-bold text-[#00284F]">
-                                      {student.user?.first_name}{" "}
-                                      {student.user?.last_name}
+                                      {student?.first_name} {student?.last_name}
                                     </p>
                                     <p className="text-[10px] text-gray-400 uppercase tracking-tight font-medium">
-                                      ID:{" "}
-                                      {student.user?.external_id ||
-                                        student.user?.id}
+                                      ID: {student?.id}
                                     </p>
                                   </div>
                                 </div>
                               </td>
                               <td className="px-6 py-4">
                                 <span className="text-sm text-gray-500">
-                                  {student.user?.email}
+                                  {student?.email}
                                 </span>
                               </td>
                               <td className="px-6 py-4 text-center">
@@ -276,10 +307,7 @@ export default function InstructorAttendancePage() {
                               <td className="px-6 py-4 text-right">
                                 <button
                                   onClick={() =>
-                                    handleToggleAttendance(
-                                      student.user_id,
-                                      attended,
-                                    )
+                                    handleToggleAttendance(student.id, attended)
                                   }
                                   disabled={isUpdating}
                                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm ${

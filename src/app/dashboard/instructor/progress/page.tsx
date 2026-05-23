@@ -62,9 +62,8 @@ export default function InstructorProgressPage() {
   const modules =
     (selectedAssign?.assigned_to === "TrainingTrack" &&
       trackModulesData?.modules) ||
-    (selectedAssign?.assigned_to === "Type" && typeModulesData?.modules) ||
-    (selectedAssign?.assigned_to === "TypeSub" &&
-      subTypeModulesData?.modules) ||
+    (selectedAssign?.assigned_to === "Type" && typeModulesData) ||
+    (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
     [];
 
   const isLoadingSelectedModules =

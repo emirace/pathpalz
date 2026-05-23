@@ -87,6 +87,7 @@ export const useGetTypeModules = (typeId: number) => {
     queryKey: ["type-modules", typeId],
     queryFn: () => getTypeModules({ typeId }),
     enabled: !!typeId,
+    select: (response) => response.data,
   });
 };
 
@@ -95,5 +96,6 @@ export const useGetSubTypeModules = (subTypeId: number) => {
     queryKey: ["sub-type-modules", subTypeId],
     queryFn: () => getSubTypeModules({ subTypeId }),
     enabled: !!subTypeId,
+    select: (response) => response.data,
   });
 };
