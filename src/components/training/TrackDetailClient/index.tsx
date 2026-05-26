@@ -158,7 +158,7 @@ export default function TrackDetailClient() {
                 {track.description}
               </p>
 
-              <div className="flex flex-wrap gap-6 pt-4">
+              {/* <div className="flex flex-wrap gap-6 pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
                     <Clock className="w-5 h-5 text-teal" />
@@ -192,7 +192,7 @@ export default function TrackDetailClient() {
                     <p className="font-bold">Cohort-based</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="bg-white rounded-3xl p-8 text-[#00284F] shadow-2xl">
@@ -222,13 +222,13 @@ export default function TrackDetailClient() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleApply("training_track", track.id)}
+                <Link
+                  href={`/training/${track.slug}#types`}
                   className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
                 >
                   {isOpen ? "Apply for this path" : "Join the Waitlist"}
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
 
                 <p className="text-center text-xs text-gray-400 font-medium">
                   {isOpen
@@ -246,6 +246,8 @@ export default function TrackDetailClient() {
         trackId={String(track.id)}
         trackTitle={track.title}
         onApply={handleApply}
+        slug={slug as string}
+        isOpen={isOpen}
       />
 
       <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
@@ -253,14 +255,15 @@ export default function TrackDetailClient() {
           {/* Left: Curriculum & Modules */}
           <div className="lg:col-span-3 space-y-12">
             {/* Specialized Tracks Section */}
-            <div className="lg:col-span-2 ">
+            <div id="sub_types" className="lg:col-span-2 ">
               <SpecializedTracks
                 trackId={String(track.id)}
                 onApply={handleApply}
+                isOpen={isOpen}
               />
             </div>
 
-            <div>
+            {/* <div>
               <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
                 Curriculum Deep Dive
               </h2>
@@ -270,7 +273,7 @@ export default function TrackDetailClient() {
                 subType={specializedSubTypes}
                 onApply={handleApply}
               />
-            </div>
+            </div> */}
 
             <div>
               <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">

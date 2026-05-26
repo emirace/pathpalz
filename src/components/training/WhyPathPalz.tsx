@@ -17,7 +17,9 @@ const WhyPathPalz = () => {
               We don&apos;t do passive watching. Every week you build something
               real. You have a learning partner to work through challenges with,
               and an accountability manager who checks in with you every single
-              week. By the end, you have a working project and a{" "}
+              week. By the end, you have a{" "}
+              <span className="font-semibold text-navy">working project</span>{" "}
+              and a{" "}
               <span className="font-semibold text-navy">GitHub profile</span> —
               not just a certificate.
             </p>

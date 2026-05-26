@@ -17,16 +17,19 @@ import {
   useGetTypeSubTypes,
   useCreateSubType,
   useUpdateSubType,
+  useDeleteSubType,
 } from "@/query/admin/type-subs";
 import {
   useGetSubTypeModuleHeaders,
   useCreateCourseModuleHeader,
   useUpdateCourseModuleHeader,
+  useDeleteCourseModuleHeader,
 } from "@/query/admin/course-module-headers";
 import {
   useGetHeaderModules,
   useCreateCourseModule,
   useUpdateCourseModule,
+  useDeleteCourseModule,
 } from "@/query/admin/course-modules";
 
 import {
@@ -42,6 +45,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import EntityFormModal, { IFormField } from "./EntityFormModal";
+import { useGetPayments } from "@/query/admin/payment";
+import { useGetStudents } from "@/query/admin/student";
 
 // --- Types ---
 type Level = "TRACKS" | "TYPES" | "SUB_TYPES" | "HEADERS" | "MODULES";
@@ -53,6 +58,9 @@ interface IBreadcrumb {
 }
 
 export default function CourseTrackManager() {
+  const { data: payments } = useGetPayments();
+  const { data: students } = useGetStudents();
+  console.log("Payments:", payments, students);
   const [level, setLevel] = useState<Level>("TRACKS");
   const [breadcrumbs, setBreadcrumbs] = useState<IBreadcrumb[]>([]);
 
@@ -111,12 +119,15 @@ export default function CourseTrackManager() {
 
   const createSubType = useCreateSubType();
   const updateSubType = useUpdateSubType();
+  const deleteSubType = useDeleteSubType();
 
   const createHeader = useCreateCourseModuleHeader();
   const updateHeader = useUpdateCourseModuleHeader();
+  const deleteHeader = useDeleteCourseModuleHeader();
 
   const createModule = useCreateCourseModule();
   const updateModule = useUpdateCourseModule();
+  const deleteModule = useDeleteCourseModule();
 
   // --- Data for Current Level ---
   const currentTypes = types;
@@ -226,7 +237,7 @@ export default function CourseTrackManager() {
           type: "select",
           options: [
             { label: "Open", value: "open" },
-            { label: "Closed", value: "closed" },
+            { label: "Coming Soon", value: "coming_soon" },
           ],
         },
       ],
@@ -247,8 +258,18 @@ export default function CourseTrackManager() {
     openModal(
       item ? "Edit Type" : "Create Type",
       [
-        { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number" },
+        {
+          name: "title",
+          label: "Title",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Fundamental Track", value: "Fundamental Track" },
+            { label: "Specialized Track", value: "Specialized Track" },
+          ],
+        },
+        { name: "price_ngn", label: "Price (NGN)", type: "number" },
+        { name: "price_gbp", label: "Price (GBP)", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -272,7 +293,18 @@ export default function CourseTrackManager() {
       item ? "Edit Sub Type" : "Create Sub Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
+        {
+          name: "price_ngn",
+          label: "Price (NGN)",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "price_gbp",
+          label: "Price (GBP)",
+          type: "number",
+          required: true,
+        },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -405,7 +437,9 @@ export default function CourseTrackManager() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete();
+                  if (confirm("Are you sure you want to delete this item?")) {
+                    onDelete();
+                  }
                 }}
                 className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               >
@@ -434,7 +468,7 @@ export default function CourseTrackManager() {
 
         {item.price && (
           <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
-            <span className="font-semibold text-teal">${item.price}</span>
+            <span className="font-semibold text-teal">£{item.price}</span>
             <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
               {item.status}
             </span>
@@ -517,7 +551,7 @@ export default function CourseTrackManager() {
                 subType,
                 <LayoutGrid size={20} />,
                 () => openSubTypeModal(subType),
-                undefined, // Assuming no delete subtype endpoint yet
+                () => deleteSubType.mutate(subType.id),
                 () =>
                   handleNavigate(
                     "HEADERS",
@@ -534,7 +568,7 @@ export default function CourseTrackManager() {
                 header,
                 <FileText size={20} />,
                 () => openHeaderModal(header),
-                undefined,
+                () => deleteHeader.mutate(header.id),
                 () =>
                   handleNavigate("MODULES", header.id, header.title, "HEADERS"),
               ),
@@ -542,8 +576,11 @@ export default function CourseTrackManager() {
 
           {level === "MODULES" &&
             currentModules.map((module: any) =>
-              renderCard(module, <BookOpen size={20} />, () =>
-                openModuleModal(module),
+              renderCard(
+                module,
+                <BookOpen size={20} />,
+                () => openModuleModal(module),
+                () => deleteModule.mutate(module.id),
               ),
             )}
         </div>

@@ -6,10 +6,9 @@ import TypeCard from "./TypeCard";
 interface TrainingPathsProps {
   trackId: string;
   trackTitle: string;
-  onApply: (
-    type: "training_track" | "type" | "sub_type",
-    id: number,
-  ) => void;
+  slug: string;
+  onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
+  isOpen: boolean;
 }
 const TypeCardSkeleton = () => (
   <div className="bg-white rounded-4xl p-8 sm:p-10 border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
@@ -40,6 +39,8 @@ export default function TrainingPaths({
   trackId,
   trackTitle,
   onApply,
+  slug,
+  isOpen,
 }: TrainingPathsProps) {
   const { data: typesRes, isLoading: loadingTypes } = useGetAllTrackTypes({
     track_id: trackId,
@@ -49,7 +50,7 @@ export default function TrainingPaths({
   if (!types || types.length === 0) return null;
 
   return (
-    <section className="py-12 bg-[#F2F4F7] border-y border-gray-100">
+    <section id="types" className="py-12 bg-[#F2F4F7] border-y border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mb-16">
           <h2 className="text-3xl sm:text-4xl  font-black font-manrope  text-[#00284F] mb-6 tracking-tight">
@@ -70,6 +71,8 @@ export default function TrainingPaths({
                   type={type}
                   index={index}
                   onApply={onApply}
+                  slug={slug}
+                  isOpen={isOpen}
                 />
               ))}
         </div>

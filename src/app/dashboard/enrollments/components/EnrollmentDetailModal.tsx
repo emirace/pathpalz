@@ -286,7 +286,7 @@ const EnrollmentDetailModal = ({
               Enrolled:
             </span>
             <span>
-              {new Date(enrollment.created_at).toLocaleDateString("en-GB", {
+              {new Date(enrollment.purchased_at).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",

@@ -5,6 +5,7 @@ import {
   updateSubType,
   getAllSubTypes,
   getTypeSubTypes,
+  deleteSubType,
 } from "@/services/admin/type-subs";
 import {
   ISubTypeCreatePayload,
@@ -60,5 +61,15 @@ export const useGetTypeSubTypes = ({ type_id }: { type_id: string }) => {
     queryKey: ["admin-type-subs", type_id],
     queryFn: () => getTypeSubTypes({ type_id }),
     enabled: !!type_id,
+  });
+};
+
+export const useDeleteSubType = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number | string) => deleteSubType(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-type-subs"] });
+    },
   });
 };

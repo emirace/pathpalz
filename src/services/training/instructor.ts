@@ -2,6 +2,8 @@ import {
   IInstructorProgressRequest,
   IInstructorProgressResponse,
   IInstructorModuleResponse,
+  IAssignedTrack,
+  IGetInstructorAssignedTracksResponse,
 } from "@/types/training/instructor";
 import { trainingClient } from "../api";
 
@@ -17,9 +19,11 @@ export const getInstructorProgress = async () => {
   return response.data;
 };
 
-export const getInstructorAssignedTracks = async () => {
+export const getInstructorAssignedTracks = async (): Promise<
+  IAssignedTrack[]
+> => {
   const response = await trainingClient.get(`/instructor/my-assigns`);
-  return response.data;
+  return response.data.data;
 };
 
 export const getTrackModules = async (
@@ -59,9 +63,23 @@ export const updateStudentAttendance = async ({
   course_module_id: number;
   attendance: boolean;
 }) => {
-  const response = await trainingClient.post(
+  const response = await trainingClient.patch(
     `/instructor/attendance/students/${studentId}`,
-    { course_module_id, attendance },
+    { course_module_id, attended: attendance },
   );
+  return response.data;
+};
+
+export const getTypeModules = async ({ typeId }: { typeId: number }) => {
+  const response = await trainingClient.get(`/types/${typeId}/modules`);
+  return response.data;
+};
+
+export const getSubTypeModules = async ({
+  subTypeId,
+}: {
+  subTypeId: number;
+}) => {
+  const response = await trainingClient.get(`/sub-types/${subTypeId}/modules`);
   return response.data;
 };
