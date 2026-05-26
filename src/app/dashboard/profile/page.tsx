@@ -8,6 +8,8 @@ import {
   Mail,
   Phone,
   Shield,
+  Link as LinkIcon,
+  FileText,
   Loader2,
   Edit3,
   Camera,
@@ -24,6 +26,8 @@ export default function ProfilePage() {
     first_name: "",
     last_name: "",
     phone_number: "",
+    bio: "",
+    social_media_link: "",
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -39,11 +43,15 @@ export default function ProfilePage() {
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         phone_number: user.phone_number || "",
+        bio: user.bio || "",
+        social_media_link: user.social_media_link || "",
       });
     }
   }, [user]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -62,6 +70,8 @@ export default function ProfilePage() {
     data.append("first_name", formData.first_name);
     data.append("last_name", formData.last_name);
     data.append("phone_number", formData.phone_number);
+    data.append("bio", formData.bio);
+    data.append("social_media_link", formData.social_media_link);
     if (selectedImage) {
       data.append("profile_image", selectedImage);
     }
@@ -105,6 +115,9 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
+  const socialMediaLink = user.social_media_link || user.social_link || "";
 
   return (
     <div className="mx-auto max-w-4xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -157,7 +170,7 @@ export default function ProfilePage() {
               )}
             </div>
             <h2 className="text-xl font-bold text-gray-900">
-              {user.first_name + " " + user.last_name || "PathPalz Member"}
+              {fullName || "PathPalz Member"}
             </h2>
             <p className="mt-1 text-sm font-medium text-teal capitalize">
               {user.usertype?.[0] || "User"}
@@ -219,10 +232,54 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* About Card */}
+      <div className="mt-6 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
+        <h3 className="mb-6 text-lg font-semibold text-gray-900 border-b border-gray-100 pb-4">
+          About
+        </h3>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="flex items-start gap-4 rounded-xl border border-transparent p-4 transition-all hover:border-gray-100 hover:bg-gray-50 hover:shadow-sm">
+            <div className="rounded-full bg-amber-50 p-3 text-amber-600 shadow-inner">
+              <FileText size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-500">Bio</p>
+              <p className="mt-1 whitespace-pre-line font-medium text-gray-900">
+                {user.bio || "Not provided"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 rounded-xl border border-transparent p-4 transition-all hover:border-gray-100 hover:bg-gray-50 hover:shadow-sm">
+            <div className="rounded-full bg-cyan-50 p-3 text-cyan-600 shadow-inner">
+              <LinkIcon size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-500">
+                Social Media Link
+              </p>
+              {socialMediaLink ? (
+                <a
+                  href={socialMediaLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 block break-words font-medium text-navy transition-colors hover:text-teal hover:underline"
+                >
+                  {socialMediaLink}
+                </a>
+              ) : (
+                <p className="mt-1 font-medium text-gray-900">Not provided</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Edit Profile</h2>
               <button
@@ -252,9 +309,9 @@ export default function ProfilePage() {
               <div className="flex flex-col items-center">
                 <div className="relative mb-3">
                   <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100">
-                    {imagePreview || user.image ? (
+                    {imagePreview || user.profile_image ? (
                       <Image
-                        src={imagePreview || user.image}
+                        src={imagePreview || user.profile_image}
                         alt="Profile"
                         width={80}
                         height={80}
@@ -325,6 +382,41 @@ export default function ProfilePage() {
                   name="phone_number"
                   value={formData.phone_number}
                   onChange={handleInputChange}
+                  className="w-full rounded-lg border text-black border-gray-300 px-4 py-2 focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="bio"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Bio
+                </label>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full resize-none rounded-lg border text-black border-gray-300 px-4 py-2 focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="social_media_link"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Social Media Link
+                </label>
+                <input
+                  type="url"
+                  id="social_media_link"
+                  name="social_media_link"
+                  value={formData.social_media_link}
+                  onChange={handleInputChange}
+                  placeholder="https://"
                   className="w-full rounded-lg border text-black border-gray-300 px-4 py-2 focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20"
                 />
               </div>
