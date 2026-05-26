@@ -27,6 +27,10 @@ export default function ProfilePage() {
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -64,9 +68,24 @@ export default function ProfilePage() {
 
     updateProfileMutation.mutate(data, {
       onSuccess: () => {
-        setIsEditModalOpen(false);
+        setNotification({
+          type: "success",
+          message: "Profile updated successfully.",
+        });
         setSelectedImage(null);
         setImagePreview(null);
+        // close modal shortly after showing success message
+        setTimeout(() => {
+          setIsEditModalOpen(false);
+          setNotification(null);
+        }, 1500);
+      },
+      onError: (error: any) => {
+        const msg =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Could not update profile. Please try again.";
+        setNotification({ type: "error", message: msg });
       },
     });
   };
@@ -207,7 +226,10 @@ export default function ProfilePage() {
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900">Edit Profile</h2>
               <button
-                onClick={() => setIsEditModalOpen(false)}
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setNotification(null);
+                }}
                 className="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
               >
                 <X size={20} />
@@ -215,6 +237,17 @@ export default function ProfilePage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {notification && (
+                <div
+                  className={`mb-2 rounded-md border p-3 text-sm ${
+                    notification.type === "success"
+                      ? "bg-green-50 text-green-800 border-green-100"
+                      : "bg-red-50 text-red-800 border-red-100"
+                  }`}
+                >
+                  {notification.message}
+                </div>
+              )}
               {/* Profile Image Picker */}
               <div className="flex flex-col items-center">
                 <div className="relative mb-3">
@@ -244,7 +277,10 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label htmlFor="first_name" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="first_name"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     First Name
                   </label>
                   <input
@@ -258,7 +294,10 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="last_name" className="mb-1 block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="last_name"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Last Name
                   </label>
                   <input
@@ -274,7 +313,10 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label htmlFor="phone_number" className="mb-1 block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="phone_number"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
                   Phone Number
                 </label>
                 <input
@@ -290,7 +332,10 @@ export default function ProfilePage() {
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsEditModalOpen(false)}
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setNotification(null);
+                  }}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
                 >
                   Cancel

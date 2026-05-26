@@ -2,7 +2,11 @@
 
 import React, { useState } from "react";
 import { useGetMyEnrollments } from "@/query/training/enrollments";
-import { useGetTrackModules } from "@/query/training/instructor";
+import {
+  useGetSubTypeModules,
+  useGetTrackModules,
+  useGetTypeModules,
+} from "@/query/training/instructor";
 import {
   useMarkAttendance,
   useGetModuleAttendance,
@@ -19,23 +23,13 @@ import {
 } from "lucide-react";
 import { useGetUser } from "@/query/auth";
 
-export default function StudentAttendancePage() {
+const ModuleRow: React.FC<{
+  module: any;
+}> = ({ module }) => {
   const { data: user } = useGetUser();
-  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
-  const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
-
-  const { data: enrollments, isLoading: isLoadingEnrollments } =
-    useGetMyEnrollments();
-
-  // Extract unique tracks from enrollments
-  const enrolledTracks = enrollments?.map((e) => e.purchased_course) || [];
-
-  const { data: modulesData, isLoading: isLoadingModules } = useGetTrackModules(
-    selectedTrackId as number,
-  );
   const { mutate: markAttendance, isPending: isMarking } = useMarkAttendance();
   const { data: attendanceData, isLoading: isLoadingAttendance } =
-    useGetModuleAttendance(selectedModuleId as number);
+    useGetModuleAttendance(module.id as number);
 
   const handleMarkAttendance = (moduleId: number) => {
     markAttendance({
@@ -46,13 +40,106 @@ export default function StudentAttendancePage() {
 
   const isAttended = (moduleId: number) => {
     // Check if the current user has attended this module
-    return attendanceData?.attendance?.some(
-      (record) =>
+    const result = attendanceData?.attendance?.some((record) => {
+      return (
         record.course_module_id === moduleId &&
-        record.user_id === user?.id &&
-        record.attended,
-    );
+        record?.user?.external_id === user?.id.toString() &&
+        record.attended
+      );
+    });
+    console.log("Attendance check for module", moduleId, ":", result);
+    return result;
   };
+
+  return (
+    <div
+      key={module.id}
+      className={`p-6 transition-colors flex items-center justify-between group hover:bg-gray-50/50`}
+    >
+      <div className="flex items-center gap-4">
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
+            isAttended(module.id)
+              ? "bg-green-50 border-green-200 text-green-600 shadow-sm"
+              : "bg-gray-50 border-gray-100 text-gray-300 group-hover:border-teal/20"
+          }`}
+        >
+          {isAttended(module.id) ? (
+            <CheckCircle size={20} />
+          ) : (
+            <Circle size={20} />
+          )}
+        </div>
+        <div>
+          <h4 className={`font-bold transition-colors text-gray-900`}>
+            {module.title}
+          </h4>
+          <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
+            <Calendar size={12} />
+            Updated: {new Date(module.updated_at).toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {isAttended(module.id) ? (
+          <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">
+            Attended
+          </span>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMarkAttendance(module.id);
+            }}
+            disabled={isMarking}
+            className="px-4 py-2 bg-teal text-white text-sm font-bold rounded-lg hover:bg-teal/90 transition-all shadow-sm shadow-teal/10 hover:shadow-lg hover:shadow-teal/20 disabled:opacity-50"
+          >
+            {isMarking || isLoadingAttendance ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Mark Attendance"
+            )}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default function StudentAttendancePage() {
+  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+  const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
+
+  const { data: enrollments, isLoading: isLoadingEnrollments } =
+    useGetMyEnrollments();
+
+  // Extract unique tracks from enrollments
+  const enrolledTracks = enrollments?.map((e) => e.purchased_course) || [];
+
+  const selectedAssign = enrolledTracks?.find((a) => a.id === selectedTrackId);
+
+  const { data: trackModulesData, isLoading: isLoadingModules } =
+    useGetTrackModules(selectedAssign?.id as number);
+  const { data: typeModulesData, isLoading: isLoadingTypeModules } =
+    useGetTypeModules(selectedAssign?.id as number);
+  const { data: subTypeModulesData, isLoading: isLoadingSubTypeModules } =
+    useGetSubTypeModules(selectedAssign?.id as number);
+
+  const modules =
+    (selectedAssign?.type === "TrainingTrack" && trackModulesData?.modules) ||
+    (selectedAssign?.type === "Type" && typeModulesData) ||
+    (selectedAssign?.type === "TypeSub" && subTypeModulesData) ||
+    [];
+
+  const isLoadingSelectedModules =
+    selectedAssign?.type === "TrainingTrack"
+      ? isLoadingModules
+      : selectedAssign?.type === "Type"
+        ? isLoadingTypeModules
+        : selectedAssign?.type === "TypeSub"
+          ? isLoadingSubTypeModules
+          : false;
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -92,7 +179,7 @@ export default function StudentAttendancePage() {
                         : "border-gray-100 hover:border-teal/30 hover:bg-gray-50"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 text-black">
                       <div
                         className={`p-2 rounded-lg ${selectedTrackId === track.id ? "bg-teal text-white" : "bg-gray-100 text-gray-400 group-hover:bg-teal/10 group-hover:text-teal"}`}
                       >
@@ -152,72 +239,17 @@ export default function StudentAttendancePage() {
                 </p>
               </div>
 
-              {isLoadingModules ? (
+              {isLoadingSelectedModules ? (
                 <div className="flex justify-center py-20">
                   <Loader2 className="animate-spin text-teal h-8 w-8" />
                 </div>
               ) : (
                 <div className="divide-y divide-gray-50">
-                  {modulesData?.modules?.map((module) => (
-                    <div
-                      key={module.id}
-                      className={`p-6 transition-colors flex items-center justify-between group ${selectedModuleId === module.id ? "bg-teal/5" : "hover:bg-gray-50/50"}`}
-                      onClick={() => setSelectedModuleId(module.id)}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${
-                            isAttended(module.id)
-                              ? "bg-green-50 border-green-200 text-green-600 shadow-sm"
-                              : "bg-gray-50 border-gray-100 text-gray-300 group-hover:border-teal/20"
-                          }`}
-                        >
-                          {isAttended(module.id) ? (
-                            <CheckCircle size={20} />
-                          ) : (
-                            <Circle size={20} />
-                          )}
-                        </div>
-                        <div>
-                          <h4
-                            className={`font-bold transition-colors ${selectedModuleId === module.id ? "text-teal" : "text-gray-900"}`}
-                          >
-                            {module.title}
-                          </h4>
-                          <p className="text-xs text-gray-400 mt-1 flex items-center gap-2">
-                            <Calendar size={12} />
-                            Updated:{" "}
-                            {new Date(module.updated_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        {isAttended(module.id) ? (
-                          <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200">
-                            Attended
-                          </span>
-                        ) : (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleMarkAttendance(module.id);
-                            }}
-                            disabled={isMarking}
-                            className="px-4 py-2 bg-teal text-white text-sm font-bold rounded-lg hover:bg-teal/90 transition-all shadow-sm shadow-teal/10 hover:shadow-lg hover:shadow-teal/20 disabled:opacity-50"
-                          >
-                            {isMarking && selectedModuleId === module.id ? (
-                              <Loader2 size={16} className="animate-spin" />
-                            ) : (
-                              "Mark Attendance"
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                  {modules?.map((module: any) => (
+                    <ModuleRow key={module.id} module={module} />
                   ))}
 
-                  {modulesData?.modules?.length === 0 && (
+                  {modules?.length === 0 && (
                     <div className="py-20 text-center">
                       <BookOpen
                         size={48}

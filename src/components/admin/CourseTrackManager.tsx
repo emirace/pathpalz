@@ -237,7 +237,7 @@ export default function CourseTrackManager() {
           type: "select",
           options: [
             { label: "Open", value: "open" },
-            { label: "Closed", value: "closed" },
+            { label: "Coming Soon", value: "coming_soon" },
           ],
         },
       ],
@@ -268,7 +268,8 @@ export default function CourseTrackManager() {
             { label: "Specialized Track", value: "Specialized Track" },
           ],
         },
-        { name: "price", label: "Price", type: "number" },
+        { name: "price_ngn", label: "Price (NGN)", type: "number" },
+        { name: "price_gbp", label: "Price (GBP)", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -292,7 +293,18 @@ export default function CourseTrackManager() {
       item ? "Edit Sub Type" : "Create Sub Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
+        {
+          name: "price_ngn",
+          label: "Price (NGN)",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "price_gbp",
+          label: "Price (GBP)",
+          type: "number",
+          required: true,
+        },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -425,7 +437,9 @@ export default function CourseTrackManager() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete();
+                  if (confirm("Are you sure you want to delete this item?")) {
+                    onDelete();
+                  }
                 }}
                 className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               >

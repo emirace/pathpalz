@@ -86,7 +86,7 @@ export default function MyEnrollmentsPage() {
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-400 font-medium font-manrope uppercase tracking-wider">
                       <Calendar size={12} />
-                      Joined {new Date(item.created_at).toLocaleDateString()}
+                      Joined {new Date(item.purchased_at).toLocaleDateString()}
                     </div>
                   </div>
                   <div

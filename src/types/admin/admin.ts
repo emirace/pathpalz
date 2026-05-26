@@ -25,7 +25,8 @@ export interface IType {
   training_track_id: number;
   title: string;
   description: string;
-  price: string;
+  price_ngn: string;
+  price_gbp: string;
   created_at: string;
   updated_at: string;
 }
@@ -34,14 +35,16 @@ export interface ITypeCreatePayload {
   training_track_id: number;
   title: string;
   description: string;
-  price: string;
+  price_ngn: string;
+  price_gbp: string;
 }
 
 export interface ITypeUpdatePayload {
   training_track_id?: number;
   title?: string;
   description?: string;
-  price?: string;
+  price_ngn?: string;
+  price_gbp?: string;
 }
 
 export interface ISubType {
@@ -50,7 +53,8 @@ export interface ISubType {
   type_id: number;
   title: string;
   description: string;
-  price: string;
+  price_ngn: string;
+  price_gbp: string;
   created_at: string;
   updated_at: string;
   type?: IType;
@@ -61,7 +65,8 @@ export interface ISubTypeCreatePayload {
   type_id: number;
   title: string;
   description: string;
-  price: string;
+  price_ngn: string;
+  price_gbp: string;
 }
 
 export interface ISubTypeUpdatePayload {
@@ -69,7 +74,8 @@ export interface ISubTypeUpdatePayload {
   type_id?: number;
   title?: string;
   description?: string;
-  price?: string;
+  price_ngn?: string;
+  price_gbp?: string;
 }
 
 export interface ICourseModuleHeader {

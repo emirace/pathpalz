@@ -43,4 +43,5 @@ export interface IEnrollment {
   };
   order_status: string;
   created_at: string;
+  purchased_at: string;
 }

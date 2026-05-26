@@ -106,13 +106,13 @@ const LearningTracks = ({}: LearningTracksProps) => {
   }
 
   return (
-    <section className="py-20 bg-[#F3F3F8]">
+    <section id="learning_tracks" className="py-20 bg-[#F3F3F8]">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-12">
           <div className="space-y-2">
             <h2 className="text-3xl md:text-4xl font-extrabold font-manrope text-[#00284F]">
-              Specialized Learning Tracks
+              Learning Tracks
             </h2>
             <p className="text-[#424750] text-base">
               Precision-engineered curricula for the modern industry.

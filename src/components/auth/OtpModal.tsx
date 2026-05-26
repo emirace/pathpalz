@@ -56,7 +56,10 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
     if (!pasted) return;
 
     const newOtp = [...otp];
@@ -76,12 +79,16 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
         {
           onSuccess: (data) => {
             if (data.token) localStorage.setItem("authToken", data.token);
-            if (data.refresh_token) localStorage.setItem("refreshToken", data.refresh_token);
+            if (data.refresh_token)
+              localStorage.setItem("refreshToken", data.refresh_token);
             onClose();
             router.push("/training");
           },
           onError: (err: any) => {
-            setError(err.response?.data?.message || "Invalid OTP code. Please try again.");
+            setError(
+              err.response?.data?.message ||
+                "Invalid OTP code. Please try again.",
+            );
           },
         },
       );
@@ -108,7 +115,7 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
             localStorage.setItem("refreshToken", data.refresh_token);
           }
           onClose();
-          router.push("/training");
+          router.push("/dashboard");
         },
         onError: (err: any) => {
           setError(

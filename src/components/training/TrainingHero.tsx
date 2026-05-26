@@ -44,12 +44,12 @@ const TrainingHero = ({ onApply, onWaitlist }: TrainingHeroProps) => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
-              <button
-                onClick={onApply}
+              <Link
+                href={"/training#learning_tracks"}
                 className="inline-flex items-center justify-center h-14 px-8 font-bold text-white transition-all duration-300 rounded-xl bg-[#00284F] hover:bg-[#00284F]/90 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-[#00284F]/20 cursor-pointer"
               >
-                Apply — Software Development
-              </button>
+                Apply
+              </Link>
               <button
                 onClick={onWaitlist}
                 className="inline-flex items-center justify-center h-14 px-8 font-bold text-[#00284F] transition-all duration-300 rounded-xl border-2 border-[#00284F]/20 hover:border-[#00284F]/40 hover:bg-[#00284F]/5 active:bg-[#00284F]/10 cursor-pointer"
@@ -61,7 +61,7 @@ const TrainingHero = ({ onApply, onWaitlist }: TrainingHeroProps) => {
 
           {/* Right — Image */}
           <div className="relative flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[580px] aspect-4/3 rounded-4xl overflow-hidden shadow-2xl shadow-[#00284F]/10">
+            <div className="relative w-full max-w-145 aspect-4/3 rounded-4xl overflow-hidden shadow-2xl shadow-[#00284F]/10">
               <Image
                 src="/training_hero.png"
                 alt="Students collaborating in a modern tech workspace"
@@ -72,7 +72,7 @@ const TrainingHero = ({ onApply, onWaitlist }: TrainingHeroProps) => {
               />
               {/* Coming Soon badge */}
               <div className="absolute top-4 right-4 bg-[#00284F]/80 backdrop-blur-sm text-white text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg">
-                Coming Soon
+                Start Now
               </div>
             </div>
           </div>

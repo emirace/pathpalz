@@ -12,23 +12,28 @@ import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
 import { ISubType, IType } from "@/types/admin/admin";
 import SyllabusModal from "./SyllabusModal";
+import { useSetting } from "@/states/setting";
+import { getCurrencySymbol } from "@/utils/currency";
 
 interface SpecializedTracksProps {
   trackId: string;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
+  isOpen: boolean;
 }
 
 const SubTypeCard = ({
   subType,
   onApply,
   onViewSyllabus,
+  isOpen,
 }: {
   subType: ISubType;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
   onViewSyllabus: (subType: ISubType) => void;
+  isOpen: boolean;
 }) => {
-  const isFullStack = subType.title.toLowerCase().includes("full stack");
-  
+  const { country } = useSetting();
+
   const getIcon = (title: string) => {
     const t = title.toLowerCase();
     if (t.includes("front")) return <Monitor className="w-6 h-6" />;
@@ -52,23 +57,29 @@ const SubTypeCard = ({
           {getIcon(subType.title)}
         </div>
         <div className="text-right">
-          {isFullStack && (
-            <span className="text-xs text-gray-400 line-through block mb-0.5">£1,400</span>
-          )}
           <span className="text-2xl font-black text-[#00284F]">
-            £{parseInt(subType.price) || 700}
+            {getCurrencySymbol(country?.currency)}
+            {parseInt(
+              country?.currency === "NGN"
+                ? subType.price_ngn
+                : subType.price_gbp,
+            )}
           </span>
         </div>
       </div>
 
       <h3 className="text-xl font-bold text-[#00284F] mb-3">{subType.title}</h3>
       <p className="text-sm text-gray-500 mb-6 leading-relaxed flex-1">
-        {subType.description || "Master industry-standard workflows and build production-ready systems with expert guidance."}
+        {subType.description ||
+          "Master industry-standard workflows and build production-ready systems with expert guidance."}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-8">
         {getTags(subType.title).map((tag) => (
-          <span key={tag} className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold">
+          <span
+            key={tag}
+            className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold"
+          >
             {tag}
           </span>
         ))}
@@ -82,12 +93,16 @@ const SubTypeCard = ({
           View Syllabus
           <ChevronRight className="w-4 h-4" />
         </button>
-        <button
-          onClick={() => onApply("sub_type", subType.id)}
-          className="bg-[#00677D] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#00677D]/90 transition-colors shadow-lg shadow-[#00677D]/20"
-        >
-          Apply
-        </button>
+        {isOpen ? (
+          <button
+            onClick={() => onApply("sub_type", subType.id)}
+            className="bg-[#00677D] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#00677D]/90 transition-colors shadow-lg shadow-[#00677D]/20"
+          >
+            Apply
+          </button>
+        ) : (
+          <span className="text-gray-400 italic text-sm">Join Waitlist</span>
+        )}
       </div>
     </div>
   );
@@ -96,24 +111,27 @@ const SubTypeCard = ({
 const SpecializedTracksSkeleton = () => (
   <div className="w-full space-y-12">
     <div className="flex items-center gap-4 animate-pulse">
-        <div className="h-10 bg-gray-100 rounded-xl w-64" />
-        <div className="h-px bg-gray-100 flex-1" />
+      <div className="h-10 bg-gray-100 rounded-xl w-64" />
+      <div className="h-px bg-gray-100 flex-1" />
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="bg-white rounded-3xl p-8 border border-gray-100 h-[350px] animate-pulse">
-            <div className="flex justify-between mb-8">
-                <div className="w-12 h-12 bg-gray-100 rounded-xl" />
-                <div className="w-20 h-8 bg-gray-100 rounded-lg" />
-            </div>
-            <div className="h-6 bg-gray-100 rounded-lg w-3/4 mb-4" />
-            <div className="h-4 bg-gray-100 rounded-lg w-full mb-2" />
-            <div className="h-4 bg-gray-100 rounded-lg w-5/6 mb-8" />
-            <div className="flex gap-2 mb-8">
-                <div className="h-6 bg-gray-100 rounded-full w-16" />
-                <div className="h-6 bg-gray-100 rounded-full w-20" />
-                <div className="h-6 bg-gray-100 rounded-full w-16" />
-            </div>
+        <div
+          key={i}
+          className="bg-white rounded-3xl p-8 border border-gray-100 h-[350px] animate-pulse"
+        >
+          <div className="flex justify-between mb-8">
+            <div className="w-12 h-12 bg-gray-100 rounded-xl" />
+            <div className="w-20 h-8 bg-gray-100 rounded-lg" />
+          </div>
+          <div className="h-6 bg-gray-100 rounded-lg w-3/4 mb-4" />
+          <div className="h-4 bg-gray-100 rounded-lg w-full mb-2" />
+          <div className="h-4 bg-gray-100 rounded-lg w-5/6 mb-8" />
+          <div className="flex gap-2 mb-8">
+            <div className="h-6 bg-gray-100 rounded-full w-16" />
+            <div className="h-6 bg-gray-100 rounded-full w-20" />
+            <div className="h-6 bg-gray-100 rounded-full w-16" />
+          </div>
         </div>
       ))}
     </div>
@@ -123,6 +141,7 @@ const SpecializedTracksSkeleton = () => (
 export default function SpecializedTracks({
   trackId,
   onApply,
+  isOpen,
 }: SpecializedTracksProps) {
   const [isSyllabusModalOpen, setIsSyllabusModalOpen] = React.useState(false);
   const [selectedSubType, setSelectedSubType] = React.useState<ISubType | null>(
@@ -134,8 +153,8 @@ export default function SpecializedTracks({
   });
   const types = typesRes?.data || [];
 
-  const specializedType = types.find((t: IType) => 
-    t.title.toLowerCase().includes("specialized track")
+  const specializedType = types.find((t: IType) =>
+    t.title.toLowerCase().includes("specialized track"),
   );
 
   const { data: subTypesRes, isLoading: loadingSubTypes } = useGetTypeSubTypes({
@@ -168,6 +187,7 @@ export default function SpecializedTracks({
               setSelectedSubType(sub);
               setIsSyllabusModalOpen(true);
             }}
+            isOpen={isOpen}
           />
         ))}
       </div>
