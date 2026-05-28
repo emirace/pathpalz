@@ -84,7 +84,7 @@ export default function CourseTrackManager() {
     title: "",
     fields: [],
     initialData: null,
-    onSubmit: () => {},
+    onSubmit: () => { },
   });
 
   // Queries
@@ -268,6 +268,12 @@ export default function CourseTrackManager() {
             { label: "Specialized Track", value: "Specialized Track" },
           ],
         },
+        {
+          name: "duration_weeks",
+          label: "Duration (Weeks)",
+          type: "number",
+          required: true,
+        },
         { name: "price_ngn", label: "Price (NGN)", type: "number" },
         { name: "price_gbp", label: "Price (GBP)", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
@@ -306,6 +312,12 @@ export default function CourseTrackManager() {
           required: true,
         },
         { name: "description", label: "Description", type: "textarea" },
+        {
+          name: "duration_weeks",
+          label: "Duration (Weeks)",
+          type: "number",
+          required: true,
+        },
       ],
       item || null,
       async (data) => {
@@ -381,9 +393,8 @@ export default function CourseTrackManager() {
             setSelectedSubTypeId(null);
             setSelectedHeaderId(null);
           }}
-          className={`hover:text-teal transition-colors flex items-center gap-1 ${
-            level === "TRACKS" ? "text-[#00284F] font-bold" : ""
-          }`}
+          className={`hover:text-teal transition-colors flex items-center gap-1 ${level === "TRACKS" ? "text-[#00284F] font-bold" : ""
+            }`}
         >
           <Folder size={16} /> Tracks
         </button>
@@ -392,11 +403,10 @@ export default function CourseTrackManager() {
             <ChevronRight size={16} className="text-gray-400 shrink-0" />
             <button
               onClick={() => handleBreadcrumbClick(index)}
-              className={`hover:text-teal transition-colors whitespace-nowrap ${
-                index === breadcrumbs.length - 1
-                  ? "text-[#00284F] font-bold"
-                  : ""
-              }`}
+              className={`hover:text-teal transition-colors whitespace-nowrap ${index === breadcrumbs.length - 1
+                ? "text-[#00284F] font-bold"
+                : ""
+                }`}
             >
               {bc.name}
             </button>
@@ -590,14 +600,14 @@ export default function CourseTrackManager() {
           (level === "SUB_TYPES" && currentSubTypes.length === 0) ||
           (level === "HEADERS" && currentHeaders.length === 0) ||
           (level === "MODULES" && currentModules.length === 0)) && (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Folder size={32} className="text-gray-300" />
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <Folder size={32} className="text-gray-300" />
+              </div>
+              <p className="text-lg font-medium text-gray-500">No items found.</p>
+              <p className="text-sm">Click "Add New" to create the first one.</p>
             </div>
-            <p className="text-lg font-medium text-gray-500">No items found.</p>
-            <p className="text-sm">Click "Add New" to create the first one.</p>
-          </div>
-        )}
+          )}
       </div>
 
       <EntityFormModal
