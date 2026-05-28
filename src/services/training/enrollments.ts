@@ -7,6 +7,6 @@ export const getMyEnrollments = async (): Promise<IEnrollment[]> => {
 };
 
 export const getEnrollmentById = async (id: string | number): Promise<IEnrollment> => {
-  const response = await trainingClient.get(`/my-enrollment-details/${id}`);
+  const response = await trainingClient.get(`/my-enrollments/${id}`);
   return response.data.data;
 };

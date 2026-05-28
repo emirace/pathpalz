@@ -19,8 +19,10 @@ import {
   ShieldCheck,
   Video,
   Layout,
+  Clock,
+  ExternalLink,
 } from "lucide-react";
-import { IInstructorProgressRequest } from "@/types/training/instructor";
+import { IInstructorProgressRequest, IGetProgressResponse } from "@/types/training/instructor";
 
 export default function InstructorProgressPage() {
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
@@ -40,7 +42,6 @@ export default function InstructorProgressPage() {
     useGetInstructorAssignedTracks();
   const { data: moduleProgress, isLoading: isLoadingProgress } =
     useGetInstructorProgress();
-  console.log(moduleProgress);
   // determine the selected assigned track (contains assigned_to, type, sub_type)
   const selectedAssign = assignedTracks?.find(
     (a) => a.track.id === selectedTrackId,
@@ -121,6 +122,24 @@ export default function InstructorProgressPage() {
     }));
   };
 
+  const progressData = (moduleProgress as IGetProgressResponse)?.data ?? [];
+
+  const getStatusBadge = (status: string) => {
+    const statusMap: Record<string, { bg: string; text: string; label: string }> = {
+      completed: { bg: "bg-green-50", text: "text-green-700", label: "Completed" },
+      in_progress: { bg: "bg-blue-50", text: "text-blue-700", label: "In Progress" },
+      traning_link_uploaded: { bg: "bg-indigo-50", text: "text-indigo-700", label: "Live Link" },
+      recorded_traning_link_uploaded: { bg: "bg-purple-50", text: "text-purple-700", label: "Recorded" },
+      pending: { bg: "bg-yellow-50", text: "text-yellow-700", label: "Pending" },
+    };
+    const s = statusMap[status] || { bg: "bg-gray-100", text: "text-gray-600", label: status };
+    return (
+      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${s.bg} ${s.text}`}>
+        {s.label}
+      </span>
+    );
+  };
+
   return (
     <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="mb-8">
@@ -153,11 +172,10 @@ export default function InstructorProgressPage() {
                       setSelectedTrackId(assign.track.id);
                       setSelectedModuleId(null);
                     }}
-                    className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      selectedTrackId === assign.track.id
+                    className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${selectedTrackId === assign.track.id
                         ? "border-teal bg-teal/5 text-teal shadow-sm"
                         : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
                       {assign.track.title}
@@ -209,11 +227,10 @@ export default function InstructorProgressPage() {
                         <button
                           key={module.id}
                           onClick={() => setSelectedModuleId(module.id)}
-                          className={`w-full text-left p-4 transition-colors flex items-center justify-between group ${
-                            selectedModuleId === module.id
+                          className={`w-full text-left p-4 transition-colors flex items-center justify-between group ${selectedModuleId === module.id
                               ? "bg-teal/5"
                               : "hover:bg-gray-50/50"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center gap-3">
                             <div
@@ -388,6 +405,160 @@ export default function InstructorProgressPage() {
                   </>
                 )}
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Progress History Table */}
+      <div className="mt-10">
+        <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-[#00284F] flex items-center gap-2">
+                <Clock size={20} className="text-teal" />
+                Progress History
+              </h2>
+              <p className="text-xs text-gray-400 mt-1">
+                Overview of all module progress and session records.
+              </p>
+            </div>
+            {progressData.length > 0 && (
+              <span className="text-xs font-bold text-teal bg-teal/10 rounded-full px-3 py-1">
+                {progressData.length} module{progressData.length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+
+          {isLoadingProgress ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="animate-spin text-teal" />
+            </div>
+          ) : progressData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+              <BookOpen size={40} className="text-gray-200 mb-3" />
+              <p className="text-sm font-medium text-gray-500">No progress recorded yet.</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Update a module above to start tracking progress.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-left">
+                <thead>
+                  <tr className="text-xs text-gray-500 uppercase bg-gray-50/30">
+                    <th className="px-6 py-4 font-bold">Module</th>
+                    <th className="px-6 py-4 font-bold">Status</th>
+                    <th className="px-6 py-4 font-bold">Sessions</th>
+                    <th className="px-6 py-4 font-bold">Latest Session</th>
+                    <th className="px-6 py-4 font-bold">Links</th>
+                    <th className="px-6 py-4 font-bold">Completed</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {progressData.map((item) => {
+                    const latestSession = item.sessions?.length
+                      ? item.sessions.reduce((latest, s) =>
+                          new Date(s.training_date) > new Date(latest.training_date) ? s : latest
+                        )
+                      : null;
+
+                    return (
+                      <tr
+                        key={item.progress_id}
+                        className="text-gray-600 hover:bg-gray-50/50 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-1.5 rounded-lg bg-teal/10 text-teal">
+                              <BookOpen size={14} />
+                            </div>
+                            <span className="font-semibold text-gray-900">
+                              {item.module?.title || `Module #${item.progress_id}`}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {getStatusBadge(item.status)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1 text-gray-700 font-medium">
+                            <ShieldCheck size={14} className="text-gray-400" />
+                            {item.sessions?.length || 0}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {latestSession ? (
+                            <div className="space-y-0.5">
+                              <p className="text-gray-900 font-medium text-xs">
+                                {new Date(latestSession.training_date).toLocaleDateString(undefined, {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </p>
+                              <p className="text-[10px] text-gray-400">
+                                {getStatusBadge(latestSession.status)}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-gray-300 text-xs">—</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {latestSession?.meeting_link && (
+                              <a
+                                href={latestSession.meeting_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                title="Live session link"
+                              >
+                                <Video size={12} />
+                                Live
+                                <ExternalLink size={10} />
+                              </a>
+                            )}
+                            {latestSession?.recorded_link && (
+                              <a
+                                href={latestSession.recorded_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-800 transition-colors"
+                                title="Recorded session link"
+                              >
+                                <LinkIcon size={12} />
+                                Recorded
+                                <ExternalLink size={10} />
+                              </a>
+                            )}
+                            {!latestSession?.meeting_link && !latestSession?.recorded_link && (
+                              <span className="text-gray-300 text-xs">—</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.completed_at ? (
+                            <div className="flex items-center gap-1.5 text-green-600">
+                              <CheckCircle size={14} />
+                              <span className="text-xs font-medium">
+                                {new Date(item.completed_at).toLocaleDateString(undefined, {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-300 text-xs">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
