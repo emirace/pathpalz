@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   ArrowLeft,
   Users,
+  ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -51,6 +52,11 @@ const ADMIN_SIDEBAR_ITEMS = [
     name: "Payments",
     icon: <CreditCard size={20} />,
     href: "/dashboard/admin/payments",
+  },
+  {
+    name: "Waiting List",
+    icon: <ClipboardList size={20} />,
+    href: "/dashboard/admin/waiting-list",
   },
 ];
 

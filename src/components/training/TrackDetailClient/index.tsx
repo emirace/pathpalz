@@ -6,6 +6,7 @@ import { useGetTracks, useGetTrackById } from "@/query/training/tracks";
 import { useCheckout } from "@/query/training/payments";
 import { useGetUser } from "@/query/auth";
 import PaymentGatewayModal from "@/components/training/PaymentGatewayModal";
+import WaitlistModal from "@/components/training/WaitlistModal";
 import {
   ChevronLeft,
   Clock,
@@ -27,6 +28,7 @@ export default function TrackDetailClient() {
   const { slug } = useParams();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [guestData, setGuestData] = useState({ fullName: "", email: "" });
   const [selectedItem, setSelectedItem] = useState<{
     type: "training_track" | "type" | "sub_type";
@@ -122,7 +124,7 @@ export default function TrackDetailClient() {
         onError: (error: any) => {
           alert(
             error?.response?.data?.message ||
-              "Failed to initialize checkout. Please try again.",
+            "Failed to initialize checkout. Please try again.",
           );
         },
       },
@@ -222,13 +224,23 @@ export default function TrackDetailClient() {
                   ))}
                 </ul>
 
-                <Link
-                  href={`/training/${track.slug}#types`}
-                  className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
-                >
-                  {isOpen ? "Apply for this path" : "Join the Waitlist"}
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                {isOpen ? (
+                  <Link
+                    href={`/training/${track.slug}#types`}
+                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                  >
+                    Apply for this path
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => setIsWaitlistModalOpen(true)}
+                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                  >
+                    Join the Waitlist
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                )}
 
                 <p className="text-center text-xs text-gray-400 font-medium">
                   {isOpen
@@ -248,6 +260,7 @@ export default function TrackDetailClient() {
         onApply={handleApply}
         slug={slug as string}
         isOpen={isOpen}
+        onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
       />
 
       <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
@@ -260,6 +273,7 @@ export default function TrackDetailClient() {
                 trackId={String(track.id)}
                 onApply={handleApply}
                 isOpen={isOpen}
+                onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
               />
             </div>
 
@@ -367,6 +381,13 @@ export default function TrackDetailClient() {
         onClose={() => setIsPaymentModalOpen(false)}
         onSelect={handleGatewaySelect}
         isSubmitting={checkoutMutation.isPending}
+      />
+
+      <WaitlistModal
+        isOpen={isWaitlistModalOpen}
+        onClose={() => setIsWaitlistModalOpen(false)}
+        trackId={track.id}
+        trackTitle={track.title}
       />
 
       {isGuestModalOpen && (
