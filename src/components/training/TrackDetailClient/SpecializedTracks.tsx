@@ -19,6 +19,7 @@ interface SpecializedTracksProps {
   trackId: string;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
   isOpen: boolean;
+  onJoinWaitlist: () => void;
 }
 
 const SubTypeCard = ({
@@ -26,11 +27,13 @@ const SubTypeCard = ({
   onApply,
   onViewSyllabus,
   isOpen,
+  onJoinWaitlist,
 }: {
   subType: ISubType;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
   onViewSyllabus: (subType: ISubType) => void;
   isOpen: boolean;
+  onJoinWaitlist: () => void;
 }) => {
   const { country } = useSetting();
 
@@ -101,7 +104,12 @@ const SubTypeCard = ({
             Apply
           </button>
         ) : (
-          <span className="text-gray-400 italic text-sm">Join Waitlist</span>
+          <button
+            onClick={onJoinWaitlist}
+            className="text-[#00677D] font-semibold italic text-sm hover:underline transition-all cursor-pointer"
+          >
+            Join Waitlist
+          </button>
         )}
       </div>
     </div>
@@ -142,6 +150,7 @@ export default function SpecializedTracks({
   trackId,
   onApply,
   isOpen,
+  onJoinWaitlist,
 }: SpecializedTracksProps) {
   const [isSyllabusModalOpen, setIsSyllabusModalOpen] = React.useState(false);
   const [selectedSubType, setSelectedSubType] = React.useState<ISubType | null>(
@@ -188,6 +197,7 @@ export default function SpecializedTracks({
               setIsSyllabusModalOpen(true);
             }}
             isOpen={isOpen}
+            onJoinWaitlist={onJoinWaitlist}
           />
         ))}
       </div>

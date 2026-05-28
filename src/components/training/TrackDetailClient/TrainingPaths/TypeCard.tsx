@@ -11,13 +11,16 @@ const TypeCard = ({
   type,
   index,
   onApply,
-  slug,isOpen
+  slug,
+  isOpen,
+  onJoinWaitlist,
 }: {
   type: IType;
   index: number;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
   slug: string;
   isOpen: boolean;
+  onJoinWaitlist: () => void;
 }) => {
   const { country } = useSetting();
   const [showModal, setShowModal] = useState(false);
@@ -104,7 +107,12 @@ const TypeCard = ({
             >
               Apply
             </button>:
-            <span className="text-gray-400 italic text-sm">Join Waitlist</span>
+            <button
+              onClick={onJoinWaitlist}
+              className="text-[#00677D] font-semibold italic text-sm hover:underline transition-all cursor-pointer"
+            >
+              Join Waitlist
+            </button>
           )}
         </div>
       </div>

@@ -9,6 +9,7 @@ interface TrainingPathsProps {
   slug: string;
   onApply: (type: "training_track" | "type" | "sub_type", id: number) => void;
   isOpen: boolean;
+  onJoinWaitlist: () => void;
 }
 const TypeCardSkeleton = () => (
   <div className="bg-white rounded-4xl p-8 sm:p-10 border border-gray-100 flex flex-col relative overflow-hidden animate-pulse">
@@ -41,6 +42,7 @@ export default function TrainingPaths({
   onApply,
   slug,
   isOpen,
+  onJoinWaitlist,
 }: TrainingPathsProps) {
   const { data: typesRes, isLoading: loadingTypes } = useGetAllTrackTypes({
     track_id: trackId,
@@ -73,6 +75,7 @@ export default function TrainingPaths({
                   onApply={onApply}
                   slug={slug}
                   isOpen={isOpen}
+                  onJoinWaitlist={onJoinWaitlist}
                 />
               ))}
         </div>
