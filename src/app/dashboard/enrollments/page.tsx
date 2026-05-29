@@ -9,9 +9,12 @@ import EnrollmentDetailModal from "./components/EnrollmentDetailModal";
 import { Calendar, ExternalLink, Clock } from "lucide-react";
 import Link from "next/link";
 import { IEnrollment } from "@/types/training/enrollments";
+import { getCurrencySymbol } from "@/utils/currency";
+import { useSetting } from "@/states/setting";
 
 export default function MyEnrollmentsPage() {
   const { data: enrollments, isLoading } = useGetMyEnrollments();
+  const country = useSetting(data => data.country)
   const [selectedEnrollment, setSelectedEnrollment] =
     useState<IEnrollment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,13 +93,12 @@ export default function MyEnrollmentsPage() {
                     </div>
                   </div>
                   <div
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                      isPaid
-                        ? "bg-emerald-50 text-emerald-600"
-                        : isPending
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-red-50 text-red-600"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isPaid
+                      ? "bg-emerald-50 text-emerald-600"
+                      : isPending
+                        ? "bg-amber-50 text-amber-600"
+                        : "bg-red-50 text-red-600"
+                      }`}
                   >
                     {item.payment.status}
                   </div>
@@ -108,7 +110,7 @@ export default function MyEnrollmentsPage() {
                       Amount
                     </p>
                     <p className="text-sm font-bold text-[#00284F]">
-                      £{item.purchased_course.price}
+                      {getCurrencySymbol(country.currency)}{item.payment.amount}
                     </p>
                   </div>
                   <div className="space-y-1 text-right">

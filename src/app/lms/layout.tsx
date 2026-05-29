@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useGetEnrollmentById } from "@/query/training/enrollments";
-import { 
-  ChevronDown, 
-  ChevronRight, 
-  PlayCircle, 
-  Lock, 
-  ClipboardList, 
+import {
+  ChevronDown,
+  ChevronRight,
+  PlayCircle,
+  Lock,
+  ClipboardList,
   GraduationCap,
   Bell,
   HelpCircle,
@@ -61,7 +61,7 @@ export default function LMSLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={`
-        fixed md:static inset-y-0 left-0 w-72 bg-[#00284F] text-white z-50 transition-transform duration-300 transform flex flex-col h-full
+        fixed md:static inset-y-0 left-0 w-72 bg-[#00284F] text-white z-50 transition-transform duration-300 transform flex flex-col h-screen
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >
@@ -111,7 +111,7 @@ export default function LMSLayout({ children }: { children: React.ReactNode }) {
                   Module {index + 1}: {header.title}
                 </span>
               </button>
-              
+
               {openModules[header.header_id] && (
                 <div className="ml-5 mt-1 space-y-1 border-l border-white/10 pl-2">
                   {header.modules.map((module) => (
@@ -138,13 +138,13 @@ export default function LMSLayout({ children }: { children: React.ReactNode }) {
               )}
             </div>
           ))}
-          
+
           <button className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-left mt-4">
             <ClipboardList size={16} className="text-white/60" />
             <span className="text-sm font-medium text-white/80">Assignments</span>
           </button>
         </nav>
-        
+
         <div className="p-4 border-t border-white/10">
           <Link
             href="/dashboard"

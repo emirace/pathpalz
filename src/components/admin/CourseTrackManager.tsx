@@ -47,6 +47,8 @@ import {
 import EntityFormModal, { IFormField } from "./EntityFormModal";
 import { useGetPayments } from "@/query/admin/payment";
 import { useGetStudents } from "@/query/admin/student";
+import { useSetting } from "@/states/setting";
+import { getCurrencySymbol } from "@/utils/currency";
 
 // --- Types ---
 type Level = "TRACKS" | "TYPES" | "SUB_TYPES" | "HEADERS" | "MODULES";
@@ -63,6 +65,7 @@ export default function CourseTrackManager() {
   console.log("Payments:", payments, students);
   const [level, setLevel] = useState<Level>("TRACKS");
   const [breadcrumbs, setBreadcrumbs] = useState<IBreadcrumb[]>([]);
+  const country = useSetting(data => data.country)
 
   // Selection states
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
@@ -476,14 +479,16 @@ export default function CourseTrackManager() {
           )}
         </div>
 
-        {item.price && (
-          <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
-            <span className="font-semibold text-teal">£{item.price}</span>
-            <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
-              {item.status}
-            </span>
-          </div>
-        )}
+
+        <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
+          {item.price_ngn && (<span className="font-semibold text-teal">₦{parseFloat(item.price_ngn)}</span>
+          )}
+          {item.price_gbp && (<span className="font-semibold text-teal">£{parseFloat(item.price_gbp)}</span>
+          )}
+          <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
+            {item.status}
+          </span>
+        </div>
       </div>
     );
   };
