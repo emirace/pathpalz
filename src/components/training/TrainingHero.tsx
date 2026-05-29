@@ -71,9 +71,9 @@ const TrainingHero = ({ onApply, onWaitlist }: TrainingHeroProps) => {
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
               {/* Coming Soon badge */}
-              <div className="absolute top-4 right-4 bg-[#00284F]/80 backdrop-blur-sm text-white text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg">
+              {/* <div className="absolute top-4 right-4 bg-[#00284F]/80 backdrop-blur-sm text-white text-xs font-bold tracking-widest uppercase px-3 py-1.5 rounded-lg">
                 Start Now
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
