@@ -78,3 +78,31 @@ export interface IGetInstructorAssignedTracksResponse {
   success: boolean;
   data: IAssignedTrack[];
 }
+
+
+export interface IGetProgressResponse {
+  message: string;
+  data: {
+    progress_id: number;
+    module: {
+      id: number;
+      title: string;
+    };
+    sessions:
+    {
+      training_date: string;
+      meeting_link: string | null;
+      recorded_link: string | null;
+      status: string;
+      updated_at: string;
+    }[],
+    status: string;
+    status_history:
+    {
+      status: string;
+      updated_at: string;
+    }[],
+    completed_at: string;
+  }[];
+  success: boolean
+}

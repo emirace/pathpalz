@@ -129,13 +129,22 @@ export default function MyEnrollmentsPage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleViewDetails(item)}
-                    className="flex items-center gap-1.5 text-sm font-bold text-teal hover:underline transition-all"
-                  >
-                    View Details
-                    <ExternalLink size={14} />
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => handleViewDetails(item)}
+                      className="flex items-center gap-1.5 text-sm font-bold text-gray-500 hover:text-teal transition-all"
+                    >
+                      View Details
+                      <ExternalLink size={14} />
+                    </button>
+
+                    <Link
+                      href={`/lms?enrollmentId=${item.enrollment_id}`}
+                      className="flex items-center gap-1.5 text-sm font-bold text-white bg-teal px-4 py-2 rounded-lg hover:bg-teal/90 transition-all shadow-sm shadow-teal/20"
+                    >
+                      Go to Course
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
