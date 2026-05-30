@@ -6,6 +6,7 @@ export interface IInstructorProgressRequest {
   meeting_link?: string;
   recorded_link?: string;
   instructor_marked?: string;
+  lesson_note?: File
 }
 
 export interface IInstructorProgressResponse {

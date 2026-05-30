@@ -224,7 +224,13 @@ export default function ProfilePage() {
                   Account Role
                 </p>
                 <p className="mt-1 font-medium text-gray-900 capitalize">
-                  {user.usertype?.join(", ") || "Standard User"}
+                  {(() => {
+                    if (!user.usertype || user.usertype.length === 0) return "Standard User";
+                    const order = ["user", "instructor", "platform"];
+                    const validRoles = user.usertype.filter((r: string) => r.toLowerCase() !== "business" && r.toLowerCase() !== "bussiness");
+                    if (validRoles.length === 0) return "Standard User";
+                    return validRoles.sort((a: string, b: string) => order.indexOf(a.toLowerCase()) - order.indexOf(b.toLowerCase())).pop();
+                  })()}
                 </p>
               </div>
             </div>
@@ -296,11 +302,10 @@ export default function ProfilePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {notification && (
                 <div
-                  className={`mb-2 rounded-md border p-3 text-sm ${
-                    notification.type === "success"
+                  className={`mb-2 rounded-md border p-3 text-sm ${notification.type === "success"
                       ? "bg-green-50 text-green-800 border-green-100"
                       : "bg-red-50 text-red-800 border-red-100"
-                  }`}
+                    }`}
                 >
                   {notification.message}
                 </div>
