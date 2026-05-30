@@ -33,6 +33,7 @@ export default function InstructorProgressPage() {
       meeting_link: "",
       recorded_link: "",
       instructor_marked: "completed",
+      lesson_note: undefined,
     },
   );
 
@@ -98,6 +99,7 @@ export default function InstructorProgressPage() {
         meeting_link: formData.meeting_link,
         recorded_link: formData.recorded_link,
         instructor_marked: formData.instructor_marked,
+        lesson_note: formData.lesson_note,
       } as IInstructorProgressRequest,
       {
         onSuccess: () => {
@@ -107,7 +109,11 @@ export default function InstructorProgressPage() {
             meeting_link: "",
             recorded_link: "",
             instructor_marked: "completed",
+            lesson_note: undefined,
           });
+          // Reset file input element if needed
+          const fileInput = document.getElementById('lesson_note') as HTMLInputElement;
+          if (fileInput) fileInput.value = '';
         },
       },
     );
@@ -173,8 +179,8 @@ export default function InstructorProgressPage() {
                       setSelectedModuleId(null);
                     }}
                     className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${selectedTrackId === assign.track.id
-                        ? "border-teal bg-teal/5 text-teal shadow-sm"
-                        : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
+                      ? "border-teal bg-teal/5 text-teal shadow-sm"
+                      : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
                       }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
@@ -228,8 +234,8 @@ export default function InstructorProgressPage() {
                           key={module.id}
                           onClick={() => setSelectedModuleId(module.id)}
                           className={`w-full text-left p-4 transition-colors flex items-center justify-between group ${selectedModuleId === module.id
-                              ? "bg-teal/5"
-                              : "hover:bg-gray-50/50"
+                            ? "bg-teal/5"
+                            : "hover:bg-gray-50/50"
                             }`}
                         >
                           <div className="flex items-center gap-3">
@@ -385,6 +391,30 @@ export default function InstructorProgressPage() {
                         </div>
                       </div>
 
+                      <div>
+                        <label
+                          htmlFor="lesson_note"
+                          className="mb-2 block text-xs font-bold text-gray-500 uppercase"
+                        >
+                          Lesson Note (PDF/Docx...)
+                        </label>
+                        <input
+                          type="file"
+                          id="lesson_note"
+                          name="lesson_note"
+                          accept=".pdf,image/*"
+                          onChange={(e) => {
+                            if (e.target.files && e.target.files[0]) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                lesson_note: e.target.files![0],
+                              }));
+                            }
+                          }}
+                          className="block w-full rounded-xl border border-gray-200 bg-gray-50 p-2.5 text-sm text-gray-900 transition-colors focus:border-teal focus:bg-white focus:outline-none focus:ring-2 focus:ring-teal/20 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-teal/10 file:text-teal hover:file:bg-teal/20 cursor-pointer"
+                        />
+                      </div>
+
                       <div className="pt-4">
                         <button
                           type="submit"
@@ -459,8 +489,8 @@ export default function InstructorProgressPage() {
                   {progressData.map((item) => {
                     const latestSession = item.sessions?.length
                       ? item.sessions.reduce((latest, s) =>
-                          new Date(s.training_date) > new Date(latest.training_date) ? s : latest
-                        )
+                        new Date(s.training_date) > new Date(latest.training_date) ? s : latest
+                      )
                       : null;
 
                     return (
