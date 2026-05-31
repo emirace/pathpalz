@@ -14,6 +14,8 @@ export interface ICheckoutRequest {
   gateway: "stripe" | "paystack";
   email?: string;
   full_name?: string;
+  phoneNumber?: string;
+  address?: string;
   success_url?: string;
   cancel_url?: string;
 }

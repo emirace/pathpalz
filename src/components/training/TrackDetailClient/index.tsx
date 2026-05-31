@@ -29,7 +29,12 @@ export default function TrackDetailClient() {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
-  const [guestData, setGuestData] = useState({ fullName: "", email: "" });
+  const [guestData, setGuestData] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+  });
   const [selectedItem, setSelectedItem] = useState<{
     type: "training_track" | "type" | "sub_type";
     id: number;
@@ -112,7 +117,12 @@ export default function TrackDetailClient() {
         item_id: selectedItem.id,
         gateway,
         ...(!user
-          ? { email: guestData.email, full_name: guestData.fullName }
+          ? {
+              email: guestData.email,
+              full_name: guestData.fullName,
+              phoneNumber: guestData.phoneNumber,
+              address: guestData.address,
+            }
           : {}),
       },
       {
@@ -124,7 +134,7 @@ export default function TrackDetailClient() {
         onError: (error: any) => {
           alert(
             error?.response?.data?.message ||
-            "Failed to initialize checkout. Please try again.",
+              "Failed to initialize checkout. Please try again.",
           );
         },
       },
@@ -439,6 +449,36 @@ export default function TrackDetailClient() {
                     setGuestData({ ...guestData, email: e.target.value })
                   }
                   className="w-full px-4 py-3 text-black rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#00284F]">
+                  Phone Nmuber
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="1234567890"
+                  value={guestData.phoneNumber}
+                  onChange={(e) =>
+                    setGuestData({ ...guestData, phoneNumber: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#00284F]">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="123 Main St"
+                  value={guestData.address}
+                  onChange={(e) =>
+                    setGuestData({ ...guestData, address: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
                 />
               </div>
 
