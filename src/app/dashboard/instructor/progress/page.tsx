@@ -21,12 +21,22 @@ import {
   Layout,
   Clock,
   ExternalLink,
+  Pencil,
+  Save,
+  X,
 } from "lucide-react";
 import { IInstructorProgressRequest, IGetProgressResponse } from "@/types/training/instructor";
+
+type ProgressItem = IGetProgressResponse["data"][number];
+type ProgressSession = ProgressItem["sessions"][number];
 
 export default function InstructorProgressPage() {
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
+  const [editingProgressId, setEditingProgressId] = useState<number | null>(null);
+  const [tableEditData, setTableEditData] = useState<
+    Partial<IInstructorProgressRequest>
+  >({});
   const [formData, setFormData] = useState<Partial<IInstructorProgressRequest>>(
     {
       training_date: new Date().toISOString().split("T")[0],
@@ -126,6 +136,53 @@ export default function InstructorProgressPage() {
       ...prev,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleTableEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    setTableEditData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const startTableEdit = (item: ProgressItem, session: ProgressSession | null) => {
+    setSuccessMsg("");
+    setEditingProgressId(item.progress_id);
+    setTableEditData({
+      course_module_id: item.module.id,
+      session_id: session?.session_id ? Number(session.session_id) : undefined,
+      training_date:
+        session?.training_date || new Date().toISOString().split("T")[0],
+      meeting_link: session?.meeting_link || "",
+      recorded_link: session?.recorded_link || "",
+      instructor_marked: session?.status || item.status || "completed",
+    });
+  };
+
+  const cancelTableEdit = () => {
+    setEditingProgressId(null);
+    setTableEditData({});
+  };
+
+  const submitTableEdit = (item: ProgressItem) => {
+    updateProgress(
+      {
+        course_module_id: item.module.id,
+        session_id: tableEditData.session_id,
+        training_date: tableEditData.training_date,
+        meeting_link: tableEditData.meeting_link,
+        recorded_link: tableEditData.recorded_link,
+        instructor_marked: tableEditData.instructor_marked,
+      } as IInstructorProgressRequest,
+      {
+        onSuccess: () => {
+          setSuccessMsg("Progress updated successfully!");
+          cancelTableEdit();
+        },
+      },
+    );
   };
 
   const progressData = (moduleProgress as IGetProgressResponse)?.data ?? [];
@@ -464,7 +521,77 @@ export default function InstructorProgressPage() {
             <div className="flex justify-center py-16">
               <Loader2 className="animate-spin text-teal" />
             </div>
-          ) : progressData.length === 0 ? (
+          ) : editingProgressId ? (
+            <div className="border-b border-gray-100 bg-teal/5 p-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+                <input
+                  type="date"
+                  name="training_date"
+                  required
+                  value={tableEditData.training_date?.split("T")[0] || ""}
+                  onChange={handleTableEditChange}
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                />
+                <select
+                  name="instructor_marked"
+                  value={tableEditData.instructor_marked || ""}
+                  onChange={handleTableEditChange}
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                >
+                  <option value="traning_link_uploaded">Live Session Link</option>
+                  <option value="recorded_traning_link_uploaded">Recorded Link</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <input
+                  type="url"
+                  name="meeting_link"
+                  value={tableEditData.meeting_link || ""}
+                  onChange={handleTableEditChange}
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                  placeholder="Live link"
+                />
+                <input
+                  type="url"
+                  name="recorded_link"
+                  value={tableEditData.recorded_link || ""}
+                  onChange={handleTableEditChange}
+                  className="rounded-lg border border-gray-200 bg-white p-3 text-sm text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                  placeholder="Recorded link"
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const item = progressData.find(
+                        (progress) => progress.progress_id === editingProgressId,
+                      );
+                      if (item) submitTableEdit(item);
+                    }}
+                    disabled={isPending}
+                    className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-teal px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-teal/90 disabled:cursor-not-allowed disabled:opacity-70"
+                  >
+                    {isPending ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Save size={14} />
+                    )}
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={cancelTableEdit}
+                    disabled={isPending}
+                    className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white p-3 text-gray-500 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
+                    title="Cancel"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
+          {isLoadingProgress ? null : progressData.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400">
               <BookOpen size={40} className="text-gray-200 mb-3" />
               <p className="text-sm font-medium text-gray-500">No progress recorded yet.</p>
@@ -483,6 +610,7 @@ export default function InstructorProgressPage() {
                     <th className="px-6 py-4 font-bold">Latest Session</th>
                     <th className="px-6 py-4 font-bold">Links</th>
                     <th className="px-6 py-4 font-bold">Completed</th>
+                    <th className="px-6 py-4 font-bold">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -492,11 +620,12 @@ export default function InstructorProgressPage() {
                         new Date(s.training_date) > new Date(latest.training_date) ? s : latest
                       )
                       : null;
+                    const isEditing = editingProgressId === item.progress_id;
 
                     return (
                       <tr
                         key={item.progress_id}
-                        className="text-gray-600 hover:bg-gray-50/50 transition-colors"
+                        className={`text-gray-600 transition-colors ${isEditing ? "bg-teal/5" : "hover:bg-gray-50/50"}`}
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -509,7 +638,24 @@ export default function InstructorProgressPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          {getStatusBadge(item.status)}
+                          {isEditing ? (
+                            <select
+                              name="instructor_marked"
+                              value={tableEditData.instructor_marked || ""}
+                              onChange={handleTableEditChange}
+                              className="w-44 rounded-lg border border-gray-200 bg-white p-2 text-xs text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                            >
+                              <option value="traning_link_uploaded">
+                                Live Session Link
+                              </option>
+                              <option value="recorded_traning_link_uploaded">
+                                Recorded Link
+                              </option>
+                              <option value="completed">Completed</option>
+                            </select>
+                          ) : (
+                            getStatusBadge(item.status)
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center gap-1 text-gray-700 font-medium">
@@ -518,7 +664,16 @@ export default function InstructorProgressPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4">
-                          {latestSession ? (
+                          {isEditing ? (
+                            <input
+                              type="date"
+                              name="training_date"
+                              required
+                              value={tableEditData.training_date?.split("T")[0] || ""}
+                              onChange={handleTableEditChange}
+                              className="w-40 rounded-lg border border-gray-200 bg-white p-2 text-xs text-gray-900 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/20"
+                            />
+                          ) : latestSession ? (
                             <div className="space-y-0.5">
                               <p className="text-gray-900 font-medium text-xs">
                                 {new Date(latestSession.training_date).toLocaleDateString(undefined, {
@@ -583,6 +738,16 @@ export default function InstructorProgressPage() {
                           ) : (
                             <span className="text-gray-300 text-xs">—</span>
                           )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            type="button"
+                            onClick={() => startTableEdit(item, latestSession)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 transition-colors hover:border-teal/40 hover:bg-teal/5 hover:text-teal"
+                          >
+                            <Pencil size={12} />
+                            Edit
+                          </button>
                         </td>
                       </tr>
                     );

@@ -56,7 +56,7 @@ export interface IStudentModuleAttendanceResponse {
       created_at: string;
       updated_at: string;
     };
-    module: any;
+    module: unknown;
   }>;
 }
 
@@ -66,13 +66,12 @@ export interface IModuleSession {
     id: number;
     title: string;
   };
-  sessions: [
-    {
-      training_date: string;
-      meeting_link: string | null;
-      recorded_link: string | null;
-      status: string;
-      updated_at: string;
-    },
-  ];
+  sessions: Array<{
+    training_date: string;
+    meeting_link: string | null;
+    recorded_link: string | null;
+    status: string;
+    updated_at: string;
+    lesson_note: string | null;
+  }>;
 }
