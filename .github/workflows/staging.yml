@@ -1,4 +1,4 @@
-name: Web staging CI/CD to cPanel 
+name: Web staging CI/CD to cPanel (stable SSH key version)
 
 on:
   push:
@@ -70,12 +70,9 @@ jobs:
         run: npm run build
 
       # =========================
-      # SSH SETUP (FIXED VERSION)
+      # SSH KEY SETUP (FIXED - NO AGENT)
       # =========================
-      - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.STAGING_CPANEL_SSH_PRIVATE_KEY }}
-          SSH_PASSPHRASE: ${{ secrets.STAGING_CPANEL_SSH_PASSPHRASE }}
+      - name: Setup SSH key
         run: |
           set -e
 
@@ -85,28 +82,17 @@ jobs:
           PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
 
+          # Write private key safely
+          echo "${{ secrets.STAGING_CPANEL_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # Add host to known hosts
           ssh-keyscan -p "$PORT" -H "${{ secrets.STAGING_CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
 
-          eval "$(ssh-agent -s)"
-
-          # askpass setup (needed for passphrase-protected keys)
-          echo '#!/bin/sh' > ~/.ssh_askpass
-          echo 'echo "$SSH_PASSPHRASE"' >> ~/.ssh_askpass
-          chmod +x ~/.ssh_askpass
-
-          export SSH_ASKPASS=~/.ssh_askpass
-          export DISPLAY=:0
-          export SSH_ASKPASS_REQUIRE=force
-
-          # =========================
-          # FIXED SSH KEY LOADING (IMPORTANT)
-          # =========================
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-
-          echo "SSH agent loaded successfully"
+          echo "SSH_KEY_READY=1" >> $GITHUB_ENV
 
       # =========================
-      # REMOTE PREP (1 SSH CALL)
+      # REMOTE PREP (SSH #1)
       # =========================
       - name: Prepare remote staging + backup
         run: |
@@ -117,7 +103,7 @@ jobs:
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
+          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -p $PORT $SERVER << EOF
           set -e
 
           BACKUP_DIR="$APP_DIR/backups"
@@ -126,18 +112,20 @@ jobs:
           mkdir -p "$STAGING_DIR"
           mkdir -p "$BACKUP_DIR"
 
+          # Backup live site
           if [ -d "$APP_DIR" ]; then
             zip -r "$BACKUP_DIR/live_$TIMESTAMP.zip" "$APP_DIR" \
               -x "$BACKUP_DIR/*" >/dev/null 2>&1 || true
           fi
 
+          # Keep only last 2 backups
           ls -tp "$BACKUP_DIR"/*.zip 2>/dev/null | tail -n +3 | xargs -r rm --
 
           echo "REMOTE READY"
           EOF
 
       # =========================
-      # SCP DEPLOY
+      # SCP DEPLOY (UPLOAD ONLY)
       # =========================
       - name: Deploy to staging (SCP)
         run: |
@@ -147,10 +135,10 @@ jobs:
           PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           STAGING_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}_staging"
 
-          scp -o ConnectTimeout=20 -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
+          scp -i ~/.ssh/id_rsa -o ConnectTimeout=20 -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
 
       # =========================
-      # SWAP (1 SSH CALL)
+      # SWAP (SSH #2)
       # =========================
       - name: Swap staging to live
         run: |
@@ -161,14 +149,16 @@ jobs:
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
+          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -p $PORT $SERVER << EOF
           set -e
 
+          # Clean live (preserve backups + htaccess)
           find "$APP_DIR" -mindepth 1 \
             ! -name "backups" \
             ! -name ".htaccess" \
             -exec rm -rf {} +
 
+          # Promote staging → live
           cp -r "$STAGING_DIR/"* "$APP_DIR/"
           rm -rf "$STAGING_DIR"
 
@@ -176,7 +166,7 @@ jobs:
           EOF
 
       # =========================
-      # VERIFY
+      # VERIFY (OPTIONAL SSH #3)
       # =========================
       - name: Verify deployment
         run: |
@@ -186,7 +176,7 @@ jobs:
           PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
 
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
+          ssh -i ~/.ssh/id_rsa -o ConnectTimeout=20 -p $PORT $SERVER << EOF
 
           echo "===================="
           echo "DEPLOYMENT CHECK"
