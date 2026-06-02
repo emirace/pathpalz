@@ -1,4 +1,4 @@
-name: Web CI/CD to cPanel (main_pathpalz)
+name: Web CI/CD to cPanel (live_pathpalz)
 
 on:
   push:
