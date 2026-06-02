@@ -105,7 +105,7 @@ function LMSPageContent() {
     if (!sessionData?.module?.title) return;
     markCompletedMutation.mutate(sessionData.module.title, {
       // onSuccess: () => toast.success("Module marked as completed!"),
-      // onError: () => toast.error("Failed to mark as completed"),
+      // onError: () => toast.error("Failed to mark as completed."),
     });
   };
 
