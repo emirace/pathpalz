@@ -33,7 +33,12 @@ export default function TrackDetailClient() {
     fullName: "",
     email: "",
     phoneNumber: "",
-    address: "",
+    city: "",
+    country: "",
+    state: "",
+    street: "",
+    house_number: "",
+    apartment_number: "",
   });
   const [selectedItem, setSelectedItem] = useState<{
     type: "training_track" | "type" | "sub_type";
@@ -121,7 +126,12 @@ export default function TrackDetailClient() {
               email: guestData.email,
               full_name: guestData.fullName,
               phoneNumber: guestData.phoneNumber,
-              address: guestData.address,
+              city: guestData.city,
+              country: guestData.country,
+              state: guestData.state,
+              street: guestData.street,
+              house_number: guestData.house_number,
+              apartment_number: guestData.apartment_number,
             }
           : {}),
       },
@@ -420,7 +430,10 @@ export default function TrackDetailClient() {
               </button>
             </div>
 
-            <form onSubmit={handleGuestSubmit} className="p-6 space-y-4">
+            <form
+              onSubmit={handleGuestSubmit}
+              className="p-6 space-y-4 overflow-auto max-h-[80vh]"
+            >
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#00284F]">
                   Full Name
@@ -466,20 +479,104 @@ export default function TrackDetailClient() {
                   className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#00284F]">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="123 Main St"
-                  value={guestData.address}
-                  onChange={(e) =>
-                    setGuestData({ ...guestData, address: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your country"
+                    value={guestData.country}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, country: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your state"
+                    value={guestData.state}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, state: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your city"
+                    value={guestData.city}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, city: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Street Address
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your street address"
+                    value={guestData.street}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, street: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    House Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your house number"
+                    value={guestData.house_number}
+                    onChange={(e) =>
+                      setGuestData({
+                        ...guestData,
+                        house_number: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Apartment Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your apartment number"
+                    value={guestData.apartment_number}
+                    onChange={(e) =>
+                      setGuestData({
+                        ...guestData,
+                        apartment_number: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
               </div>
 
               <div className="pt-4">

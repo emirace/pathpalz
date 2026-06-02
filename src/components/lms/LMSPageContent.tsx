@@ -5,11 +5,13 @@ import { useSearchParams } from "next/navigation";
 
 import { useGetEnrollmentById } from "@/query/training/enrollments";
 import {
+  useGetModuleAttendance,
   useGetModuleSessions,
   useMarkAttendance,
   useMarkCourseAsCompleted,
 } from "@/query/training/student";
 import { Play, Download, FileText, Code, Loader2, Video } from "lucide-react";
+import { useGetUser } from "@/query/auth";
 
 const getDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -63,10 +65,14 @@ function LMSPageContent() {
     useGetEnrollmentById(enrollmentId || "");
   const moduleId = moduleIdParam ? Number(moduleIdParam) : undefined;
 
+  const { data: user } = useGetUser();
+
   const { data: sessionData, isLoading: isSessionLoading } =
     useGetModuleSessions(moduleId || 0);
 
   const markAttendanceMutation = useMarkAttendance();
+  const { data: attendanceData, isLoading: isLoadingAttendance } =
+    useGetModuleAttendance(moduleId as number);
   const markCompletedMutation = useMarkCourseAsCompleted();
   const sessions = sessionData?.sessions || [];
   const selectedSessionIndex =
@@ -88,8 +94,9 @@ function LMSPageContent() {
     markAttendanceMutation.mutate(
       { course_module_id: moduleId, attended: true },
       {
-        // onSuccess: () => toast.success("Marked as attended!"),
-        // onError: () => toast.error("Failed to mark attendance"),
+        onSuccess: () => alert("Marked as attended!"),
+        onError: (error: any) =>
+          alert(error.response?.data?.message || "Failed to mark attendance"),
       },
     );
   };
@@ -100,6 +107,19 @@ function LMSPageContent() {
       // onSuccess: () => toast.success("Module marked as completed!"),
       // onError: () => toast.error("Failed to mark as completed"),
     });
+  };
+
+  const isAttended = (moduleId: number) => {
+    // Check if the current user has attended this module
+    const result = attendanceData?.attendance?.some((record) => {
+      return (
+        record.course_module_id === moduleId &&
+        record?.user?.external_id === user?.id.toString() &&
+        record.attended
+      );
+    });
+    console.log("Attendance check for module", moduleId, ":", result);
+    return result;
   };
 
   if (isEnrollmentLoading || !enrollmentId) {
@@ -362,8 +382,12 @@ function LMSPageContent() {
 
           <button
             onClick={handleMarkAttended}
-            disabled={markAttendanceMutation.isPending}
             className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2"
+            disabled={
+              isLoadingAttendance ||
+              markAttendanceMutation.isPending ||
+              isAttended(moduleId)
+            }
           >
             {markAttendanceMutation.isPending ? (
               <Loader2 size={18} className="animate-spin" />
