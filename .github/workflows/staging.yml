@@ -1,4 +1,4 @@
-name: Web staging CI/CD to cPanel (SCP stable hardened)
+name: Web staging CI/CD to cPanel 
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       # =========================
-      # NODE
+      # NODE SETUP
       # =========================
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,8 +39,16 @@ jobs:
           restore-keys: |
             npm-${{ runner.os }}-node22-
 
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
+          restore-keys: |
+            next-${{ runner.os }}-
+
       # =========================
-      # BUILD
+      # INSTALL + BUILD
       # =========================
       - name: Install dependencies
         run: npm ci
@@ -58,11 +66,11 @@ jobs:
           }
           EOF
 
-      - name: Build
+      - name: Build Next.js static export
         run: npm run build
 
       # =========================
-      # SSH SETUP
+      # SSH SETUP (FIXED VERSION)
       # =========================
       - name: Setup SSH
         env:
@@ -81,6 +89,7 @@ jobs:
 
           eval "$(ssh-agent -s)"
 
+          # askpass setup (needed for passphrase-protected keys)
           echo '#!/bin/sh' > ~/.ssh_askpass
           echo 'echo "$SSH_PASSPHRASE"' >> ~/.ssh_askpass
           chmod +x ~/.ssh_askpass
@@ -89,10 +98,15 @@ jobs:
           export DISPLAY=:0
           export SSH_ASKPASS_REQUIRE=force
 
-          ssh-add <(echo "$SSH_PRIVATE_KEY")
+          # =========================
+          # FIXED SSH KEY LOADING (IMPORTANT)
+          # =========================
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+          echo "SSH agent loaded successfully"
 
       # =========================
-      # REMOTE PREP (ONLY SSH #1)
+      # REMOTE PREP (1 SSH CALL)
       # =========================
       - name: Prepare remote staging + backup
         run: |
@@ -103,11 +117,9 @@ jobs:
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
           set -e
 
-          APP_DIR="'"$APP_DIR"'"
-          STAGING_DIR="'"$STAGING_DIR"'"
           BACKUP_DIR="$APP_DIR/backups"
           TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
@@ -125,9 +137,9 @@ jobs:
           EOF
 
       # =========================
-      # SCP DEPLOY (ONLY TRANSFER STEP)
+      # SCP DEPLOY
       # =========================
-      - name: Upload build to staging (SCP)
+      - name: Deploy to staging (SCP)
         run: |
           set -e
 
@@ -135,13 +147,10 @@ jobs:
           PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           STAGING_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}_staging"
 
-          # IMPORTANT: small delay reduces firewall suspicion
-          sleep 5
-
           scp -o ConnectTimeout=20 -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
 
       # =========================
-      # SWAP (ONLY SSH #2)
+      # SWAP (1 SSH CALL)
       # =========================
       - name: Swap staging to live
         run: |
@@ -152,14 +161,8 @@ jobs:
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          # IMPORTANT: delay prevents rapid SSH after SCP
-          sleep 8
-
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
           set -e
-
-          APP_DIR="'"$APP_DIR"'"
-          STAGING_DIR="'"$STAGING_DIR"'"
 
           find "$APP_DIR" -mindepth 1 \
             ! -name "backups" \
@@ -173,7 +176,7 @@ jobs:
           EOF
 
       # =========================
-      # VERIFY (OPTIONAL SSH #3 but safe)
+      # VERIFY
       # =========================
       - name: Verify deployment
         run: |
@@ -183,14 +186,14 @@ jobs:
           PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
 
-          sleep 5
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << EOF
 
-          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
-          set -e
+          echo "===================="
+          echo "DEPLOYMENT CHECK"
+          echo "===================="
 
-          APP_DIR="'"$APP_DIR"'"
-
-          echo "CHECKING DEPLOYMENT"
           ls -la "$APP_DIR/index.html" || echo "Missing index.html"
           cat "$APP_DIR/version.json" || echo "Missing version.json"
+
+          echo "DONE"
           EOF
