@@ -70,20 +70,22 @@ jobs:
         run: npm run build
 
       # =========================
-      # SSH SETUP (ASKPASS FIX)
+      # DEPLOY TO CPANEL
       # =========================
-      - name: Setup SSH (ASKPASS FIX)
+      - name: Deploy to cPanel (Consolidated & Multiplexed)
         env:
           SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
           SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
         run: |
           set -e
 
+          # 1. Setup SSH (ASKPASS FIX)
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
           PORT="${{ secrets.CPANEL_SSH_PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
+          SERVER="${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}"
 
           ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
 
@@ -100,16 +102,23 @@ jobs:
 
           setsid ssh-add <(echo "$SSH_PRIVATE_KEY") </dev/null
 
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          # 2. Configure SSH Multiplexing (ControlMaster)
+          mkdir -p ~/.ssh/control
+          cat << 'EOF' > ~/.ssh/config
+          Host *
+            ControlMaster auto
+            ControlPath ~/.ssh/control/conn-%r@%h:%p
+            ControlPersist 10m
+          EOF
 
-      # =========================
-      # BACKUP PRODUCTION
-      # =========================
-      - name: Backup production
-        run: |
-          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
-          ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} '
+          # Start the master persistent connection in background
+          ssh -p "$PORT" -M -N -f "$SERVER"
+
+          # 3. Backup production
+          echo "=============================="
+          echo " RUNNING BACKUP "
+          echo "=============================="
+          ssh -p "$PORT" "$SERVER" '
             set -e
 
             APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
@@ -129,26 +138,21 @@ jobs:
             echo "✅ Backup complete"
           '
 
-      # =========================
-      # DEPLOY (SCP + STAGING)
-      # =========================
-      - name: Deploy to cPanel (SCP safe deploy)
-        run: |
-          set -e
-
-          SERVER="${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}"
-          PORT="${{ secrets.CPANEL_SSH_PORT }}"
+          # 4. Deploy (SCP + swap)
+          echo "=============================="
+          echo " RUNNING DEPLOY "
+          echo "=============================="
           APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
           # Create staging directory
-          ssh -p $PORT $SERVER "mkdir -p $STAGING_DIR"
+          ssh -p "$PORT" "$SERVER" "mkdir -p $STAGING_DIR"
 
           # Upload build to staging
-          scp -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
+          scp -P "$PORT" -r out/* "$SERVER:$STAGING_DIR/"
 
           # Swap staging → live
-          ssh -p $PORT $SERVER '
+          ssh -p "$PORT" "$SERVER" '
             set -e
 
             APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
@@ -172,20 +176,14 @@ jobs:
             echo "✅ Deployment complete"
           '
 
-      # =========================
-      # VERIFY DEPLOYMENT
-      # =========================
-      - name: Verify deployment
-        run: |
-          ssh -p ${{ secrets.CPANEL_SSH_PORT }} \
-          ${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }} '
+          # 5. Verify deployment
+          echo "=============================="
+          echo " VERIFYING DEPLOYMENT "
+          echo "=============================="
+          ssh -p "$PORT" "$SERVER" '
             set -e
 
             APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
-
-            echo "=============================="
-            echo " DEPLOYMENT VERIFICATION "
-            echo "=============================="
 
             ls -la "$APP_DIR/index.html" || echo "Missing index.html"
             ls -la "$APP_DIR/.htaccess" || echo "Missing .htaccess"
@@ -197,3 +195,6 @@ jobs:
             echo "=============================="
             echo "DONE"
           '
+
+          # 6. Close the master multiplexer connection
+          ssh -p "$PORT" -O exit "$SERVER"
