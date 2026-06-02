@@ -140,7 +140,7 @@ function LMSPageContent() {
           Welcome to Your Course
         </h2>
         <p className="text-gray-500 max-w-md">
-          Select a module from the sidebar on the left to start learning.
+          Select a module from the sidebar on the left to start learning
         </p>
       </div>
     );
