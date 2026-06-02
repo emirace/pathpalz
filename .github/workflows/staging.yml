@@ -1,4 +1,4 @@
-name: Web staging CI/CD to cPanel 
+name: Web staging CI/CD to cPanel (SCP stable hardened)
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      CACHE_BUST: v2
+      CACHE_BUST: v3
 
     steps:
       # =========================
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       # =========================
-      # NODE SETUP
+      # NODE
       # =========================
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,7 +29,7 @@ jobs:
           node-version: 22
 
       # =========================
-      # CACHE NPM
+      # CACHE
       # =========================
       - name: Cache npm
         uses: actions/cache@v4
@@ -40,39 +40,31 @@ jobs:
             npm-${{ runner.os }}-node22-
 
       # =========================
-      # CACHE NEXT.JS
-      # =========================
-      - name: Cache Next.js
-        uses: actions/cache@v4
-        with:
-          path: .next/cache
-          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
-          restore-keys: |
-            next-${{ runner.os }}-
-
-      # =========================
-      # INSTALL + BUILD
+      # BUILD
       # =========================
       - name: Install dependencies
         run: npm ci
 
       - name: Create build version file
         run: |
-          echo "{
-            \"branch\": \"${GITHUB_REF_NAME}\",
-            \"sha\": \"${GITHUB_SHA}\",
-            \"run_id\": \"${GITHUB_RUN_ID}\",
-            \"run_number\": \"${GITHUB_RUN_NUMBER}\",
-            \"built_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
-          }" > public/version.json
+          mkdir -p public
+          cat <<EOF > public/version.json
+          {
+            "branch": "${GITHUB_REF_NAME}",
+            "sha": "${GITHUB_SHA}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_number": "${GITHUB_RUN_NUMBER}",
+            "built_at": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
 
-      - name: Build Next.js static export
+      - name: Build
         run: npm run build
 
       # =========================
-      # SSH SETUP (ASKPASS FIX)
+      # SSH SETUP
       # =========================
-      - name: Setup SSH (ASKPASS FIX)
+      - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.STAGING_CPANEL_SSH_PRIVATE_KEY }}
           SSH_PASSPHRASE: ${{ secrets.STAGING_CPANEL_SSH_PASSPHRASE }}
@@ -91,48 +83,18 @@ jobs:
 
           echo '#!/bin/sh' > ~/.ssh_askpass
           echo 'echo "$SSH_PASSPHRASE"' >> ~/.ssh_askpass
-
           chmod +x ~/.ssh_askpass
 
           export SSH_ASKPASS=~/.ssh_askpass
           export DISPLAY=:0
           export SSH_ASKPASS_REQUIRE=force
 
-          setsid ssh-add <(echo "$SSH_PRIVATE_KEY") </dev/null
-
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          ssh-add <(echo "$SSH_PRIVATE_KEY")
 
       # =========================
-      # BACKUP PRODUCTION
+      # REMOTE PREP (ONLY SSH #1)
       # =========================
-      - name: Backup production
-        run: |
-          ssh -p ${{ secrets.STAGING_CPANEL_SSH_PORT }} \
-          ${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }} '
-            set -e
-
-            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
-            BACKUP_DIR="$APP_DIR/backups"
-            TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-
-            mkdir -p "$BACKUP_DIR"
-
-            if [ -d "$APP_DIR" ]; then
-              zip -r "$BACKUP_DIR/live_$TIMESTAMP.zip" "$APP_DIR" \
-                -x "$APP_DIR/backups/*" >/dev/null 2>&1 || true
-            fi
-
-            # Keep last 2 backups
-            ls -tp "$BACKUP_DIR"/*.zip 2>/dev/null | tail -n +3 | xargs -r rm --
-
-            echo "✅ Backup complete"
-          '
-
-      # =========================
-      # DEPLOY (SCP + STAGING)
-      # =========================
-      - name: Deploy to cPanel (SCP safe deploy)
+      - name: Prepare remote staging + backup
         run: |
           set -e
 
@@ -141,59 +103,94 @@ jobs:
           APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
-          # Create staging directory
-          ssh -p $PORT $SERVER "mkdir -p $STAGING_DIR"
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
+          set -e
 
-          # Upload build to staging
-          scp -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
+          APP_DIR="'"$APP_DIR"'"
+          STAGING_DIR="'"$STAGING_DIR"'"
+          BACKUP_DIR="$APP_DIR/backups"
+          TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
-          # Swap staging → live
-          ssh -p $PORT $SERVER '
-            set -e
+          mkdir -p "$STAGING_DIR"
+          mkdir -p "$BACKUP_DIR"
 
-            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
-            STAGING_DIR="${APP_DIR}_staging"
-            BACKUP_DIR="$APP_DIR/backups"
+          if [ -d "$APP_DIR" ]; then
+            zip -r "$BACKUP_DIR/live_$TIMESTAMP.zip" "$APP_DIR" \
+              -x "$BACKUP_DIR/*" >/dev/null 2>&1 || true
+          fi
 
-            mkdir -p "$BACKUP_DIR"
+          ls -tp "$BACKUP_DIR"/*.zip 2>/dev/null | tail -n +3 | xargs -r rm --
 
-            # Clean live but protect .htaccess + backups
-            find "$APP_DIR" -mindepth 1 \
-              ! -name "backups" \
-              ! -name ".htaccess" \
-              -exec rm -rf {} +
-
-            # Move staging to live
-            cp -r "$STAGING_DIR/"* "$APP_DIR/"
-
-            # Remove staging
-            rm -rf "$STAGING_DIR"
-
-            echo "✅ Deployment complete"
-          '
+          echo "REMOTE READY"
+          EOF
 
       # =========================
-      # VERIFY DEPLOYMENT
+      # SCP DEPLOY (ONLY TRANSFER STEP)
+      # =========================
+      - name: Upload build to staging (SCP)
+        run: |
+          set -e
+
+          SERVER="${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }}"
+          PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
+          STAGING_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}_staging"
+
+          # IMPORTANT: small delay reduces firewall suspicion
+          sleep 5
+
+          scp -o ConnectTimeout=20 -P $PORT -r out/* "$SERVER:$STAGING_DIR/"
+
+      # =========================
+      # SWAP (ONLY SSH #2)
+      # =========================
+      - name: Swap staging to live
+        run: |
+          set -e
+
+          SERVER="${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }}"
+          PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
+          APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+          STAGING_DIR="${APP_DIR}_staging"
+
+          # IMPORTANT: delay prevents rapid SSH after SCP
+          sleep 8
+
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
+          set -e
+
+          APP_DIR="'"$APP_DIR"'"
+          STAGING_DIR="'"$STAGING_DIR"'"
+
+          find "$APP_DIR" -mindepth 1 \
+            ! -name "backups" \
+            ! -name ".htaccess" \
+            -exec rm -rf {} +
+
+          cp -r "$STAGING_DIR/"* "$APP_DIR/"
+          rm -rf "$STAGING_DIR"
+
+          echo "DEPLOY COMPLETE"
+          EOF
+
+      # =========================
+      # VERIFY (OPTIONAL SSH #3 but safe)
       # =========================
       - name: Verify deployment
         run: |
-          ssh -p ${{ secrets.STAGING_CPANEL_SSH_PORT }} \
-          ${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }} '
-            set -e
+          set -e
 
-            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+          SERVER="${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }}"
+          PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
+          APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
 
-            echo "=============================="
-            echo " DEPLOYMENT VERIFICATION "
-            echo "=============================="
+          sleep 5
 
-            ls -la "$APP_DIR/index.html" || echo "Missing index.html"
-            ls -la "$APP_DIR/.htaccess" || echo "Missing .htaccess"
+          ssh -o ConnectTimeout=20 -p $PORT $SERVER << 'EOF'
+          set -e
 
-            echo ""
-            cat "$APP_DIR/version.json" || echo "Missing version.json"
+          APP_DIR="'"$APP_DIR"'"
 
-            echo ""
-            echo "=============================="
-            echo "DONE"
-          '
+          echo "CHECKING DEPLOYMENT"
+          ls -la "$APP_DIR/index.html" || echo "Missing index.html"
+          cat "$APP_DIR/version.json" || echo "Missing version.json"
+          EOF
