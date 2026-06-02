@@ -181,7 +181,7 @@ jobs:
           ${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }} '
             set -e
 
-            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
 
             echo "=============================="
             echo " DEPLOYMENT VERIFICATION "
