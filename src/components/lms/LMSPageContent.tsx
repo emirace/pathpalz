@@ -10,7 +10,7 @@ import {
   useMarkAttendance,
   useMarkCourseAsCompleted,
 } from "@/query/training/student";
-import { Play, Download, FileText, Code, Loader2, Video } from "lucide-react";
+import { Play, Download, FileText, Loader2, Video } from "lucide-react";
 import { useGetUser } from "@/query/auth";
 
 const getDateKey = (date: Date) => {
@@ -52,6 +52,24 @@ const formatTrainingDate = (
 const isDirectVideoLink = (url: string) =>
   /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
 
+const formatFileSize = (bytes: number) => {
+  if (!bytes) return "Unknown size";
+
+  const units = ["B", "KB", "MB", "GB"];
+  const unitIndex = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(1024)),
+    units.length - 1,
+  );
+  const size = bytes / 1024 ** unitIndex;
+
+  return `${size.toFixed(size >= 10 || unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+};
+
+const getFileExtension = (fileName: string) => {
+  const extension = fileName.split(".").pop();
+  return extension && extension !== fileName ? extension.toUpperCase() : "FILE";
+};
+
 function LMSPageContent() {
   const searchParams = useSearchParams();
   const enrollmentId = searchParams.get("enrollmentId");
@@ -88,6 +106,7 @@ function LMSPageContent() {
   const hasRecordedSession = !!selectedSession?.recorded_link;
   const canJoinLiveSession =
     hasLiveSession && selectedSessionDateKey === todayKey;
+  const lessonResources = sessionData?.lesson_notes || [];
 
   const handleMarkAttended = () => {
     if (!moduleId) return;
@@ -103,10 +122,14 @@ function LMSPageContent() {
 
   const handleMarkCompleted = () => {
     if (!sessionData?.module?.title) return;
-    markCompletedMutation.mutate(sessionData.module.title, {
-      // onSuccess: () => toast.success("Module marked as completed!"),
-      // onError: () => toast.error("Failed to mark as completed."),
-    });
+    if (!moduleId) return;
+    markCompletedMutation.mutate(
+      { module_title: sessionData.module.title, course_module_id: moduleId },
+      {
+        // onSuccess: () => toast.success("Module marked as completed!"),
+        // onError: () => toast.error("Failed to mark as completed."),
+      },
+    );
   };
 
   const isAttended = (moduleId: number) => {
@@ -274,7 +297,6 @@ function LMSPageContent() {
             </div>
           )}
 
-          {/* Resources Card */}
           <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -285,40 +307,50 @@ function LMSPageContent() {
                   Download materials to follow along with the lecture.
                 </p>
               </div>
-              <button className="flex items-center gap-2 text-teal font-bold text-sm hover:underline">
+              <button
+                type="button"
+                disabled={lessonResources.length === 0}
+                onClick={() =>
+                  lessonResources.forEach((resource) =>
+                    window.open(resource.file_url, "_blank", "noopener"),
+                  )
+                }
+                className="flex items-center gap-2 text-teal font-bold text-sm hover:underline disabled:cursor-not-allowed disabled:text-gray-300 disabled:no-underline"
+              >
                 <Download size={16} />
-                Download All (.zip)
+                Download All
               </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-teal/5 hover:border-teal/20 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-teal flex items-center justify-center text-white shrink-0">
-                  <FileText size={20} />
+              {lessonResources.length > 0 ? (
+                lessonResources.map((resource) => (
+                  <a
+                    key={`${resource.file_url}-${resource.uploaded_at}`}
+                    href={resource.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-teal/5 hover:border-teal/20 transition-colors"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-teal flex items-center justify-center text-white shrink-0">
+                      <FileText size={20} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-[#00284F]">
+                        {resource.file_name}
+                      </p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">
+                        {getFileExtension(resource.file_name)} -{" "}
+                        {formatFileSize(resource.file_size)}
+                      </p>
+                    </div>
+                  </a>
+                ))
+              ) : (
+                <div className="sm:col-span-2 rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4 text-sm font-medium text-gray-500">
+                  No lesson resources have been uploaded yet.
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-[#00284F]">
-                    Cheat Sheet: {sessionData?.module?.title}
-                  </p>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">
-                    PDF • 1.2 MB
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-teal/5 hover:border-teal/20 transition-colors cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-[#00284F] flex items-center justify-center text-white shrink-0">
-                  <Code size={20} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[#00284F]">
-                    Lab Exercise
-                  </p>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-0.5">
-                    SH • 45 KB
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

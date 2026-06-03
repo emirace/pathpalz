@@ -74,4 +74,10 @@ export interface IModuleSession {
     updated_at: string;
     lesson_note: string | null;
   }>;
+  lesson_notes: {
+    file_name: string;
+    file_url: string;
+    file_size: number;
+    uploaded_at: string;
+  }[];
 }

@@ -20,9 +20,16 @@ export const getModuleAttendance = async (
   return response.data;
 };
 
-export const markCourseAsCompleted = async (module_title: string) => {
-  const response = await trainingClient.post(`/training/progress/student`, {
+export const markCourseAsCompleted = async ({
+  module_title,
+  course_module_id,
+}: {
+  module_title: string;
+  course_module_id: number;
+}) => {
+  const response = await trainingClient.post(`/progress/student`, {
     module_title,
+    course_module_id,
   });
   return response.data;
 };
