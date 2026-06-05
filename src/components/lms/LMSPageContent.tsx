@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import ReactPlayer from "react-player";
+
 import { useGetEnrollmentById } from "@/query/training/enrollments";
 import {
   useGetModuleAttendance,
@@ -126,8 +128,9 @@ function LMSPageContent() {
     markCompletedMutation.mutate(
       { module_title: sessionData.module.title, course_module_id: moduleId },
       {
-        // onSuccess: () => toast.success("Module marked as completed!"),
-        // onError: () => toast.error("Failed to mark as completed."),
+        onSuccess: () => alert("Module marked as completed!"),
+        onError: (err: any) =>
+          alert(err.response?.data?.message || "Failed to mark as completed."),
       },
     );
   };
@@ -215,21 +218,25 @@ function LMSPageContent() {
               </div>
             ) : hasRecordedSession && selectedSession?.recorded_link ? (
               <>
-                {isDirectVideoLink(selectedSession.recorded_link) ? (
+                {/* {isDirectVideoLink(selectedSession.recorded_link) ? (
                   <video
                     className="absolute inset-0 h-full w-full"
                     controls
                     src={selectedSession.recorded_link}
                   />
-                ) : (
-                  <iframe
-                    className="absolute inset-0 h-full w-full"
-                    src={selectedSession.recorded_link}
-                    title={`${sessionData?.module?.title || "Session"} recording`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                )}
+                ) : ( */}
+                <ReactPlayer
+                  className="absolute inset-0 h-full w-full"
+                  src={selectedSession.recorded_link}
+                  title={`${sessionData?.module?.title || "Session"} recording`}
+                  // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  // allowFullScreen
+                  controls={true}
+                  height="100%"
+                  width="100%"
+                  autoPlay
+                />
+                {/* )} */}
 
                 {/* Fake player controls */}
                 <div className="pointer-events-none absolute bottom-0 inset-x-0 p-4 bg-linear-to-t from-black/80 to-transparent flex flex-col gap-2 z-20">
@@ -414,7 +421,7 @@ function LMSPageContent() {
 
           <button
             onClick={handleMarkAttended}
-            className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2"
+            className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2 disabled:bg-[#00284F] disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={
               isLoadingAttendance ||
               markAttendanceMutation.isPending ||
@@ -424,7 +431,7 @@ function LMSPageContent() {
             {markAttendanceMutation.isPending ? (
               <Loader2 size={18} className="animate-spin" />
             ) : null}
-            MARK AS ATTENDED
+            {isAttended(moduleId) ? "ATTENDANCE MARKED" : "MARK AS ATTENDED"}
           </button>
 
           {/* Course Progress Card */}
