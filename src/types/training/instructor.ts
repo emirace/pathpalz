@@ -1,11 +1,13 @@
 export interface IInstructorProgressRequest {
   course_module_id: number;
+  session_id?: number;
   sub_type_id?: number;
   type_id?: number;
   training_date: string;
   meeting_link?: string;
   recorded_link?: string;
   instructor_marked?: string;
+  lesson_note?: File;
 }
 
 export interface IInstructorProgressResponse {
@@ -35,6 +37,35 @@ export interface IInstructorProgressResponse {
     created_at: string;
     updated_at: string;
   };
+}
+
+export interface IInstructorGetProgressRequest {
+  success: boolean;
+  message: string;
+  data: {
+    progress_id: number;
+    module: {
+      id: number;
+      title: string;
+    };
+    sessions: {
+      session_id: string;
+      training_date: string;
+      meeting_link: string | null;
+      recorded_link: string | null;
+      status: string;
+      created_at: string;
+      updated_at: string;
+    }[];
+    status: string;
+    status_history: [
+      {
+        status: string;
+        updated_at: string;
+      },
+    ];
+    completed_at: string | null;
+  }[];
 }
 
 export interface IInstructorModuleResponse {
@@ -77,4 +108,30 @@ export interface IAssignedTrack {
 export interface IGetInstructorAssignedTracksResponse {
   success: boolean;
   data: IAssignedTrack[];
+}
+
+export interface IGetProgressResponse {
+  message: string;
+  data: {
+    progress_id: number;
+    module: {
+      id: number;
+      title: string;
+    };
+    sessions: {
+      session_id: string;
+      training_date: string;
+      meeting_link: string | null;
+      recorded_link: string | null;
+      status: string;
+      updated_at: string;
+    }[];
+    status: string;
+    status_history: {
+      status: string;
+      updated_at: string;
+    }[];
+    completed_at: string;
+  }[];
+  success: boolean;
 }

@@ -47,6 +47,8 @@ import {
 import EntityFormModal, { IFormField } from "./EntityFormModal";
 import { useGetPayments } from "@/query/admin/payment";
 import { useGetStudents } from "@/query/admin/student";
+import { useSetting } from "@/states/setting";
+import { getCurrencySymbol } from "@/utils/currency";
 
 // --- Types ---
 type Level = "TRACKS" | "TYPES" | "SUB_TYPES" | "HEADERS" | "MODULES";
@@ -63,6 +65,7 @@ export default function CourseTrackManager() {
   console.log("Payments:", payments, students);
   const [level, setLevel] = useState<Level>("TRACKS");
   const [breadcrumbs, setBreadcrumbs] = useState<IBreadcrumb[]>([]);
+  const country = useSetting(data => data.country)
 
   // Selection states
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
@@ -84,7 +87,7 @@ export default function CourseTrackManager() {
     title: "",
     fields: [],
     initialData: null,
-    onSubmit: () => {},
+    onSubmit: () => { },
   });
 
   // Queries
@@ -237,7 +240,7 @@ export default function CourseTrackManager() {
           type: "select",
           options: [
             { label: "Open", value: "open" },
-            { label: "Closed", value: "closed" },
+            { label: "Coming Soon", value: "coming_soon" },
           ],
         },
       ],
@@ -268,7 +271,14 @@ export default function CourseTrackManager() {
             { label: "Specialized Track", value: "Specialized Track" },
           ],
         },
-        { name: "price", label: "Price", type: "number" },
+        {
+          name: "duration_weeks",
+          label: "Duration (Weeks)",
+          type: "number",
+          required: true,
+        },
+        { name: "price_ngn", label: "Price (NGN)", type: "number" },
+        { name: "price_gbp", label: "Price (GBP)", type: "number" },
         { name: "description", label: "Description", type: "textarea" },
       ],
       item || null,
@@ -292,8 +302,25 @@ export default function CourseTrackManager() {
       item ? "Edit Sub Type" : "Create Sub Type",
       [
         { name: "title", label: "Title", type: "text", required: true },
-        { name: "price", label: "Price", type: "number", required: true },
+        {
+          name: "price_ngn",
+          label: "Price (NGN)",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "price_gbp",
+          label: "Price (GBP)",
+          type: "number",
+          required: true,
+        },
         { name: "description", label: "Description", type: "textarea" },
+        {
+          name: "duration_weeks",
+          label: "Duration (Weeks)",
+          type: "number",
+          required: true,
+        },
       ],
       item || null,
       async (data) => {
@@ -369,9 +396,8 @@ export default function CourseTrackManager() {
             setSelectedSubTypeId(null);
             setSelectedHeaderId(null);
           }}
-          className={`hover:text-teal transition-colors flex items-center gap-1 ${
-            level === "TRACKS" ? "text-[#00284F] font-bold" : ""
-          }`}
+          className={`hover:text-teal transition-colors flex items-center gap-1 ${level === "TRACKS" ? "text-[#00284F] font-bold" : ""
+            }`}
         >
           <Folder size={16} /> Tracks
         </button>
@@ -380,11 +406,10 @@ export default function CourseTrackManager() {
             <ChevronRight size={16} className="text-gray-400 shrink-0" />
             <button
               onClick={() => handleBreadcrumbClick(index)}
-              className={`hover:text-teal transition-colors whitespace-nowrap ${
-                index === breadcrumbs.length - 1
-                  ? "text-[#00284F] font-bold"
-                  : ""
-              }`}
+              className={`hover:text-teal transition-colors whitespace-nowrap ${index === breadcrumbs.length - 1
+                ? "text-[#00284F] font-bold"
+                : ""
+                }`}
             >
               {bc.name}
             </button>
@@ -425,7 +450,9 @@ export default function CourseTrackManager() {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete();
+                  if (confirm("Are you sure you want to delete this item?")) {
+                    onDelete();
+                  }
                 }}
                 className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
               >
@@ -452,14 +479,16 @@ export default function CourseTrackManager() {
           )}
         </div>
 
-        {item.price && (
-          <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
-            <span className="font-semibold text-teal">£{item.price}</span>
-            <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
-              {item.status}
-            </span>
-          </div>
-        )}
+
+        <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between text-sm">
+          {item.price_ngn && (<span className="font-semibold text-teal">₦{parseFloat(item.price_ngn)}</span>
+          )}
+          {item.price_gbp && (<span className="font-semibold text-teal">£{parseFloat(item.price_gbp)}</span>
+          )}
+          <span className="text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">
+            {item.status}
+          </span>
+        </div>
       </div>
     );
   };
@@ -576,14 +605,14 @@ export default function CourseTrackManager() {
           (level === "SUB_TYPES" && currentSubTypes.length === 0) ||
           (level === "HEADERS" && currentHeaders.length === 0) ||
           (level === "MODULES" && currentModules.length === 0)) && (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-              <Folder size={32} className="text-gray-300" />
+            <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <Folder size={32} className="text-gray-300" />
+              </div>
+              <p className="text-lg font-medium text-gray-500">No items found.</p>
+              <p className="text-sm">Click "Add New" to create the first one.</p>
             </div>
-            <p className="text-lg font-medium text-gray-500">No items found.</p>
-            <p className="text-sm">Click "Add New" to create the first one.</p>
-          </div>
-        )}
+          )}
       </div>
 
       <EntityFormModal

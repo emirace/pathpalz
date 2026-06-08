@@ -3,21 +3,29 @@ import {
   IInstructorProgressResponse,
   IInstructorModuleResponse,
   IAssignedTrack,
-  IGetInstructorAssignedTracksResponse,
+  IInstructorGetProgressRequest,
 } from "@/types/training/instructor";
 import { trainingClient } from "../api";
 
 export const updateInstructorProgress = async (
   data: IInstructorProgressRequest,
 ): Promise<IInstructorProgressResponse> => {
-  const response = await trainingClient.post("/progress/instructor", data);
+  const formData = new FormData();
+  const dataEntries = Object.entries(data) as [string, any][];
+  for (const [key, value] of dataEntries) {
+    formData.append(key, value);
+  }
+  const response = await trainingClient.post("/progress/instructor", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return response.data;
 };
 
-export const getInstructorProgress = async () => {
-  const response = await trainingClient.get(`/instructor/progress`);
-  return response.data;
-};
+export const getInstructorProgress =
+  async (): Promise<IInstructorGetProgressRequest> => {
+    const response = await trainingClient.get(`/instructor/progress`);
+    return response.data;
+  };
 
 export const getInstructorAssignedTracks = async (): Promise<
   IAssignedTrack[]

@@ -6,6 +6,7 @@ import { useGetTracks, useGetTrackById } from "@/query/training/tracks";
 import { useCheckout } from "@/query/training/payments";
 import { useGetUser } from "@/query/auth";
 import PaymentGatewayModal from "@/components/training/PaymentGatewayModal";
+import WaitlistModal from "@/components/training/WaitlistModal";
 import {
   ChevronLeft,
   Clock,
@@ -27,7 +28,18 @@ export default function TrackDetailClient() {
   const { slug } = useParams();
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
-  const [guestData, setGuestData] = useState({ fullName: "", email: "" });
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [guestData, setGuestData] = useState({
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+    city: "",
+    country: "",
+    state: "",
+    street: "",
+    house_number: "",
+    apartment_number: "",
+  });
   const [selectedItem, setSelectedItem] = useState<{
     type: "training_track" | "type" | "sub_type";
     id: number;
@@ -110,7 +122,17 @@ export default function TrackDetailClient() {
         item_id: selectedItem.id,
         gateway,
         ...(!user
-          ? { email: guestData.email, full_name: guestData.fullName }
+          ? {
+              email: guestData.email,
+              full_name: guestData.fullName,
+              phoneNumber: guestData.phoneNumber,
+              city: guestData.city,
+              country: guestData.country,
+              state: guestData.state,
+              street: guestData.street,
+              house_number: guestData.house_number,
+              apartment_number: guestData.apartment_number,
+            }
           : {}),
       },
       {
@@ -158,7 +180,7 @@ export default function TrackDetailClient() {
                 {track.description}
               </p>
 
-              <div className="flex flex-wrap gap-6 pt-4">
+              {/* <div className="flex flex-wrap gap-6 pt-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
                     <Clock className="w-5 h-5 text-teal" />
@@ -192,7 +214,7 @@ export default function TrackDetailClient() {
                     <p className="font-bold">Cohort-based</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="bg-white rounded-3xl p-8 text-[#00284F] shadow-2xl">
@@ -222,13 +244,23 @@ export default function TrackDetailClient() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handleApply("training_track", track.id)}
-                  className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
-                >
-                  {isOpen ? "Apply for this path" : "Join the Waitlist"}
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </button>
+                {isOpen ? (
+                  <Link
+                    href={`/training/${track.slug}#types`}
+                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                  >
+                    Apply for this path
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => setIsWaitlistModalOpen(true)}
+                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                  >
+                    Join the Waitlist
+                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                )}
 
                 <p className="text-center text-xs text-gray-400 font-medium">
                   {isOpen
@@ -246,6 +278,9 @@ export default function TrackDetailClient() {
         trackId={String(track.id)}
         trackTitle={track.title}
         onApply={handleApply}
+        slug={slug as string}
+        isOpen={isOpen}
+        onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
       />
 
       <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
@@ -253,14 +288,16 @@ export default function TrackDetailClient() {
           {/* Left: Curriculum & Modules */}
           <div className="lg:col-span-3 space-y-12">
             {/* Specialized Tracks Section */}
-            <div className="lg:col-span-2 ">
+            <div id="sub_types" className="lg:col-span-2 ">
               <SpecializedTracks
                 trackId={String(track.id)}
                 onApply={handleApply}
+                isOpen={isOpen}
+                onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
               />
             </div>
 
-            <div>
+            {/* <div>
               <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
                 Curriculum Deep Dive
               </h2>
@@ -270,7 +307,7 @@ export default function TrackDetailClient() {
                 subType={specializedSubTypes}
                 onApply={handleApply}
               />
-            </div>
+            </div> */}
 
             <div>
               <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
@@ -366,6 +403,13 @@ export default function TrackDetailClient() {
         isSubmitting={checkoutMutation.isPending}
       />
 
+      <WaitlistModal
+        isOpen={isWaitlistModalOpen}
+        onClose={() => setIsWaitlistModalOpen(false)}
+        trackId={track.id}
+        trackTitle={track.title}
+      />
+
       {isGuestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00284f]/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
@@ -386,7 +430,10 @@ export default function TrackDetailClient() {
               </button>
             </div>
 
-            <form onSubmit={handleGuestSubmit} className="p-6 space-y-4">
+            <form
+              onSubmit={handleGuestSubmit}
+              className="p-6 space-y-4 overflow-auto max-h-[80vh]"
+            >
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#00284F]">
                   Full Name
@@ -416,6 +463,120 @@ export default function TrackDetailClient() {
                   }
                   className="w-full px-4 py-3 text-black rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-[#00284F]">
+                  Phone Nmuber
+                </label>
+                <input
+                  type="tel"
+                  required
+                  placeholder="1234567890"
+                  value={guestData.phoneNumber}
+                  onChange={(e) =>
+                    setGuestData({ ...guestData, phoneNumber: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Country
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your country"
+                    value={guestData.country}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, country: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your state"
+                    value={guestData.state}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, state: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your city"
+                    value={guestData.city}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, city: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Street Address
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your street address"
+                    value={guestData.street}
+                    onChange={(e) =>
+                      setGuestData({ ...guestData, street: e.target.value })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    House Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your house number"
+                    value={guestData.house_number}
+                    onChange={(e) =>
+                      setGuestData({
+                        ...guestData,
+                        house_number: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-[#00284F]">
+                    Apartment Number
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="enter your apartment number"
+                    value={guestData.apartment_number}
+                    onChange={(e) =>
+                      setGuestData({
+                        ...guestData,
+                        apartment_number: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                  />
+                </div>
               </div>
 
               <div className="pt-4">

@@ -9,9 +9,12 @@ import EnrollmentDetailModal from "./components/EnrollmentDetailModal";
 import { Calendar, ExternalLink, Clock } from "lucide-react";
 import Link from "next/link";
 import { IEnrollment } from "@/types/training/enrollments";
+import { getCurrencySymbol } from "@/utils/currency";
+import { useSetting } from "@/states/setting";
 
 export default function MyEnrollmentsPage() {
   const { data: enrollments, isLoading } = useGetMyEnrollments();
+  const country = useSetting(data => data.country)
   const [selectedEnrollment, setSelectedEnrollment] =
     useState<IEnrollment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,17 +89,16 @@ export default function MyEnrollmentsPage() {
                     </h3>
                     <div className="flex items-center gap-2 text-xs text-gray-400 font-medium font-manrope uppercase tracking-wider">
                       <Calendar size={12} />
-                      Joined {new Date(item.created_at).toLocaleDateString()}
+                      Joined {new Date(item.purchased_at).toLocaleDateString()}
                     </div>
                   </div>
                   <div
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                      isPaid
-                        ? "bg-emerald-50 text-emerald-600"
-                        : isPending
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-red-50 text-red-600"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isPaid
+                      ? "bg-emerald-50 text-emerald-600"
+                      : isPending
+                        ? "bg-amber-50 text-amber-600"
+                        : "bg-red-50 text-red-600"
+                      }`}
                   >
                     {item.payment.status}
                   </div>
@@ -108,7 +110,7 @@ export default function MyEnrollmentsPage() {
                       Amount
                     </p>
                     <p className="text-sm font-bold text-[#00284F]">
-                      £{item.purchased_course.price}
+                      {getCurrencySymbol(country.currency)}{item.payment.amount}
                     </p>
                   </div>
                   <div className="space-y-1 text-right">
@@ -129,13 +131,22 @@ export default function MyEnrollmentsPage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleViewDetails(item)}
-                    className="flex items-center gap-1.5 text-sm font-bold text-teal hover:underline transition-all"
-                  >
-                    View Details
-                    <ExternalLink size={14} />
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => handleViewDetails(item)}
+                      className="flex items-center gap-1.5 text-sm font-bold text-gray-500 hover:text-teal transition-all"
+                    >
+                      View Details
+                      <ExternalLink size={14} />
+                    </button>
+
+                    <Link
+                      href={`/lms?enrollmentId=${item.enrollment_id}`}
+                      className="flex items-center gap-1.5 text-sm font-bold text-white bg-teal px-4 py-2 rounded-lg hover:bg-teal/90 transition-all shadow-sm shadow-teal/20"
+                    >
+                      Go to Course
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
