@@ -267,7 +267,7 @@ export default function CourseTrackManager() {
           type: "select",
           required: true,
           options: [
-            { label: "Fundamental Track", value: "Fundamental Track" },
+            { label: "Foundational Track", value: "Foundational Track" },
             { label: "Specialized Track", value: "Specialized Track" },
           ],
         },
