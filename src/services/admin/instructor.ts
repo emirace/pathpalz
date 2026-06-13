@@ -15,3 +15,17 @@ export const addInstructor = async (data: IInstructorCreatePayload) => {
   const response = await apiClient.post("/instructor/register", data);
   return response.data;
 };
+
+export const updateInstructorStatus = async ({
+  instructorId,
+  status,
+}: {
+  instructorId: string;
+  status: "active" | "inactive" | "suspended";
+}) => {
+  const response = await apiClient.put(`/admin/status`, {
+    user_id: instructorId,
+    status,
+  });
+  return response.data;
+};

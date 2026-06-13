@@ -31,7 +31,7 @@ const TrainingNavbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-[#023E74] shadow-lg">
+    <nav className="sticky top-0 z-50 w-full bg-white backdrop-blur-md">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -55,7 +55,7 @@ const TrainingNavbar = () => {
                 key={link.name}
                 href={link.href}
                 className={`text-sm font-semibold transition-colors duration-200 relative py-2 ${
-                  link.active ? "text-teal" : "text-gray-300 hover:text-white"
+                  link.active ? "text-teal" : "text-gray-600 hover:text-teal"
                 }`}
               >
                 {link.name}
@@ -70,7 +70,7 @@ const TrainingNavbar = () => {
             {user ? (
               <Link
                 href="/dashboard"
-                className="flex items-center justify-center w-12 h-12 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10 group"
+                className="flex items-center justify-center w-12 h-12 rounded-xl bg-black/10 text-black hover:bg-black/20 transition-all border border-black/10 group"
                 aria-label="Go to Dashboard"
               >
                 <UserIcon
@@ -92,7 +92,7 @@ const TrainingNavbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-teal hover:bg-gray-100 transition-colors"
               aria-label="Toggle menu"
             >
               <svg
