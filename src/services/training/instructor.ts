@@ -4,6 +4,7 @@ import {
   IInstructorModuleResponse,
   IAssignedTrack,
   IInstructorGetProgressRequest,
+  IGetAttendanceByModule,
 } from "@/types/training/instructor";
 import { trainingClient } from "../api";
 
@@ -46,7 +47,9 @@ export const getAllStudentAttendance = async () => {
   return response.data;
 };
 
-export const getStudentAttendancePerModule = async (moduleId: number) => {
+export const getStudentAttendancePerModule = async (
+  moduleId: number,
+): Promise<IGetAttendanceByModule> => {
   const response = await trainingClient.get(`/attendance/modules/${moduleId}`);
   return response.data;
 };
