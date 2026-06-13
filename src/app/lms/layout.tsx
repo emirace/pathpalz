@@ -140,7 +140,15 @@ function LMSLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           ))}
 
-          <button className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-left mt-4">
+          <button
+            onClick={() => {
+              if (enrollmentId) {
+                router.push(`/lms?enrollmentId=${enrollmentId}&view=assignments`);
+                setIsSidebarOpen(false);
+              }
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-left mt-4"
+          >
             <ClipboardList size={16} className="text-white/60" />
             <span className="text-sm font-medium text-white/80">Assignments</span>
           </button>
