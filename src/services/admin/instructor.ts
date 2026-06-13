@@ -23,7 +23,7 @@ export const updateInstructorStatus = async ({
   instructorId: string;
   status: "active" | "inactive" | "suspended";
 }) => {
-  const response = await apiClient.put(`/admin/status`, {
+  const response = await apiClient.post(`/admin/status`, {
     user_id: instructorId,
     status,
   });
