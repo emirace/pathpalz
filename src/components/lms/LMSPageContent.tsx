@@ -162,29 +162,52 @@ function LMSPageContent() {
     // If view=assignments, render assignments overview for the course
     if (viewParam === "assignments") {
       // Build a simple assignments list from modules as a fallback
-      const modules = enrollment?.purchased_course.course_structure.flatMap((h: any) => h.modules) || [];
-      const assignments: AssignmentProps[] = modules.map((m: any, idx: number) => ({
-        id: m.id,
-        title: `${m.title}`,
-        moduleTitle: m.title,
-        dueDate: idx % 4 === 0 ? "Due Oct 24, 11:59 PM" : idx % 4 === 1 ? "Due Oct 28, 6:00 PM" : null,
-        points: idx % 4 === 2 ? { obtained: 92, total: 100 } : undefined,
-        status: idx % 4 === 0 ? "to-do" : idx % 4 === 1 ? "upcoming" : idx % 4 === 2 ? "graded" : "submitted",
-        priority: idx % 3 === 0 ? "high" : "normal",
-      }));
+      const modules =
+        enrollment?.purchased_course.course_structure.flatMap(
+          (h: any) => h.modules,
+        ) || [];
+      const assignments: AssignmentProps[] = modules.map(
+        (m: any, idx: number) => ({
+          id: m.id,
+          title: `${m.title}`,
+          moduleTitle: m.title,
+          dueDate:
+            idx % 4 === 0
+              ? "Due Oct 24, 11:59 PM"
+              : idx % 4 === 1
+                ? "Due Oct 28, 6:00 PM"
+                : null,
+          points: idx % 4 === 2 ? { obtained: 92, total: 100 } : undefined,
+          status:
+            idx % 4 === 0
+              ? "to-do"
+              : idx % 4 === 1
+                ? "upcoming"
+                : idx % 4 === 2
+                  ? "graded"
+                  : "submitted",
+          priority: idx % 3 === 0 ? "high" : "normal",
+        }),
+      );
 
       return (
         <div className="p-6 max-w-7xl mx-auto animate-in fade-in duration-500">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2 bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
-              <h2 className="text-2xl font-bold text-[#00284F]">Assignments Overview</h2>
-              <p className="text-sm text-gray-500">All assignments for {enrollment?.purchased_course.title}</p>
+              <h2 className="text-2xl font-bold text-[#00284F]">
+                Assignments Overview
+              </h2>
+              <p className="text-sm text-gray-500">
+                All assignments for {enrollment?.purchased_course.title}
+              </p>
             </div>
 
             <div className="space-y-4">
               <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
                 <p className="text-xs text-gray-400">Next Due</p>
-                <div className="mt-2 font-bold text-[#00284F]">No upcoming due dates</div>
+                <div className="mt-2 font-bold text-[#00284F]">
+                  No upcoming due dates
+                </div>
               </div>
               <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
                 <p className="text-xs text-gray-400">Overall Progress</p>
@@ -196,7 +219,9 @@ function LMSPageContent() {
           <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
-                <button className="text-sm font-bold text-teal border-b-2 border-teal pb-2">All Items</button>
+                <button className="text-sm font-bold text-teal border-b-2 border-teal pb-2">
+                  All Items
+                </button>
                 <button className="text-sm text-gray-400">To Do</button>
                 <button className="text-sm text-gray-400">Submitted</button>
                 <button className="text-sm text-gray-400">Graded</button>
@@ -205,7 +230,9 @@ function LMSPageContent() {
 
             <div className="space-y-4">
               {assignments.length === 0 && (
-                <div className="text-center text-gray-500 py-8">No assignments found for this course.</div>
+                <div className="text-center text-gray-500 py-8">
+                  No assignments found for this course.
+                </div>
               )}
 
               <div className="space-y-4">

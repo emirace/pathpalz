@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { Clock, ArrowRight, CheckCircle, AlertTriangle, FileText } from "lucide-react";
+import {
+  Clock,
+  ArrowRight,
+  CheckCircle,
+  AlertTriangle,
+  FileText,
+} from "lucide-react";
 
 export type AssignmentStatus = "to-do" | "submitted" | "graded" | "upcoming";
 
@@ -29,8 +35,8 @@ export default function AssignmentCard({
   const leftAccent = isHigh
     ? "border-l-4 border-red-500"
     : status === "graded"
-    ? "border-l-4 border-emerald-400"
-    : "border-l-4 border-transparent";
+      ? "border-l-4 border-emerald-400"
+      : "border-l-4 border-transparent";
 
   return (
     <div
@@ -43,9 +49,13 @@ export default function AssignmentCard({
 
         <div className="min-w-0">
           <div className="flex items-center gap-3">
-            <h4 className="text-sm font-bold text-[#00284F] truncate">{title}</h4>
+            <h4 className="text-sm font-bold text-[#00284F] truncate">
+              {title}
+            </h4>
             {isHigh && (
-              <span className="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full font-bold">HIGH PRIORITY</span>
+              <span className="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full font-bold">
+                HIGH PRIORITY
+              </span>
             )}
           </div>
           <p className="text-xs text-gray-400 mt-1 truncate">{moduleTitle}</p>
@@ -55,7 +65,9 @@ export default function AssignmentCard({
               <span>{dueDate ?? "No due date"}</span>
             </div>
             {points && (
-              <div className="inline-flex items-center gap-1">{points.obtained ?? "-"}/{points.total ?? "-"} pts</div>
+              <div className="inline-flex items-center gap-1">
+                {points.obtained ?? "-"}/{points.total ?? "-"} pts
+              </div>
             )}
           </div>
         </div>
@@ -63,19 +75,27 @@ export default function AssignmentCard({
 
       <div className="flex items-center gap-4">
         {status === "to-do" && (
-          <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold">To Do</button>
+          <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold">
+            To Do
+          </button>
         )}
 
         {status === "upcoming" && (
-          <button className="px-4 py-2 rounded-lg bg-gray-50 text-gray-600 text-sm font-bold">Upcoming</button>
+          <button className="px-4 py-2 rounded-lg bg-gray-50 text-gray-600 text-sm font-bold">
+            Upcoming
+          </button>
         )}
 
         {status === "graded" && (
-          <button className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-bold">View Feedback</button>
+          <button className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-bold">
+            View Feedback
+          </button>
         )}
 
         {status === "submitted" && (
-          <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold">Submitted</button>
+          <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold">
+            Submitted
+          </button>
         )}
 
         {/* Primary action for to-do / upcoming */}
