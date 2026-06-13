@@ -135,3 +135,30 @@ export interface IGetProgressResponse {
   }[];
   success: boolean;
 }
+
+export interface IStudentAttendace {
+  id: number;
+  external_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  usertype: string[];
+  created_at: string;
+  updated_at: string;
+  attendances: {
+    id: number;
+    course_module_id: number;
+    user_id: number;
+    attended: boolean;
+    created_at: string;
+    updated_at: string;
+  }[];
+}
+export interface IGetAttendanceByModule {
+  success: boolean;
+  module: {
+    id: number;
+    title: string;
+  };
+  data: IStudentAttendace[];
+}

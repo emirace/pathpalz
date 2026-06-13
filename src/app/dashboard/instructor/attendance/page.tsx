@@ -21,6 +21,7 @@ import {
   Users,
   Search,
 } from "lucide-react";
+import { IStudentAttendace } from "@/types/training/instructor";
 
 export default function InstructorAttendancePage() {
   const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
@@ -81,8 +82,10 @@ export default function InstructorAttendancePage() {
     });
   };
 
-  const isStudentAttended = (student: any) => {
-    return !!student.attended;
+  const isStudentAttended = (student: IStudentAttendace) => {
+    if (!selectedModuleId) return false;
+    return Array.isArray(student.attendances) &&
+      student.attendances.some((a: any) => a.course_module_id === selectedModuleId);
   };
 
   const students = moduleAttendance?.data || [];

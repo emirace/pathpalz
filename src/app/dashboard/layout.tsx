@@ -108,6 +108,29 @@ export default function DashboardLayout({
 
   if (!user) return null;
 
+  // If the user's account is not active, show a blocking status message
+  if (user.status && user.status !== "active") {
+    const title = user.status === "suspended" ? "Account Suspended" : "Account Inactive";
+    return (
+      <div className="min-h-screen bg-[#F3F3F8] flex items-center justify-center p-6">
+        <div className="max-w-lg w-full bg-white p-8 rounded-2xl border border-gray-100 shadow-sm text-center">
+          <h2 className="text-2xl font-bold text-[#00284F]">{title}</h2>
+          <p className="mt-3 text-gray-500">
+            Your account is currently <span className="font-semibold">{user.status}</span>. Please contact support if you believe this is an error.
+          </p>
+          <div className="mt-6">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 rounded-lg bg-teal text-white font-bold"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F3F3F8] flex">
       {/* Mobile Sidebar Overlay */}

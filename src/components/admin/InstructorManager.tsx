@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useGetInstructors, useAddInstructor } from "@/query/admin/instructor";
+import { useGetInstructors, useAddInstructor, useUpdateInstructorStatus } from "@/query/admin/instructor";
 import { useGetTracks } from "@/query/training/tracks";
 import { useGetAllTypes } from "@/query/admin/types";
 import { useGetAllSubTypes } from "@/query/admin/type-subs";
@@ -14,6 +14,14 @@ export default function InstructorManager() {
   const { data: typesRes } = useGetAllTypes();
   const { data: subTypesRes } = useGetAllSubTypes();
   const addInstructor = useAddInstructor();
+  const {mutate: updateInstructorStatus,isPending:isUpdatingInstructorStatus}=useUpdateInstructorStatus();
+
+  const handleStatusChange = (
+    instructorId: number | string,
+    status: "active" | "inactive" | "suspended",
+  ) => {
+    updateInstructorStatus({ instructorId: String(instructorId), status });
+  };
 
   const types = typesRes?.data || [];
   const subTypes = subTypesRes?.data || [];
@@ -297,10 +305,42 @@ export default function InstructorManager() {
 
                       {/* Status */}
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          Active
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
+                            instructor.user.status === "active"
+                              ? "text-emerald-600 bg-emerald-50"
+                              : instructor.user.status === "inactive"
+                              ? "text-gray-500 bg-gray-50"
+                              : "text-yellow-700 bg-yellow-50"
+                          }`}>
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                instructor.user.status === "active"
+                                  ? "bg-emerald-500"
+                                  : instructor.user.status === "inactive"
+                                  ? "bg-gray-400"
+                                  : "bg-yellow-600"
+                              }`}
+                            />
+                            {instructor.user.status}
+                          </span>
+
+                          <select
+                            defaultValue={instructor.user.status}
+                            onChange={(e) =>
+                              handleStatusChange(
+                                instructor.user.id,
+                                e.target.value as "active" | "inactive" | "suspended",
+                              )
+                            }
+                            disabled={isUpdatingInstructorStatus}
+                            className="text-xs py-1 px-2 border border-gray-100 rounded-lg bg-white"
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="suspended">Suspended</option>
+                          </select>
+                        </div>
                       </td>
                     </tr>
                   ))
