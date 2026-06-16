@@ -14,7 +14,7 @@ export default function InstructorManager() {
   const { data: typesRes } = useGetAllTypes();
   const { data: subTypesRes } = useGetAllSubTypes();
   const addInstructor = useAddInstructor();
-  const {mutate: updateInstructorStatus,isPending:isUpdatingInstructorStatus}=useUpdateInstructorStatus();
+  const { mutate: updateInstructorStatus, isPending: isUpdatingInstructorStatus } = useUpdateInstructorStatus();
 
   const handleStatusChange = (
     instructorId: number | string,
@@ -41,7 +41,7 @@ export default function InstructorManager() {
     title: "",
     fields: [],
     initialData: null,
-    onSubmit: () => {},
+    onSubmit: () => { },
     error: null,
   });
 
@@ -306,21 +306,19 @@ export default function InstructorManager() {
                       {/* Status */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${
-                            instructor.user.status === "active"
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${instructor.user.status === "active"
                               ? "text-emerald-600 bg-emerald-50"
                               : instructor.user.status === "inactive"
-                              ? "text-gray-500 bg-gray-50"
-                              : "text-yellow-700 bg-yellow-50"
-                          }`}>
+                                ? "text-gray-500 bg-gray-50"
+                                : "text-yellow-700 bg-yellow-50"
+                            }`}>
                             <span
-                              className={`w-1.5 h-1.5 rounded-full ${
-                                instructor.user.status === "active"
+                              className={`w-1.5 h-1.5 rounded-full ${instructor.user.status === "active"
                                   ? "bg-emerald-500"
                                   : instructor.user.status === "inactive"
-                                  ? "bg-gray-400"
-                                  : "bg-yellow-600"
-                              }`}
+                                    ? "bg-gray-400"
+                                    : "bg-yellow-600"
+                                }`}
                             />
                             {instructor.user.status}
                           </span>
@@ -329,7 +327,7 @@ export default function InstructorManager() {
                             defaultValue={instructor.user.status}
                             onChange={(e) =>
                               handleStatusChange(
-                                instructor.user.id,
+                                instructor.user.external_id,
                                 e.target.value as "active" | "inactive" | "suspended",
                               )
                             }

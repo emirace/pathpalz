@@ -21,11 +21,12 @@ import TrainingPaths from "./TrainingPaths/index.ts";
 import SpecializedTracks from "./SpecializedTracks";
 import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
-import Curriculum from "../Curriculum";
 import TutorSection from "../TutorSection";
+import { useSetting } from "@/states/setting";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
+  const country = useSetting((state) => state.country)
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
@@ -121,18 +122,19 @@ export default function TrackDetailClient() {
         item_type: selectedItem.type,
         item_id: selectedItem.id,
         gateway,
+        priceType: country.code === "NG" ? "price_ngn" : "price_gbp",
         ...(!user
           ? {
-              email: guestData.email,
-              full_name: guestData.fullName,
-              phoneNumber: guestData.phoneNumber,
-              city: guestData.city,
-              country: guestData.country,
-              state: guestData.state,
-              street: guestData.street,
-              house_number: guestData.house_number,
-              apartment_number: guestData.apartment_number,
-            }
+            email: guestData.email,
+            full_name: guestData.fullName,
+            phoneNumber: guestData.phoneNumber,
+            city: guestData.city,
+            country: guestData.country,
+            state: guestData.state,
+            street: guestData.street,
+            house_number: guestData.house_number,
+            apartment_number: guestData.apartment_number,
+          }
           : {}),
       },
       {
@@ -144,7 +146,7 @@ export default function TrackDetailClient() {
         onError: (error: any) => {
           alert(
             error?.response?.data?.message ||
-              "Failed to initialize checkout. Please try again.",
+            "Failed to initialize checkout. Please try again.",
           );
         },
       },

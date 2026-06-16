@@ -12,6 +12,7 @@ export interface ICheckoutRequest {
   item_type: "training_track" | "type" | "sub_type";
   item_id: number;
   gateway: "stripe" | "paystack";
+  priceType: "price_ngn" | "price_gbp"
   email?: string;
   full_name?: string;
   phoneNumber?: string;

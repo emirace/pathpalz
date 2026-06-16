@@ -45,6 +45,6 @@ export const getTypeSubTypes = async ({
 export const deleteSubType = async (
   id: number | string,
 ): Promise<IApiResponse<{ message: string }>> => {
-  const response = await trainingClient.delete(`/admin/types/${id}`);
+  const response = await trainingClient.delete(`/admin/type-subs/${id}`);
   return response.data;
 };
