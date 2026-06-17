@@ -66,6 +66,25 @@ jobs:
             \"built_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
           }" > public/version.json
 
+      - name: Configure Next.js static export
+        run: |
+          node -e '
+            const fs = require("fs");
+            const file = fs.existsSync("next.config.ts") ? "next.config.ts" : fs.existsSync("next.config.js") ? "next.config.js" : fs.existsSync("next.config.mjs") ? "next.config.mjs" : null;
+            if (file) {
+              let content = fs.readFileSync(file, "utf8");
+              if (!content.includes("output:")) {
+                content = content.replace(/(nextConfig\s*(:\s*\w+)?\s*=\s*\{|module\.exports\s*=\s*\{|export\s+default\s*\{)/, "$1\n  output: \"export\",");
+                fs.writeFileSync(file, content, "utf8");
+                console.log(`Injected output: "export" into ${file}`);
+              } else {
+                console.log(`output config already exists in ${file}`);
+              }
+            } else {
+              console.log("No next.config file found");
+            }
+          '
+
       - name: Build Next.js static export
         run: npm run build
 
