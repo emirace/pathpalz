@@ -1,12 +1,34 @@
 import { trainingClient } from "@/services/api";
 import { IAssignment, ICreateAssignmentPayload, ISubmission } from "@/types/training/assignments";
 
+export const getInstructorAssignments = async () => {
+    const response = await trainingClient.get(`/instructor/assignments`);
+    return response.data;
+}
+
 export const createAssignment = async (data: ICreateAssignmentPayload) => {
     const formData = new FormData();
-    const dataEntries = Object.entries(data) as [string, any][];
-    for (const [key, value] of dataEntries) {
-        formData.append(key, value);
+
+    const { attachments, ...fields } = data;
+
+    // Append scalar fields
+    for (const [key, value] of Object.entries(fields) as [string, any][]) {
+        if (value === undefined || value === null) continue;
+        // Booleans must be sent as "1"/"0" for most PHP/Laravel backends
+        if (typeof value === "boolean") {
+            formData.append(key, value ? "1" : "0");
+        } else {
+            formData.append(key, String(value));
+        }
     }
+
+    // Append each attachment file individually
+    if (attachments && attachments.length > 0) {
+        for (let i = 0; i < attachments.length; i++) {
+            formData.append(`attachments[${i}]`, attachments[i]);
+        }
+    }
+
     const response = await trainingClient.post(`/assignments`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });

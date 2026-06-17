@@ -2,10 +2,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createAssignment,
   getAssignmentSubmissions,
+  getInstructorAssignments,
   getInstructorAssignmentsPerModule,
   gradeSubmission,
 } from "@/services/training/instructor/assignments";
 
+export const useGetInstructorAssignment = () => {
+  return useQuery({
+    queryKey: ["instructor-assignments"],
+    queryFn: () => getInstructorAssignments(),
+  });
+};
 export const useCreateAssignment = () => {
   const queryClient = useQueryClient();
   return useMutation({

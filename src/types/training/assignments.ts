@@ -22,6 +22,7 @@ export interface ICreateAssignmentPayload {
     multiple_attempts: boolean;
     strict_deadline: boolean;
     attachments?: File[];
+    status: string;
 }
 
 export interface ISubmission {

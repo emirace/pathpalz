@@ -78,7 +78,7 @@ export default function CreateAssignmentPage() {
     setFormModuleId("");
   }, [formTrackId]);
 
-  const handleCreateAssignment = (e: React.FormEvent) => {
+  const handleCreateAssignment = (e: React.FormEvent, type: "draft" | "published") => {
     e.preventDefault();
     if (!formModuleId || !formTitle || !formDeadline) {
       setErrorMsg("Please fill in all required fields (Module, Title, Deadline).");
@@ -95,6 +95,7 @@ export default function CreateAssignmentPage() {
       multiple_attempts: formMultipleAttempts,
       strict_deadline: formStrictDeadline,
       attachments: formFiles.length > 0 ? formFiles : undefined,
+      status: type
     };
 
     apiCreateAssignment(payload, {
@@ -107,10 +108,6 @@ export default function CreateAssignmentPage() {
       onError: (err: any) => {
         console.error(err);
         setErrorMsg(err?.response?.data?.message || "Failed to create assignment on the server. Continuing preview.");
-        setSuccessMsg("Assignment created successfully (local preview)!");
-        setTimeout(() => {
-          router.push("/dashboard/instructor/assignments");
-        }, 1500);
       },
     });
   };
@@ -157,14 +154,14 @@ export default function CreateAssignmentPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => router.push("/dashboard/instructor/assignments")}
+            onClick={e => handleCreateAssignment(e, "draft")}
             className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm shadow-sm"
           >
             Save Draft
           </button>
           <button
             type="button"
-            onClick={handleCreateAssignment}
+            onClick={e => handleCreateAssignment(e, "published")}
             disabled={isSubmitting}
             className="flex items-center gap-2 px-6 py-2.5 bg-[#006666] border border-[#006666] text-white font-bold rounded-lg hover:bg-[#004D4D] transition-colors text-sm shadow-sm disabled:opacity-50"
           >

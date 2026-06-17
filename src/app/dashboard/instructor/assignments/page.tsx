@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import {
   useCreateAssignment,
+  useGetInstructorAssignment,
   useInstructorGetAssignmentsPerModule,
 } from "@/query/training/instructor/assignments";
 import {
@@ -46,9 +47,7 @@ interface AssignmentDisplayItem {
 }
 
 export default function InstructorAssignmentsPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
   // Filter/Search states
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,14 +58,6 @@ export default function InstructorAssignmentsPage() {
   // Form states
   const [formTrackId, setFormTrackId] = useState<number | "">("");
   const [formModuleId, setFormModuleId] = useState<string>("");
-  const [formTitle, setFormTitle] = useState("");
-  const [formDescription, setFormDescription] = useState("");
-  const [formDeadline, setFormDeadline] = useState("");
-  const [formDuration, setFormDuration] = useState("60");
-  const [formPassScore, setFormPassScore] = useState("50");
-  const [formMultipleAttempts, setFormMultipleAttempts] = useState(false);
-  const [formStrictDeadline, setFormStrictDeadline] = useState(false);
-  const [formFiles, setFormFiles] = useState<File[]>([]);
 
   // Local state for tracking deleted mock/real items to allow full interaction
   const [deletedIds, setDeletedIds] = useState<Set<string | number>>(new Set());
@@ -75,6 +66,9 @@ export default function InstructorAssignmentsPage() {
   // Fetch API data
   const { data: assignmentsData, isLoading: isLoadingAssignments, refetch: refetchAssignments } =
     useInstructorGetAssignmentsPerModule({ moduleId: "1" })
+
+  const { data: instructorAssignmets } = useGetInstructorAssignment()
+  console.log(instructorAssignmets)
 
   const { data: assignedTracks, isLoading: isLoadingTracks } =
     useGetInstructorAssignedTracks();
@@ -101,25 +95,6 @@ export default function InstructorAssignmentsPage() {
     (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
     [];
 
-  const { mutate: apiCreateAssignment, isPending: isSubmitting } =
-    useCreateAssignment();
-
-  // Reset form when modal closes or track changes
-  useEffect(() => {
-    if (!isModalOpen) {
-      setFormTrackId("");
-      setFormModuleId("");
-      setFormTitle("");
-      setFormDescription("");
-      setFormDeadline("");
-      setFormDuration("60");
-      setFormPassScore("50");
-      setFormMultipleAttempts(false);
-      setFormStrictDeadline(false);
-      setFormFiles([]);
-      setErrorMsg("");
-    }
-  }, [isModalOpen]);
 
   useEffect(() => {
     setFormModuleId("");
@@ -246,65 +221,7 @@ export default function InstructorAssignmentsPage() {
     currentPage * itemsPerPage
   );
 
-  // Handlers
-  const handleCreateAssignment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formModuleId || !formTitle || !formDeadline) {
-      setErrorMsg("Please fill in all required fields (Module, Title, Deadline).");
-      return;
-    }
 
-    const payload: ICreateAssignmentPayload = {
-      title: formTitle,
-      description: formDescription,
-      course_module_id: formModuleId,
-      deadline: formDeadline,
-      duration_minutes: formDuration,
-      pass_score: formPassScore,
-      multiple_attempts: formMultipleAttempts,
-      strict_deadline: formStrictDeadline,
-      attachments: formFiles.length > 0 ? formFiles : undefined,
-    };
-
-    apiCreateAssignment(payload, {
-      onSuccess: () => {
-        setSuccessMsg("Assignment created successfully!");
-        setIsModalOpen(false);
-        refetchAssignments();
-        // Clear message after 3 seconds
-        setTimeout(() => setSuccessMsg(""), 4000);
-      },
-      onError: (err: any) => {
-        console.error(err);
-        setErrorMsg(err?.response?.data?.message || "Failed to create assignment on the server. Adding locally for preview.");
-
-        // As a fallback for demonstration purposes if API is offline
-        const tempId = `local-${Date.now()}`;
-        const matchedModule = modalModules.find((m: any) => String(m.id) === String(formModuleId));
-        const newLocalItem: AssignmentDisplayItem = {
-          id: tempId,
-          title: formTitle,
-          moduleName: matchedModule?.title || "Custom Module",
-          moduleId: formModuleId,
-          deadline: new Date(formDeadline).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-          }),
-          submissionsText: "0/30",
-          submissionsRatio: 0,
-          statusText: "SCHEDULED",
-          statusColor: "text-blue-600 bg-blue-50 border-blue-100",
-        };
-
-        // Add to combined preview list locally by updating query or state
-        mockAssignments.unshift(newLocalItem);
-        setSuccessMsg("Assignment created successfully (local preview)!");
-        setIsModalOpen(false);
-        setTimeout(() => setSuccessMsg(""), 4000);
-      },
-    });
-  };
 
   const handleDelete = (id: string | number) => {
     if (confirm("Are you sure you want to delete this assignment?")) {
