@@ -4,7 +4,7 @@ import {
   IStudentAttendanceResponse,
   IStudentModuleAttendanceResponse,
 } from "@/types/training/student";
-import { trainingClient } from "../api";
+import { trainingClient } from "../../api";
 
 export const markAttendance = async (
   data: IStudentAttendanceRequest,

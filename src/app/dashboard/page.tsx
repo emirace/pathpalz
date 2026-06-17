@@ -90,25 +90,24 @@ export default function DashboardOverviewPage() {
                       {item.purchased_course.title}
                     </p>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
-                      Enrolled {new Date(item.created_at).toLocaleDateString()}
+                      Enrolled {new Date(item.purchased_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
                 <div
-                  className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${
-                    item.payment?.status === "paid"
+                  className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${item.payment?.status === "paid"
                       ? "bg-emerald-50 text-emerald-600"
                       : "bg-amber-50 text-amber-600"
-                  }`}
+                    }`}
                 >
                   {item.payment?.status}
                 </div>
               </div>
             )) || (
-              <p className="text-sm text-gray-400 italic py-4">
-                No recent enrollments to show.
-              </p>
-            )}
+                <p className="text-sm text-gray-400 italic py-4">
+                  No recent enrollments to show.
+                </p>
+              )}
           </div>
         </div>
 

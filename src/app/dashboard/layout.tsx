@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   Users,
   ClipboardList,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -58,6 +59,11 @@ const ADMIN_SIDEBAR_ITEMS = [
     icon: <ClipboardList size={20} />,
     href: "/dashboard/admin/waiting-list",
   },
+  {
+    name: "Discounts",
+    icon: <Tag size={20} />,
+    href: "/dashboard/admin/discounts",
+  },
 ];
 
 const INSTRUCTOR_SIDEBAR_ITEMS = [
@@ -70,6 +76,11 @@ const INSTRUCTOR_SIDEBAR_ITEMS = [
     name: "Attendance",
     icon: <ShieldCheck size={20} />,
     href: "/dashboard/instructor/attendance",
+  },
+  {
+    name: "Assignments",
+    icon: <ClipboardList size={20} />,
+    href: "/dashboard/instructor/assignments",
   },
 ];
 
@@ -144,9 +155,8 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={`
-        fixed lg:static inset-y-0 left-0 w-72 ${
-          isAdminPath ? "bg-[#001529]" : isInstructorPath ? "bg-[#00284F]" : "bg-[#00284F]"
-        } text-white z-50 transition-transform duration-300 transform
+        fixed lg:static inset-y-0 left-0 h-screen w-72 ${isAdminPath ? "bg-[#001529]" : isInstructorPath ? "bg-[#00284F]" : "bg-[#00284F]"
+          } text-white z-50 transition-transform duration-300 transform
         ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
@@ -170,11 +180,10 @@ export default function DashboardLayout({
                       key={item.name}
                       href={item.href}
                       className={`
-                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
-                        ${
-                          isActive
-                            ? "bg-teal text-white shadow-lg shadow-teal/20"
-                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        flex items-center justify-between px-4 py-3.5 transition-all duration-200 group
+                        ${isActive
+                          ? "bg-teal/10 border-l-4 border-teal text-teal"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                         }
                       `}
                       onClick={() => setIsSidebarOpen(false)}
@@ -194,11 +203,10 @@ export default function DashboardLayout({
                   <Link
                     href="/dashboard/instructor/progress"
                     className={`
-                      flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group mt-4 border border-teal/30
-                      ${
-                        pathname.startsWith("/dashboard/instructor")
-                          ? "bg-teal text-white shadow-lg shadow-teal/20"
-                          : "text-teal hover:text-white hover:bg-teal/20"
+                      flex items-center justify-between px-4 py-3.5 transition-all duration-200 group mt-4 border border-teal/30
+                      ${pathname.startsWith("/dashboard/instructor")
+                        ? "bg-teal/10 border-l-4 border-teal text-teal"
+                        : "text-teal hover:text-white hover:bg-teal/20"
                       }
                     `}
                     onClick={() => setIsSidebarOpen(false)}
@@ -245,11 +253,10 @@ export default function DashboardLayout({
                       key={item.name}
                       href={item.href}
                       className={`
-                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
-                        ${
-                          isActive
-                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        flex items-center justify-between px-4 py-3.5  transition-all duration-200 group
+                        ${isActive
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                         }
                       `}
                       onClick={() => setIsSidebarOpen(false)}
@@ -267,7 +274,7 @@ export default function DashboardLayout({
 
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
+                  className="flex items-center gap-3 px-4 py-3.5 transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <ArrowLeft size={20} />
@@ -290,11 +297,10 @@ export default function DashboardLayout({
                       key={item.name}
                       href={item.href}
                       className={`
-                        flex items-center justify-between px-4 py-3.5 rounded-xl transition-all duration-200 group
-                        ${
-                          isActive
-                            ? "bg-teal text-white shadow-lg shadow-teal/20"
-                            : "text-white/60 hover:text-white hover:bg-white/5"
+                        flex items-center justify-between px-4 py-3.5 transition-all duration-200 group
+                        ${isActive
+                          ? "bg-teal/10 border-l-4 border-teal text-teal"
+                          : "text-white/60 hover:text-white hover:bg-white/5"
                         }
                       `}
                       onClick={() => setIsSidebarOpen(false)}
@@ -312,7 +318,7 @@ export default function DashboardLayout({
 
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
+                  className="flex items-center gap-3 px-4 py-3.5 transition-all duration-200 group mt-8 border border-white/10 text-white/40 hover:text-white hover:bg-white/5"
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <ArrowLeft size={20} />
@@ -340,7 +346,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 h-screen">
         <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8">
           <div className="flex items-center gap-4">
             <button

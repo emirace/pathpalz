@@ -6,7 +6,7 @@ import {
   IInstructorGetProgressRequest,
   IGetAttendanceByModule,
 } from "@/types/training/instructor";
-import { trainingClient } from "../api";
+import { trainingClient } from "../../api";
 
 export const updateInstructorProgress = async (
   data: IInstructorProgressRequest,

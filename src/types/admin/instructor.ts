@@ -17,6 +17,7 @@ export interface IInstructor {
     email: string;
     phone_number: string | null;
     status: "active" | "inactive" | "suspended";
+    external_id: string
   };
   description: string | null;
   assigned_course: {
