@@ -877,7 +877,6 @@ export default function TrackDetailClient() {
                   </label>
                   <input
                     type="text"
-                    required
                     placeholder="enter your apartment number"
                     value={guestData.apartment_number}
                     onChange={(e) =>

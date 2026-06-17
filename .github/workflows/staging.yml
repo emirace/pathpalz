@@ -1,9 +1,9 @@
-name: Web CI/CD to cPanel (live_pathpalz)
+name: Web staging CI/CD to cPanel
 
 on:
   push:
     branches:
-      - main
+      - pre-prod
   workflow_dispatch:
 
 jobs:
@@ -74,8 +74,8 @@ jobs:
       # =========================
       - name: Deploy to cPanel (Consolidated & Multiplexed)
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.CPANEL_SSH_PRIVATE_KEY }}
-          SSH_PASSPHRASE: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_CPANEL_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.STAGING_CPANEL_SSH_PASSPHRASE }}
         run: |
           set -e
 
@@ -83,11 +83,11 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
 
-          PORT="${{ secrets.CPANEL_SSH_PORT }}"
+          PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
           if [ -z "$PORT" ]; then PORT=22; fi
-          SERVER="${{ secrets.CPANEL_SSH_USER }}@${{ secrets.CPANEL_SSH_HOST }}"
+          SERVER="${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }}"
 
-          ssh-keyscan -p "$PORT" -H "${{ secrets.CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p "$PORT" -H "${{ secrets.STAGING_CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
 
           eval "$(ssh-agent -s)"
 
@@ -121,7 +121,7 @@ jobs:
           ssh -p "$PORT" "$SERVER" '
             set -e
 
-            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
             BACKUP_DIR="$APP_DIR/backups"
             TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 
@@ -142,7 +142,7 @@ jobs:
           echo "=============================="
           echo " RUNNING DEPLOY "
           echo "=============================="
-          APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+          APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
           STAGING_DIR="${APP_DIR}_staging"
 
           # Create staging directory
@@ -155,7 +155,7 @@ jobs:
           ssh -p "$PORT" "$SERVER" '
             set -e
 
-            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
             STAGING_DIR="${APP_DIR}_staging"
             BACKUP_DIR="$APP_DIR/backups"
 
@@ -183,7 +183,7 @@ jobs:
           ssh -p "$PORT" "$SERVER" '
             set -e
 
-            APP_DIR="${{ secrets.CPANEL_TARGET_DIR }}"
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
 
             ls -la "$APP_DIR/index.html" || echo "Missing index.html"
             ls -la "$APP_DIR/.htaccess" || echo "Missing .htaccess"
