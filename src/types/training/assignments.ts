@@ -1,45 +1,65 @@
+import { ICourseModule } from "../admin/admin";
+
 export interface IAssignment {
-    id: string;
-    instructor_id: string;
-    title: string;
-    description: string;
-    course_module_id: string;
-    deadline: string;
-    duration_minutes: string;
-    pass_score: string;
-    multiple_attempts: boolean;
-    strict_deadline: boolean;
-    attachments?: File[];
+  id: number;
+  instructor_id: number;
+  title: string;
+  description: string;
+  course_module_id: string;
+  deadline: string;
+  duration_minutes: number;
+  pass_score: number;
+  multiple_attempts: boolean;
+  strict_deadline: boolean;
+  attachments?: {
+    file_name: string;
+    file_path: string;
+    file_url: string;
+    file_size: number;
+    uploaded_at: string;
+  }[];
+  status: "draft" | "published";
+  created_at: string;
+  updated_at: string;
+  submissions_count: number;
+  my_submission: null;
+  submission_state: "not_submitted";
+  submissions: [];
+  module?: ICourseModule;
 }
 
 export interface ICreateAssignmentPayload {
-    title: string;
-    description: string;
-    course_module_id: string;
-    deadline: string;
-    duration_minutes: string;
-    pass_score: string;
-    multiple_attempts: boolean;
-    strict_deadline: boolean;
-    attachments?: File[];
-    status: string;
+  title: string;
+  description: string;
+  course_module_id: string;
+  deadline: string;
+  duration_minutes: string;
+  pass_score: string;
+  multiple_attempts: boolean;
+  strict_deadline: boolean;
+  attachments?: File[];
+  status: string;
 }
 
 export interface ISubmission {
-    id: string;
-    assignment_id: string;
-    student_id: number;
-    submission_files: { file_path: string; file_name: string; file_size: number }[];
-    submission_note: string;
-    score?: string;
-    feedback?: string;
-    submitted_at: string;
-    status: string;
-    updated_at: string;
-    created_at: string
+  id: string;
+  assignment_id: string;
+  student_id: number;
+  submission_files: {
+    file_path: string;
+    file_name: string;
+    file_size: number;
+  }[];
+  submission_note: string;
+  score?: string;
+  feedback?: string;
+  submitted_at: string;
+  status: string;
+  updated_at: string;
+  created_at: string;
 }
 
 export interface ISubmissionResponse {
-    success: boolean;
-    data: ISubmission
+  success: boolean;
+  data: ISubmission;
 }

@@ -1,42 +1,39 @@
 "use client";
 
 import React from "react";
-import {
-  Clock,
-  ArrowRight,
-  CheckCircle,
-  AlertTriangle,
-  FileText,
-} from "lucide-react";
-
-export type AssignmentStatus = "to-do" | "submitted" | "graded" | "upcoming";
-
-export interface AssignmentProps {
-  id: number | string;
-  title: string;
-  moduleTitle?: string;
-  dueDate?: string | null;
-  points?: { obtained?: number; total?: number } | null;
-  status?: AssignmentStatus;
-  priority?: "high" | "normal";
-}
+import { Clock, ArrowRight, FileText } from "lucide-react";
+import { IAssignment } from "@/types/training/assignments";
+import { useRouter } from "next/navigation";
 
 export default function AssignmentCard({
-  id,
-  title,
-  moduleTitle,
-  dueDate,
-  points,
-  status = "to-do",
-  priority = "normal",
-}: AssignmentProps) {
-  const isHigh = priority === "high";
+  assignment,
+  enrollmentId,
+}: {
+  assignment: IAssignment;
+  enrollmentId: string;
+}) {
+  const router = useRouter();
+  const isHigh = "high";
+
+  const deadlineDate =
+    assignment.deadline &&
+    !Number.isNaN(new Date(assignment.deadline).getTime())
+      ? new Date(assignment.deadline)
+      : null;
+
+  const formattedDeadline = deadlineDate
+    ? deadlineDate.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "No due date";
 
   const leftAccent = isHigh
     ? "border-l-4 border-red-500"
-    : status === "graded"
-      ? "border-l-4 border-emerald-400"
-      : "border-l-4 border-transparent";
+    : // : assignment.status === "graded"
+      //   ? "border-l-4 border-emerald-400"
+      "border-l-4 border-transparent";
 
   return (
     <div
@@ -50,7 +47,7 @@ export default function AssignmentCard({
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             <h4 className="text-sm font-bold text-[#00284F] truncate">
-              {title}
+              {assignment.title}
             </h4>
             {isHigh && (
               <span className="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded-full font-bold">
@@ -58,23 +55,21 @@ export default function AssignmentCard({
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-1 truncate">{moduleTitle}</p>
+          <p className="text-xs text-gray-400 mt-1 truncate">
+            {assignment?.module?.title}
+          </p>
           <div className="flex items-center gap-3 mt-3 text-xs text-gray-500">
             <div className="inline-flex items-center gap-1">
               <Clock size={14} />
-              <span>{dueDate ?? "No due date"}</span>
+              <span>{formattedDeadline ?? "No due date"}</span>
             </div>
-            {points && (
-              <div className="inline-flex items-center gap-1">
-                {points.obtained ?? "-"}/{points.total ?? "-"} pts
-              </div>
-            )}
+            <div className="inline-flex items-center gap-1">0/100 pts</div>
           </div>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        {status === "to-do" && (
+        {/* {status === "to-do" && (
           <button className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold">
             To Do
           </button>
@@ -84,7 +79,7 @@ export default function AssignmentCard({
           <button className="px-4 py-2 rounded-lg bg-gray-50 text-gray-600 text-sm font-bold">
             Upcoming
           </button>
-        )}
+        )} 
 
         {status === "graded" && (
           <button className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-bold">
@@ -97,14 +92,19 @@ export default function AssignmentCard({
             Submitted
           </button>
         )}
+*/}
 
-        {/* Primary action for to-do / upcoming */}
-        {status === "to-do" && (
-          <button className="px-4 py-2 rounded-lg bg-teal text-white text-sm font-bold flex items-center gap-2">
-            Submit Assignment <ArrowRight size={14} />
-          </button>
-        )}
-
+        <button
+          type="button"
+          onClick={() =>
+            router.push(
+              `/lms/?enrollmentId=${enrollmentId}&assignmentId=${assignment.id}`,
+            )
+          }
+          className="px-4 py-2 rounded-lg bg-teal text-white text-sm font-bold flex items-center gap-2"
+        >
+          Submit Assignment <ArrowRight size={14} />
+        </button>
         {isHigh && (
           <div className="text-red-500 text-xs font-bold">Due Soon</div>
         )}
