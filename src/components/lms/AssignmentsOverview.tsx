@@ -2,6 +2,7 @@
 
 import { useGetStudentAssignments } from "@/query/training/student/assignment";
 import AssignmentCard from "./AssignmentCard";
+import { Calendar } from "lucide-react";
 
 type Props = {
   enrollment: any;
@@ -23,15 +24,15 @@ export default function AssignmentsOverview({ enrollment }: Props) {
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-            <p className="text-xs text-gray-400">Next Due</p>
-            <div className="mt-2 font-bold text-[#00284F]">
-              No upcoming due dates
-            </div>
+          <div className="bg-[#00284F] text-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+            <p className="text-xs text-teal flex items-center font-bold gap-1">
+              <Calendar /> TO DO
+            </p>
+            <div className="mt-2 font-bold">0</div>
           </div>
           <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
-            <p className="text-xs text-gray-400">Overall Progress</p>
-            <div className="mt-2 font-bold text-[#00284F]">0%</div>
+            <p className="text-xs text-gray-400">Completed</p>
+            <div className="mt-2 font-bold text-[#00284F]">0</div>
           </div>
         </div>
       </div>

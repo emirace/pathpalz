@@ -72,9 +72,32 @@ export const gradeSubmission = async ({
   submissionId: string;
   data: { score: string; feedback: string; status: string };
 }) => {
-  const response = await trainingClient.patch(
+  const response = await trainingClient.post(
     `/submissions/${submissionId}/grade`,
     data,
   );
+  return response.data;
+};
+
+export const editAssignment = async ({
+  assignmentId,
+  data,
+}: {
+  assignmentId: string;
+  data: ICreateAssignmentPayload;
+}) => {
+  const response = await trainingClient.patch(
+    `/assignments/${assignmentId}`,
+    data,
+  );
+  return response.data;
+};
+
+export const deleteAssignment = async ({
+  assignmentId,
+}: {
+  assignmentId: string;
+}) => {
+  const response = await trainingClient.delete(`/assignments/${assignmentId}`);
   return response.data;
 };

@@ -57,6 +57,16 @@ export interface ISubmission {
   status: string;
   updated_at: string;
   created_at: string;
+  student: {
+    id: number;
+    external_id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    usertype: string[];
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 export interface ISubmissionResponse {

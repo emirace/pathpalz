@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useGetInstructorAssignment } from "@/query/training/instructor/assignments";
+import {
+  useDeleteAssignment,
+  useGetInstructorAssignment,
+} from "@/query/training/instructor/assignments";
 import {
   useGetInstructorAssignedTracks,
   useGetTrackModules,
@@ -46,6 +49,8 @@ export default function InstructorAssignmentsPage() {
 
   const { data: assignedTracks, isLoading: isLoadingTracks } =
     useGetInstructorAssignedTracks();
+
+  const { mutate: deleteAssignment } = useDeleteAssignment();
 
   // Selected Track info for module retrieval in modal
   const selectedAssign = assignedTracks?.find(
@@ -106,7 +111,7 @@ export default function InstructorAssignmentsPage() {
           statusText = `${days} DAYS LEFT`;
           statusColor = "text-red-600 bg-red-50 border-red-100";
         } else {
-          statusText = "SCHEDULED";
+          statusText = item.status || "PUBLISHED";
           statusColor = "text-blue-600 bg-blue-50 border-blue-100";
         }
       }
@@ -137,6 +142,24 @@ export default function InstructorAssignmentsPage() {
   // Stats
   const totalCount = apiAssignmentsList?.length || 0;
   const pendingReviewsCount = 0;
+
+  const handleDelete = (id: number) => {
+    if (
+      confirm(
+        "Are you sure you want to delete this assignment? This action cannot be undone.",
+      )
+    ) {
+      deleteAssignment(
+        { assignmentId: String(id) },
+        {
+          onSuccess: () => {
+            setSuccessMsg("Assignment deleted successfully!");
+            setTimeout(() => setSuccessMsg(""), 3000);
+          },
+        },
+      );
+    }
+  };
 
   return (
     <div className="mx-auto max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -398,20 +421,17 @@ export default function InstructorAssignmentsPage() {
                         >
                           <Eye size={16} />
                         </Link>
-                        <button
-                          onClick={() =>
-                            alert(
-                              "Edit Assignment features are configured to sync automatically via the next pipeline release. Details will open.",
-                            )
-                          }
+                        <Link
+                          href={`/dashboard/instructor/assignments/new?assignmentId=${item.id}`}
                           className="p-2 text-teal hover:bg-gray-100 rounded-lg transition-all"
                           title="Edit"
                         >
                           <Pencil size={16} />
-                        </button>
+                        </Link>
                         <button
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
                           title="Delete"
+                          onClick={() => handleDelete(item.id)}
                         >
                           <Trash2 size={16} />
                         </button>

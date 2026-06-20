@@ -40,7 +40,7 @@ export default function AssignmentCard({
     assignment.my_submission?.status || (assignment as any).status || "to-do";
 
   // visual state helpers
-  const isGraded = submissionState === "graded" || submissionState === "graded";
+  const isGraded = submissionState === "passed" || submissionState === "failed";
   const isSubmitted =
     submissionState === "submitted" || submissionState === "submitted";
   const isUpcoming =

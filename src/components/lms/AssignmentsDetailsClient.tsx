@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Clock, Calendar, FileText, Download, Loader2 } from "lucide-react";
@@ -19,6 +19,9 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
   const assignment = assignments?.data?.find(
     (a) => String(a.id) === assignmentId,
   );
+
+  const [selectedSubmission, setSelectedSubmission] =
+    useState<ISubmission | null>(null);
 
   if (isLoading) {
     return (
@@ -108,7 +111,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
 
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex items-center gap-4">
             <div className="p-3 bg-gray-50 rounded-lg">
-              <FileText />
+              <FileText className="text-black" />
             </div>
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wider">
@@ -181,9 +184,13 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link href={`#`} className="text-teal font-bold">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedSubmission(s)}
+                          className="text-teal font-bold"
+                        >
                           View Report
-                        </Link>
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -192,6 +199,71 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
             </div>
           </div>
         </div>
+
+        {selectedSubmission && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setSelectedSubmission(null)}
+            />
+            <div className="relative bg-white rounded-xl w-full max-w-lg p-6 shadow-2xl">
+              <div className="flex items-start justify-between">
+                <h3 className="text-lg font-bold text-[#00284F]">
+                  Submission Report
+                </h3>
+                <button
+                  onClick={() => setSelectedSubmission(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-xl leading-none">&times;</span>
+                </button>
+              </div>
+
+              <div className="mt-4 space-y-3 text-sm text-gray-700">
+                <p className="text-xs text-gray-500">
+                  Submitted:{" "}
+                  {new Date(selectedSubmission.submitted_at).toLocaleString()}
+                </p>
+                <p className="font-bold">
+                  Score: {selectedSubmission.score ?? "-"}
+                </p>
+                <div>
+                  <h4 className="font-bold text-sm mt-2">Feedback</h4>
+                  <p className="text-sm text-gray-700">
+                    {selectedSubmission.feedback ?? "No feedback provided."}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-sm mt-2">Files</h4>
+                  <div className="mt-2">
+                    {selectedSubmission.submission_files?.map((f, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between border border-gray-100 rounded-lg p-2 mb-2"
+                      >
+                        <div className="flex items-center gap-3">
+                          <FileText />
+                          <span className="text-sm text-gray-700">
+                            {f.file_name}
+                          </span>
+                        </div>
+                        <a
+                          href={f.file_path || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-teal font-bold"
+                        >
+                          View
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <aside className="space-y-6">
           <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">

@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createAssignment,
+  deleteAssignment,
+  editAssignment,
   getAssignmentSubmissions,
   getInstructorAssignments,
   getInstructorAssignmentsPerModule,
@@ -23,25 +25,28 @@ export const useCreateAssignment = () => {
   });
 };
 
-export const useInstructorGetAssignmentsPerModule = ({ moduleId }: { moduleId: string }) => {
+export const useInstructorGetAssignmentsPerModule = ({
+  moduleId,
+}: {
+  moduleId: string;
+}) => {
   return useQuery({
     queryKey: ["instructor-assignments", moduleId],
     queryFn: () => getInstructorAssignmentsPerModule({ moduleId }),
     enabled: !!moduleId,
-    select: data => data?.data
+    select: (data) => data?.data,
   });
 };
 
-
 export const useGetAssignmentSubmissions = ({
-  assignmentId
+  assignmentId,
 }: {
-  assignmentId: string
+  assignmentId: string;
 }) => {
   return useQuery({
     queryKey: ["assignment-submissions", assignmentId],
     queryFn: () => getAssignmentSubmissions({ assignmentId }),
-    select: data => data.data
+    select: (data) => data.data,
   });
 };
 
@@ -51,7 +56,27 @@ export const useGradeSubmission = () => {
     mutationFn: gradeSubmission,
     onSuccess: (_data, variables) => {
       const submissionId = variables.submissionId;
-      queryClient.invalidateQueries({ queryKey: ["assignment-submissions", submissionId] });
-    }
-  })
-}
+      queryClient.invalidateQueries({ queryKey: ["assignment-submissions"] });
+    },
+  });
+};
+
+export const useEditAssignment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: editAssignment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["instructor-assignments"] });
+    },
+  });
+};
+
+export const useDeleteAssignment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteAssignment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["instructor-assignments"] });
+    },
+  });
+};

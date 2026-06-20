@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useCreateAssignment,
+  useEditAssignment,
+  useGetInstructorAssignment,
 } from "@/query/training/instructor/assignments";
 import {
   useGetInstructorAssignedTracks,
@@ -36,6 +38,15 @@ export default function CreateAssignmentPage() {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
+  const searchParams = useSearchParams();
+  const assignmentIdParam = searchParams?.get("assignmentId");
+  const isEditing = !!assignmentIdParam;
+
+  const { data: allAssignments } = useGetInstructorAssignment();
+  const existingAssignment = allAssignments?.data?.find(
+    (a: any) => String(a.id) === String(assignmentIdParam),
+  );
+
   // Form states
   const [formTrackId, setFormTrackId] = useState<number | "">("");
   const [formModuleId, setFormModuleId] = useState<string>("");
@@ -54,7 +65,7 @@ export default function CreateAssignmentPage() {
 
   // Selected Track info for module retrieval
   const selectedAssign = assignedTracks?.find(
-    (a) => a.track.id === Number(formTrackId)
+    (a) => a.track.id === Number(formTrackId),
   );
   const selectedTrackIdSafe = selectedAssign?.track?.id ?? 0;
   const selectedTypeId = selectedAssign?.track?.type?.id ?? 0;
@@ -73,15 +84,42 @@ export default function CreateAssignmentPage() {
 
   const { mutate: apiCreateAssignment, isPending: isSubmitting } =
     useCreateAssignment();
+  const { mutate: apiEditAssignment, isPending: isEditingPending } =
+    useEditAssignment();
 
   useEffect(() => {
     setFormModuleId("");
   }, [formTrackId]);
 
-  const handleCreateAssignment = (e: React.FormEvent, type: "draft" | "published") => {
+  // Prefill form when editing
+  useEffect(() => {
+    if (isEditing && existingAssignment) {
+      setFormTitle(existingAssignment.title || "");
+      setFormDescription(existingAssignment.description || "");
+      setFormModuleId(existingAssignment.course_module_id || "");
+      // If deadline includes time, keep full ISO; date input expects yyyy-mm-dd
+      setFormDeadline(
+        existingAssignment.deadline
+          ? existingAssignment.deadline.split("T")[0]
+          : "",
+      );
+      setFormDuration(String(existingAssignment.duration_minutes || "60"));
+      setFormPassScore(String(existingAssignment.pass_score || "70"));
+      setFormMultipleAttempts(Boolean(existingAssignment.multiple_attempts));
+      setFormStrictDeadline(Boolean(existingAssignment.strict_deadline));
+      // attachments cannot be reconstructed as File objects; omit preloading files
+    }
+  }, [isEditing, existingAssignment]);
+
+  const handleCreateAssignment = (
+    e: React.FormEvent,
+    type: "draft" | "published",
+  ) => {
     e.preventDefault();
     if (!formModuleId || !formTitle || !formDeadline) {
-      setErrorMsg("Please fill in all required fields (Module, Title, Deadline).");
+      setErrorMsg(
+        "Please fill in all required fields (Module, Title, Deadline).",
+      );
       return;
     }
 
@@ -95,21 +133,48 @@ export default function CreateAssignmentPage() {
       multiple_attempts: formMultipleAttempts,
       strict_deadline: formStrictDeadline,
       attachments: formFiles.length > 0 ? formFiles : undefined,
-      status: type
+      status: type,
     };
 
-    apiCreateAssignment(payload, {
-      onSuccess: () => {
-        setSuccessMsg("Assignment created successfully!");
-        setTimeout(() => {
-          router.push("/dashboard/instructor/assignments");
-        }, 1500);
-      },
-      onError: (err: any) => {
-        console.error(err);
-        setErrorMsg(err?.response?.data?.message || "Failed to create assignment on the server. Continuing preview.");
-      },
-    });
+    if (isEditing && assignmentIdParam) {
+      // For edits, don't send attachments as FormData here (API expects JSON patch).
+      const editPayload = { ...payload } as any;
+      delete editPayload.attachments;
+      apiEditAssignment(
+        { assignmentId: assignmentIdParam, data: editPayload },
+        {
+          onSuccess: () => {
+            setSuccessMsg("Assignment updated successfully!");
+            setTimeout(() => {
+              router.push("/dashboard/instructor/assignments");
+            }, 1200);
+          },
+          onError: (err: any) => {
+            console.error(err);
+            setErrorMsg(
+              err?.response?.data?.message ||
+                "Failed to update assignment on the server.",
+            );
+          },
+        },
+      );
+    } else {
+      apiCreateAssignment(payload, {
+        onSuccess: () => {
+          setSuccessMsg("Assignment created successfully!");
+          setTimeout(() => {
+            router.push("/dashboard/instructor/assignments");
+          }, 1500);
+        },
+        onError: (err: any) => {
+          console.error(err);
+          setErrorMsg(
+            err?.response?.data?.message ||
+              "Failed to create assignment on the server. Continuing preview.",
+          );
+        },
+      });
+    }
   };
 
   const handleFileDrop = (e: React.DragEvent) => {
@@ -140,7 +205,10 @@ export default function CreateAssignmentPage() {
       <div className="sticky top-0 bg-white p-4 z-10 rounded-xl flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <div className="flex items-center text-sm text-gray-500 mb-1">
-            <Link href="/dashboard/instructor/assignments" className="hover:text-teal transition-colors">
+            <Link
+              href="/dashboard/instructor/assignments"
+              className="hover:text-teal transition-colors"
+            >
               Assignments
             </Link>
             <ChevronRight size={14} className="mx-1" />
@@ -154,14 +222,14 @@ export default function CreateAssignmentPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={e => handleCreateAssignment(e, "draft")}
+            onClick={(e) => handleCreateAssignment(e, "draft")}
             className="px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors text-sm shadow-sm"
           >
             Save Draft
           </button>
           <button
             type="button"
-            onClick={e => handleCreateAssignment(e, "published")}
+            onClick={(e) => handleCreateAssignment(e, "published")}
             disabled={isSubmitting}
             className="flex items-center gap-2 px-6 py-2.5 bg-[#006666] border border-[#006666] text-white font-bold rounded-lg hover:bg-[#004D4D] transition-colors text-sm shadow-sm disabled:opacity-50"
           >
@@ -187,7 +255,9 @@ export default function CreateAssignmentPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm text-gray-600 mb-1.5 font-medium">Assignment Title</label>
+                <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                  Assignment Title
+                </label>
                 <input
                   type="text"
                   placeholder="e.g., Advanced Data Structures - Final Project"
@@ -199,10 +269,16 @@ export default function CreateAssignmentPage() {
 
               {/* Temporary track selector since module depends on it */}
               <div>
-                <label className="block text-sm text-gray-600 mb-1.5 font-medium">Track (Required for Module)</label>
+                <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                  Track (Required for Module)
+                </label>
                 <select
                   value={formTrackId}
-                  onChange={(e) => setFormTrackId(e.target.value === "" ? "" : Number(e.target.value))}
+                  onChange={(e) =>
+                    setFormTrackId(
+                      e.target.value === "" ? "" : Number(e.target.value),
+                    )
+                  }
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-teal focus:ring-1 focus:ring-teal outline-none transition-colors text-sm text-gray-800 bg-white"
                 >
                   <option value="">Select Training Track</option>
@@ -215,7 +291,9 @@ export default function CreateAssignmentPage() {
               </div>
 
               <div>
-                <label className="block text-sm text-gray-600 mb-1.5 font-medium">Module</label>
+                <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                  Module
+                </label>
                 <select
                   value={formModuleId}
                   onChange={(e) => setFormModuleId(e.target.value)}
@@ -233,12 +311,22 @@ export default function CreateAssignmentPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm text-gray-600 font-medium">Description</label>
+                  <label className="block text-sm text-gray-600 font-medium">
+                    Description
+                  </label>
                   <div className="flex items-center bg-gray-100 rounded-md p-1 gap-1 border border-gray-200">
-                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded"><Bold className="w-3.5 h-3.5" /></button>
-                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded"><Italic className="w-3.5 h-3.5" /></button>
-                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded"><List className="w-3.5 h-3.5" /></button>
-                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded"><LinkIcon className="w-3.5 h-3.5" /></button>
+                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
+                      <Bold className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
+                      <Italic className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
+                      <List className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="p-1 text-gray-600 hover:bg-gray-200 rounded">
+                      <LinkIcon className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
                 <textarea
@@ -268,8 +356,12 @@ export default function CreateAssignmentPage() {
               <div className="w-12 h-12 bg-[#E0F2F2] rounded-full flex items-center justify-center mb-3">
                 <CloudUpload className="text-[#006666] w-6 h-6" />
               </div>
-              <p className="text-gray-800 font-bold text-sm mb-1">Click to upload or drag and drop</p>
-              <p className="text-gray-500 text-xs">PDF, DOCX, ZIP or MP4 (Max 50MB)</p>
+              <p className="text-gray-800 font-bold text-sm mb-1">
+                Click to upload or drag and drop
+              </p>
+              <p className="text-gray-500 text-xs">
+                PDF, DOCX, ZIP or MP4 (Max 50MB)
+              </p>
 
               <input
                 id="upload-file"
@@ -284,18 +376,25 @@ export default function CreateAssignmentPage() {
               />
             </label>
 
-
-
             {/* Show actually selected files */}
             {formFiles.map((f, i) => (
-              <div key={i} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-3 mt-2">
+              <div
+                key={i}
+                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-3 mt-2"
+              >
                 <div className="flex items-center gap-3">
                   <FileText className="text-teal w-4 h-4" />
-                  <span className="text-sm text-gray-800 font-bold">{f.name}</span>
-                  <span className="text-xs text-gray-500">({(f.size / 1024 / 1024).toFixed(1)} MB)</span>
+                  <span className="text-sm text-gray-800 font-bold">
+                    {f.name}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    ({(f.size / 1024 / 1024).toFixed(1)} MB)
+                  </span>
                 </div>
                 <button
-                  onClick={() => setFormFiles(formFiles.filter((_, idx) => idx !== i))}
+                  onClick={() =>
+                    setFormFiles(formFiles.filter((_, idx) => idx !== i))
+                  }
                   className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-md hover:bg-red-50"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -314,7 +413,9 @@ export default function CreateAssignmentPage() {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm text-gray-600 mb-1.5 font-medium">Deadline Date</label>
+                <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                  Deadline Date
+                </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Calendar className="h-4 w-4 text-gray-400" />
@@ -330,7 +431,9 @@ export default function CreateAssignmentPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1.5 font-medium">Duration (min)</label>
+                  <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                    Duration (min)
+                  </label>
                   <input
                     type="number"
                     value={formDuration}
@@ -339,7 +442,9 @@ export default function CreateAssignmentPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1.5 font-medium">Pass Score (%)</label>
+                  <label className="block text-sm text-gray-600 mb-1.5 font-medium">
+                    Pass Score (%)
+                  </label>
                   <input
                     type="number"
                     value={formPassScore}
@@ -353,32 +458,43 @@ export default function CreateAssignmentPage() {
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-bold text-[#00284F]">Multiple Attempts</p>
-                  <p className="text-[10px] text-gray-400">Allow students to resubmit</p>
+                  <p className="text-sm font-bold text-[#00284F]">
+                    Multiple Attempts
+                  </p>
+                  <p className="text-[10px] text-gray-400">
+                    Allow students to resubmit
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormMultipleAttempts(!formMultipleAttempts)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formMultipleAttempts ? 'bg-teal' : 'bg-gray-300'}`}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formMultipleAttempts ? "bg-teal" : "bg-gray-300"}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formMultipleAttempts ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formMultipleAttempts ? "translate-x-6" : "translate-x-1"}`}
+                  />
                 </button>
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-bold text-[#00284F]">Strict Deadline</p>
-                  <p className="text-[10px] text-gray-400">Disable late submissions</p>
+                  <p className="text-sm font-bold text-[#00284F]">
+                    Strict Deadline
+                  </p>
+                  <p className="text-[10px] text-gray-400">
+                    Disable late submissions
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormStrictDeadline(!formStrictDeadline)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formStrictDeadline ? 'bg-teal' : 'bg-gray-300'}`}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${formStrictDeadline ? "bg-teal" : "bg-gray-300"}`}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formStrictDeadline ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formStrictDeadline ? "translate-x-6" : "translate-x-1"}`}
+                  />
                 </button>
               </div>
-
             </div>
           </div>
         </div>
