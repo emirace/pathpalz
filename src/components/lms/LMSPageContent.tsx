@@ -16,6 +16,7 @@ import { Play, Download, FileText, Loader2, Video } from "lucide-react";
 import AssignmentsOverview from "./AssignmentsOverview";
 import { useGetUser } from "@/query/auth";
 import AssignmentsDetailsClient from "./AssignmentsDetailsClient";
+import AssignmentSubmitClient from "./AssignmentSubmitClient";
 
 const getDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -162,6 +163,10 @@ function LMSPageContent() {
 
   if (viewParam === "assignments") {
     return <AssignmentsOverview enrollment={enrollment} />;
+  }
+
+  if (viewParam === "submit" && assignmentId) {
+    return <AssignmentSubmitClient assignmentId={assignmentId} />;
   }
 
   if (assignmentId) {

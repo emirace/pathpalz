@@ -22,9 +22,9 @@ export interface IAssignment {
   created_at: string;
   updated_at: string;
   submissions_count: number;
-  my_submission: null;
+  my_submission?: ISubmission;
   submission_state: "not_submitted";
-  submissions: [];
+  submissions: ISubmission[];
   module?: ICourseModule;
 }
 

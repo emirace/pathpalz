@@ -9,7 +9,7 @@ type Props = {
 
 export default function AssignmentsOverview({ enrollment }: Props) {
   const { data: assignments } = useGetStudentAssignments();
-  console.log("AssignmentsOverview assignments:", enrollment, assignments);
+
   return (
     <div className="p-6 max-w-7xl mx-auto animate-in fade-in duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">

@@ -1,82 +1,42 @@
 "use client";
 
 import React from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Clock, Calendar, FileText, Download, Loader2 } from "lucide-react";
 import { IAssignment, ISubmission } from "@/types/training/assignments";
+import { useGetStudentAssignments } from "@/query/training/student/assignment";
 
 type Props = {
   assignmentId: string;
 };
 
 const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
-  // Mock data shaped to match IAssignment / ISubmission
-  const assignment: IAssignment = {
-    id: Number(assignmentId),
-    instructor_id: 0,
-    title: "Advanced Predictive Modeling",
-    description:
-      "For this assignment, you are required to build a predictive model using the 'CustomerChurn_V2' dataset. Explore at least three algorithms, compare metrics, and submit a Jupyter Notebook or PDF report.",
-    course_module_id: "1",
-    deadline: "2023-10-24T23:59:00Z",
-    duration_minutes: 120,
-    pass_score: 50,
-    multiple_attempts: true,
-    strict_deadline: false,
-    attachments: [
-      {
-        file_name: "Assignment_Guide.pdf",
-        file_path: "/files/Assignment_Guide.pdf",
-        file_url: "#",
-        file_size: 2400000,
-        uploaded_at: "2023-09-01T12:00:00Z",
-      },
-      {
-        file_name: "CustomerChurn_V2.csv",
-        file_path: "/files/CustomerChurn_V2.csv",
-        file_url: "#",
-        file_size: 14800000,
-        uploaded_at: "2023-09-01T12:00:00Z",
-      },
-      {
-        file_name: "Baseline_Script.py",
-        file_path: "/files/Baseline_Script.py",
-        file_url: "#",
-        file_size: 12000,
-        uploaded_at: "2023-09-01T12:00:00Z",
-      },
-    ],
-    status: "published",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    submissions_count: 1,
-    my_submission: null,
-    submission_state: "not_submitted",
-    submissions: [],
-    module: undefined,
-  };
+  const { data: assignments, isLoading } = useGetStudentAssignments();
 
-  const submissions: ISubmission[] = [
-    {
-      id: "sub-1",
-      assignment_id: String(assignment.id),
-      student_id: 123,
-      submission_files: [
-        {
-          file_path: "/subs/sub1.ipynb",
-          file_name: "sub1.ipynb",
-          file_size: 102400,
-        },
-      ],
-      submission_note: "Initial submission",
-      score: undefined,
-      feedback: undefined,
-      submitted_at: "2023-10-18T14:45:00Z",
-      status: "Pending",
-      updated_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-    },
-  ];
+  const enrollmentId = useSearchParams().get("enrollmentId") || "";
+
+  const assignment = assignments?.data?.find(
+    (a) => String(a.id) === assignmentId,
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="animate-spin" />
+      </div>
+    );
+  }
+
+  if (!assignment) {
+    return (
+      <div className="text-center text-gray-500 py-12">
+        Assignment not found.
+      </div>
+    );
+  }
+
+  const submissions = assignment.submissions || [];
 
   const deadlineLabel = assignment.deadline
     ? new Date(assignment.deadline).toLocaleString(undefined, {
@@ -97,6 +57,9 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
               My Courses
             </Link>
             <span className="mx-2">›</span>
+            <span className="text-gray-500">{assignment?.module?.title}</span>
+
+            <span className="mx-2">›</span>
             <span className="text-[#00284F] font-bold">{assignment.title}</span>
           </div>
           <h1 className="text-3xl font-extrabold text-[#00284F] mb-1">
@@ -105,8 +68,9 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Link to the dedicated submit page handled by LMSPageContent routing */}
           <Link
-            href={`#/submit-${assignment.id}`}
+            href={`/lms/?enrollmentId=${enrollmentId || ""}&view=submit&assignmentId=${assignment.id}`}
             className="bg-teal text-white px-4 py-2 rounded-lg font-bold"
           >
             Submit Assignment
@@ -150,9 +114,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
               <p className="text-xs text-gray-400 uppercase tracking-wider">
                 Total Attempts
               </p>
-              <p className="font-bold text-[#00284F]">
-                {submissions.length} / 6
-              </p>
+              <p className="font-bold text-[#00284F]">{submissions.length}</p>
             </div>
           </div>
         </div>
@@ -162,7 +124,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
             Current Score
           </p>
           <p className="font-extrabold text-[#00284F] text-2xl mt-2">
-            {assignment.my_submission ?? "-"}
+            {assignment.my_submission?.score ?? "-"}
           </p>
         </div>
       </div>
@@ -207,7 +169,9 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
                       <td className="px-6 py-4 text-gray-600">
                         {new Date(s.submitted_at).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">--</td>
+                      <td className="px-6 py-4 text-gray-600">
+                        {assignment.submissions.length}
+                      </td>
                       <td className="px-6 py-4 text-gray-600">
                         {s.score ?? "-"}
                       </td>
@@ -217,10 +181,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`#/view-${s.id}`}
-                          className="text-teal font-bold"
-                        >
+                        <Link href={`#`} className="text-teal font-bold">
                           View Report
                         </Link>
                       </td>
@@ -261,7 +222,6 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
                     className="text-teal hover:underline flex items-center gap-2"
                   >
                     <Download size={14} />
-                    Download
                   </a>
                 </div>
               ))}
