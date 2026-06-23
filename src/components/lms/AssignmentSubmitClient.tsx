@@ -7,6 +7,7 @@ import {
   useSubmitAssignment,
 } from "@/query/training/student/assignment";
 import { useRouter, useSearchParams } from "next/navigation";
+import { notify } from "@/utils/notify";
 
 type Props = {
   assignmentId: string;
@@ -50,7 +51,7 @@ const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agree) {
-      alert("Please confirm the integrity checkbox before submitting.");
+      notify.warning("Please confirm the integrity checkbox before submitting.");
       return;
     }
     submitAssignment(

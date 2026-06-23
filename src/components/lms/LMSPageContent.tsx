@@ -13,6 +13,7 @@ import {
   useMarkCourseAsCompleted,
 } from "@/query/training/student";
 import { Play, Download, FileText, Loader2, Video } from "lucide-react";
+import { getApiErrorMessage, notify } from "@/utils/notify";
 import AssignmentsOverview from "./AssignmentsOverview";
 import { useGetUser } from "@/query/auth";
 import AssignmentsDetailsClient from "./AssignmentsDetailsClient";
@@ -120,9 +121,11 @@ function LMSPageContent() {
     markAttendanceMutation.mutate(
       { course_module_id: moduleId, attended: true },
       {
-        onSuccess: () => alert("Marked as attended!"),
-        onError: (error: any) =>
-          alert(error.response?.data?.message || "Failed to mark attendance"),
+        onSuccess: () => notify.success("Marked as attended!"),
+        onError: (error) =>
+          notify.error(
+            getApiErrorMessage(error, "Failed to mark attendance"),
+          ),
       },
     );
   };
@@ -133,9 +136,11 @@ function LMSPageContent() {
     markCompletedMutation.mutate(
       { module_title: sessionData.module.title, course_module_id: moduleId },
       {
-        onSuccess: () => alert("Module marked as completed!"),
-        onError: (err: any) =>
-          alert(err.response?.data?.message || "Failed to mark as completed."),
+        onSuccess: () => notify.success("Module marked as completed!"),
+        onError: (err) =>
+          notify.error(
+            getApiErrorMessage(err, "Failed to mark as completed."),
+          ),
       },
     );
   };

@@ -2,6 +2,7 @@
 
 import { useFetchWaitingList, useNotifyUserOfWaitingList } from "@/query/training/enquiry";
 import { Loader2, Bell, CheckCircle2 } from "lucide-react";
+import { notify } from "@/utils/notify";
 
 export default function AdminWaitingListPage() {
   const { data: waitingList, isLoading } = useFetchWaitingList();
@@ -12,10 +13,12 @@ export default function AdminWaitingListPage() {
   const handleNotify = (id: string) => {
     notifyMutation.mutate(id, {
       onSuccess: (data) => {
-        // toast.success(data.message || "User notified successfully");
+        notify.success(
+          (data as { message?: string })?.message || "User notified successfully",
+        );
       },
       onError: () => {
-        // toast.error("Failed to notify user");
+        notify.error("Failed to notify user");
       },
     });
   };

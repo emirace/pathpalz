@@ -6,6 +6,7 @@ import { useGetTracks } from "@/query/training/tracks";
 import { useSubmitEnquiry } from "@/query/training/enquiry";
 import { IEnquiryRequest } from "@/types/training/enquiry";
 import { useTraining } from "@/context/TrainingContext";
+import { getApiErrorMessage, notify } from "@/utils/notify";
 
 interface ApplicationModalProps {
   isOpen: boolean;
@@ -106,7 +107,7 @@ const ApplicationModal = ({
 
     submitEnquiry.mutate(payload, {
       onSuccess: () => {
-        alert("Application submitted successfully!");
+        notify.success("Application submitted successfully!");
         onClose();
         // Reset form
         setFormData({
@@ -125,10 +126,12 @@ const ApplicationModal = ({
           additionalInfo: "",
         });
       },
-      onError: (error: any) => {
-        alert(
-          error?.response?.data?.message ||
+      onError: (error) => {
+        notify.error(
+          getApiErrorMessage(
+            error,
             "Something went wrong. Please try again.",
+          ),
         );
       },
     });

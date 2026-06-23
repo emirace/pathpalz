@@ -11,6 +11,7 @@ import SupportSystem from "@/components/training/SupportSystem";
 import TransparentPricing from "@/components/training/TransparentPricing";
 import ReadyToStart from "@/components/training/ReadyToStart";
 import FAQ from "@/components/training/FAQ";
+import GenerateDiscountSection from "@/components/training/GenerateDiscountSection";
 import { useTraining } from "@/context/TrainingContext";
 import { useGetUser } from "@/query/auth";
 
@@ -37,6 +38,7 @@ export default function TrainingPage() {
         onWaitlist={() => handleAuthRedirect("waitlist")}
       />
       <WhyPathPalz />
+      <GenerateDiscountSection />
       <LearningTracks />
       <PathToMastery />
       <HighPerformanceRhythm />

@@ -7,7 +7,12 @@ import {
   useUpdateDiscount,
   useDeleteDiscount,
 } from "@/query/admin/discount";
-import { ICreateDiscountReponse } from "@/types/discount";
+import {
+  ICreateDiscountReponse,
+  DISCOUNT_TYPE_LABELS,
+  ICreateDiscountRequest,
+  IDiscountType,
+} from "@/types/discount";
 import {
   Tag,
   Plus,
@@ -21,16 +26,16 @@ import {
   Percent,
 } from "lucide-react";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface DiscountFormState {
-  name: string;
-  percentage: string;
-}
-
-const EMPTY_FORM: DiscountFormState = { name: "", percentage: "" };
-
-// ─── Component ───────────────────────────────────────────────────────────────
+const EMPTY_FORM = {
+  name: "",
+  percentage: 10,
+  is_active: true,
+  is_student: false,
+  discount_type: "general" as IDiscountType,
+  min_students: 0,
+  max_students: 0,
+  max_years_after_graduation: 0,
+};
 
 export default function AdminDiscountsPage() {
   const { data: discountsRaw, isLoading } = useGetDiscounts();
@@ -41,13 +46,19 @@ export default function AdminDiscountsPage() {
   // The API returns { message, data } or just an array — handle both shapes
   const discounts: ICreateDiscountReponse[] = Array.isArray(discountsRaw)
     ? discountsRaw
-    : (discountsRaw as any)?.data ?? [];
+    : ((discountsRaw as any)?.data ?? []);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<ICreateDiscountReponse | null>(null);
-  const [form, setForm] = useState<DiscountFormState>(EMPTY_FORM);
-  const [deleteConfirm, setDeleteConfirm] = useState<ICreateDiscountReponse | null>(null);
+  const [editTarget, setEditTarget] = useState<ICreateDiscountReponse | null>(
+    null,
+  );
+  const [form, setForm] = useState<ICreateDiscountRequest>(EMPTY_FORM);
+  const [formErrors, setFormErrors] = useState<{ minMax?: string } | null>(
+    null,
+  );
+  const [deleteConfirm, setDeleteConfirm] =
+    useState<ICreateDiscountReponse | null>(null);
 
   // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -59,7 +70,21 @@ export default function AdminDiscountsPage() {
 
   const openEdit = (discount: ICreateDiscountReponse) => {
     setEditTarget(discount);
-    setForm({ name: discount.name, percentage: String(discount.percentage) });
+    setForm({
+      name: discount.name,
+      percentage: discount.percentage,
+      is_active: discount.is_active ?? true,
+      is_student: discount.is_student ?? false,
+      discount_type: discount.discount_type ?? "general",
+      min_students:
+        discount.min_students != null ? discount.min_students : undefined,
+      max_students:
+        discount.max_students != null ? discount.max_students : undefined,
+      max_years_after_graduation:
+        discount.max_years_after_graduation != null
+          ? discount.max_years_after_graduation
+          : undefined,
+    });
     setModalOpen(true);
   };
 
@@ -71,11 +96,31 @@ export default function AdminDiscountsPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = { name: form.name, percentage: Number(form.percentage) };
+    // final validation
+    if (form.min_students != null && form.max_students != null) {
+      if (form.min_students > form.max_students) {
+        setFormErrors({ minMax: "Min students cannot exceed Max students." });
+        return;
+      }
+    }
+    setFormErrors(null);
+    const payload = {
+      name: form?.name,
+      percentage: Number(form?.percentage),
+      is_active: form?.is_active,
+      is_student: form?.is_student,
+      discount_type: form?.discount_type,
+      min_students: form?.min_students ? Number(form?.min_students) : undefined,
+      max_students: form?.max_students ? Number(form?.max_students) : undefined,
+      max_years_after_graduation: form?.max_years_after_graduation
+        ? Number(form?.max_years_after_graduation)
+        : undefined,
+    };
+
     if (editTarget) {
       updateDiscount(
         { data: payload, discountId: String(editTarget.id) },
-        { onSuccess: closeModal }
+        { onSuccess: closeModal },
       );
     } else {
       createDiscount(payload, { onSuccess: closeModal });
@@ -83,8 +128,18 @@ export default function AdminDiscountsPage() {
   };
 
   const handleToggleActive = (discount: ICreateDiscountReponse) => {
+    // Send the full payload expected by the API, toggling is_active
     updateDiscount({
-      data: { name: discount.name, percentage: discount.percentage },
+      data: {
+        name: discount.name,
+        percentage: discount.percentage,
+        is_active: !discount.is_active,
+        is_student: discount.is_student,
+        discount_type: discount.discount_type,
+        min_students: discount.min_students,
+        max_students: discount.max_students,
+        max_years_after_graduation: discount.max_years_after_graduation,
+      },
       discountId: String(discount.id),
     });
   };
@@ -102,7 +157,6 @@ export default function AdminDiscountsPage() {
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
-
       {/* ── Page Header ─────────────────────────────────────────────────── */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -127,8 +181,12 @@ export default function AdminDiscountsPage() {
             <Tag size={20} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total</p>
-            <p className="text-2xl font-extrabold text-[#00284F]">{discounts.length}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              Total
+            </p>
+            <p className="text-2xl font-extrabold text-[#00284F]">
+              {discounts.length}
+            </p>
           </div>
         </div>
 
@@ -137,8 +195,12 @@ export default function AdminDiscountsPage() {
             <Check size={20} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Active</p>
-            <p className="text-2xl font-extrabold text-[#00284F]">{activeCount}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              Active
+            </p>
+            <p className="text-2xl font-extrabold text-[#00284F]">
+              {activeCount}
+            </p>
           </div>
         </div>
 
@@ -147,8 +209,12 @@ export default function AdminDiscountsPage() {
             <Percent size={20} />
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Inactive</p>
-            <p className="text-2xl font-extrabold text-[#00284F]">{discounts.length - activeCount}</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+              Inactive
+            </p>
+            <p className="text-2xl font-extrabold text-[#00284F]">
+              {discounts.length - activeCount}
+            </p>
           </div>
         </div>
       </div>
@@ -168,7 +234,9 @@ export default function AdminDiscountsPage() {
         ) : discounts.length === 0 ? (
           <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
             <Tag size={36} strokeWidth={1.5} />
-            <p className="text-sm font-medium">No discounts yet. Create your first one.</p>
+            <p className="text-sm font-medium">
+              No discounts yet. Create your first one.
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -194,7 +262,9 @@ export default function AdminDiscountsPage() {
                         <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
                           <Tag size={14} />
                         </div>
-                        <span className="font-bold text-[#00284F]">{discount.name}</span>
+                        <span className="font-bold text-[#00284F]">
+                          {discount.name}
+                        </span>
                       </div>
                     </td>
 
@@ -202,30 +272,38 @@ export default function AdminDiscountsPage() {
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1 font-extrabold text-[#00284F] text-base">
                         {discount.percentage}
-                        <span className="text-xs font-bold text-gray-400">%</span>
+                        <span className="text-xs font-bold text-gray-400">
+                          %
+                        </span>
                       </span>
                     </td>
 
                     {/* Active Badge */}
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${discount.is_active
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          discount.is_active
                             ? "bg-green-50 text-green-600 border border-green-100"
                             : "bg-gray-100 text-gray-400 border border-gray-200"
-                          }`}
+                        }`}
                       >
-                        <span className={`w-1.5 h-1.5 rounded-full ${discount.is_active ? "bg-green-500" : "bg-gray-400"}`} />
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${discount.is_active ? "bg-green-500" : "bg-gray-400"}`}
+                        />
                         {discount.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
 
                     {/* Created */}
                     <td className="px-6 py-4 text-xs text-gray-400 font-medium">
-                      {new Date(discount.created_at).toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
+                      {new Date(discount.created_at).toLocaleDateString(
+                        undefined,
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        },
+                      )}
                     </td>
 
                     {/* Actions */}
@@ -237,9 +315,11 @@ export default function AdminDiscountsPage() {
                           onClick={() => handleToggleActive(discount)}
                           className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                         >
-                          {discount.is_active
-                            ? <ToggleRight size={18} className="text-green-500" />
-                            : <ToggleLeft size={18} />}
+                          {discount.is_active ? (
+                            <ToggleRight size={18} className="text-green-500" />
+                          ) : (
+                            <ToggleLeft size={18} />
+                          )}
                         </button>
 
                         {/* Edit */}
@@ -276,7 +356,7 @@ export default function AdminDiscountsPage() {
             className="absolute inset-0 bg-[#00284F]/40 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -307,7 +387,9 @@ export default function AdminDiscountsPage() {
                   required
                   placeholder="e.g. Early Bird 20%"
                   value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, name: e.target.value }))
+                  }
                   className="w-full px-4 py-2.5 border text-black border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm transition-colors"
                 />
               </div>
@@ -318,22 +400,212 @@ export default function AdminDiscountsPage() {
                   Percentage (%) <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    max="100"
-                    step="0.01"
-                    placeholder="e.g. 20"
-                    value={form.percentage}
-                    onChange={(e) => setForm((f) => ({ ...f, percentage: e.target.value }))}
-                    className="w-full px-4 py-2.5 text-black tpr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm transition-colors"
-                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="range"
+                      min={1}
+                      max={100}
+                      step={0.1}
+                      value={Number(form.percentage) || 0}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          percentage: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full"
+                      aria-label="Percentage slider"
+                    />
+                    <input
+                      type="number"
+                      required
+                      min={1}
+                      max={100}
+                      step={0.01}
+                      placeholder="e.g. 20"
+                      value={form.percentage}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          percentage: Number(e.target.value),
+                        }))
+                      }
+                      className="w-24 px-3 py-2.5 text-black tpr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm transition-colors"
+                    />
+                  </div>
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm pointer-events-none">
                     %
                   </span>
                 </div>
+                <p className="text-xs text-gray-400 mt-1">
+                  Use the slider for quick selection or type an exact value.
+                </p>
               </div>
+
+              {/* Discount Type */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                  Discount Type
+                </label>
+                <select
+                  value={form.discount_type}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      discount_type: e.target.value as IDiscountType,
+                    }))
+                  }
+                  className="w-full px-4 py-2.5 border text-black border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm transition-colors"
+                >
+                  {Object.keys(DISCOUNT_TYPE_LABELS).map((key) => (
+                    <option key={key} value={key}>
+                      {
+                        DISCOUNT_TYPE_LABELS[
+                          key as keyof typeof DISCOUNT_TYPE_LABELS
+                        ]
+                      }
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Choose the rule that best fits this discount.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                {/* Is Student */}
+                <div>
+                  <label className="inline-flex items-center gap-2 text-sm text-gray-700 font-bold">
+                    <input
+                      type="checkbox"
+                      checked={form.is_student}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, is_student: e.target.checked }))
+                      }
+                      className="w-4 h-4"
+                    />
+                    <span>Is Student</span>
+                  </label>
+                </div>
+
+                {/* Is Active */}
+                <div>
+                  <label className="inline-flex items-center gap-2 text-sm text-gray-700 font-bold">
+                    <input
+                      type="checkbox"
+                      checked={form.is_active}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, is_active: e.target.checked }))
+                      }
+                      className="w-4 h-4"
+                    />
+                    <span>Active</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-black">
+                {form.discount_type === "school_based" && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                        Min Students
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="optional"
+                        value={form.min_students ?? ""}
+                        onChange={(e) => {
+                          const val =
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value);
+                          setForm((f) => ({ ...f, min_students: val }));
+                          // validate against existing max
+                          const max = form.max_students;
+                          if (val != null && max != null && val > max) {
+                            setFormErrors({
+                              minMax:
+                                "Min students cannot exceed Max students.",
+                            });
+                          } else {
+                            setFormErrors(null);
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        Leave blank for no minimum requirement.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                        Max Students
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="optional"
+                        value={form.max_students ?? ""}
+                        onChange={(e) => {
+                          const val =
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value);
+                          setForm((f) => ({ ...f, max_students: val }));
+                          const min = form.min_students;
+                          if (min != null && val != null && min > val) {
+                            setFormErrors({
+                              minMax:
+                                "Min students cannot exceed Max students.",
+                            });
+                          } else {
+                            setFormErrors(null);
+                          }
+                        }}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                      />
+                      <p className="text-xs text-gray-400 mt-1">
+                        Leave blank for no maximum restriction.
+                      </p>
+                    </div>
+                  </>
+                )}
+                {form.discount_type === "individual_student" && (
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1.5">
+                      Max Years After Graduation
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="optional"
+                      value={form.max_years_after_graduation ?? ""}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          max_years_after_graduation:
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value),
+                        }))
+                      }
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      Optional: limit eligibility by years since graduation.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {formErrors?.minMax && (
+                <p className="text-sm text-red-600 font-medium">
+                  {formErrors.minMax}
+                </p>
+              )}
 
               {/* Actions */}
               <div className="pt-2 flex items-center justify-end gap-3 border-t border-gray-100">
@@ -349,7 +621,9 @@ export default function AdminDiscountsPage() {
                   disabled={isCreating || isUpdating}
                   className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00284F] text-white font-bold rounded-xl text-sm hover:bg-[#001D39] transition-colors disabled:opacity-60"
                 >
-                  {(isCreating || isUpdating) && <Loader2 size={15} className="animate-spin" />}
+                  {(isCreating || isUpdating) && (
+                    <Loader2 size={15} className="animate-spin" />
+                  )}
                   {editTarget ? "Save Changes" : "Create Discount"}
                 </button>
               </div>
@@ -371,11 +645,15 @@ export default function AdminDiscountsPage() {
                 <Trash2 size={18} />
               </div>
               <div>
-                <h3 className="font-bold text-[#00284F] text-base">Delete Discount</h3>
+                <h3 className="font-bold text-[#00284F] text-base">
+                  Delete Discount
+                </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-[#00284F]">"{deleteConfirm.name}"</span>?
-                  This action cannot be undone.
+                  <span className="font-bold text-[#00284F]">
+                    "{deleteConfirm.name}"
+                  </span>
+                  ? This action cannot be undone.
                 </p>
               </div>
             </div>

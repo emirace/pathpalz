@@ -21,6 +21,7 @@ import {
   useGradeSubmission,
 } from "@/query/training/instructor/assignments";
 import { ISubmission } from "@/types/training/assignments";
+import { notify } from "@/utils/notify";
 
 export default function AssignmentDetailsClient() {
   const { assignmentId } = useParams();
@@ -93,7 +94,7 @@ export default function AssignmentDetailsClient() {
     if (!scoringSubmission) return;
 
     if (!scoreInput) {
-      alert("Please enter a score before saving.");
+      notify.warning("Please enter a score before saving.");
       return;
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useGetTracks, useGetTrackById } from "@/query/training/tracks";
 import { useCheckout } from "@/query/training/payments";
@@ -18,9 +18,6 @@ import {
   X,
   Tag,
   GraduationCap,
-  Upload,
-  Loader2,
-  CheckCircle2,
 } from "lucide-react";
 import Link from "next/link";
 import TrainingPaths from "./TrainingPaths/index.ts";
@@ -29,27 +26,21 @@ import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
 import TutorSection from "../TutorSection";
 import { useSetting } from "@/states/setting";
-import { useGenerateDiscountCode } from "@/query/training/student/student";
-import { useGetDiscounts } from "@/query/admin/discount";
+import DiscountGenerateForm from "@/components/training/DiscountGenerateForm";
+import { getApiErrorMessage, notify } from "@/utils/notify";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
-  const country = useSetting((state) => state.country)
+  const country = useSetting((state) => state.country);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
   // 'enter' = enter/apply a code; 'generate' = student generate form
-  const [discountView, setDiscountView] = useState<"enter" | "generate">("enter");
+  const [discountView, setDiscountView] = useState<"enter" | "generate">(
+    "enter",
+  );
   const [discountCode, setDiscountCode] = useState("");
-  const [generateForm, setGenerateForm] = useState({
-    discount_rule_id: "",
-    institution_name: "",
-    institution_address: "",
-    email: "",
-    student_id_card: null as File | null,
-  });
-  const idCardRef = useRef<HTMLInputElement>(null);
 
   const [guestData, setGuestData] = useState({
     fullName: "",
@@ -69,9 +60,6 @@ export default function TrackDetailClient() {
 
   const { data: user } = useGetUser();
   const { data: tracks, isLoading: isTracksLoading } = useGetTracks();
-  const { mutate: generateCode, isPending: isGenerating } = useGenerateDiscountCode();
-  const { data: discountsRaw } = useGetDiscounts();
-  const discountRules = (Array.isArray(discountsRaw) ? discountsRaw : (discountsRaw as any)?.data ?? []).filter((d: any) => d.is_active);
 
   const foundTrack = useMemo(() => {
     return tracks?.find((t) => t.slug === slug);
@@ -162,16 +150,16 @@ export default function TrackDetailClient() {
         ...(discountCode.trim() ? { discount_code: discountCode.trim() } : {}),
         ...(!user
           ? {
-            email: guestData.email,
-            full_name: guestData.fullName,
-            phoneNumber: guestData.phoneNumber,
-            city: guestData.city,
-            country: guestData.country,
-            state: guestData.state,
-            street: guestData.street,
-            house_number: guestData.house_number,
-            apartment_number: guestData.apartment_number,
-          }
+              email: guestData.email,
+              full_name: guestData.fullName,
+              phoneNumber: guestData.phoneNumber,
+              city: guestData.city,
+              country: guestData.country,
+              state: guestData.state,
+              street: guestData.street,
+              house_number: guestData.house_number,
+              apartment_number: guestData.apartment_number,
+            }
           : {}),
       },
       {
@@ -180,10 +168,12 @@ export default function TrackDetailClient() {
             window.location.href = data.checkout_url;
           }
         },
-        onError: (error: any) => {
-          alert(
-            error?.response?.data?.message ||
-            "Failed to initialize checkout. Please try again.",
+        onError: (error) => {
+          notify.error(
+            getApiErrorMessage(
+              error,
+              "Failed to initialize checkout. Please try again.",
+            ),
           );
         },
       },
@@ -453,7 +443,6 @@ export default function TrackDetailClient() {
       {isDiscountModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00284f]/60 backdrop-blur-sm">
           <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-
             {/* Header */}
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
@@ -467,12 +456,14 @@ export default function TrackDetailClient() {
                 )}
                 <div>
                   <h3 className="text-xl font-bold text-[#00284F]">
-                    {discountView === "enter" ? "Discount Code" : "Generate Student Code"}
+                    {discountView === "enter"
+                      ? "Discount Code"
+                      : "Generate Discount Code"}
                   </h3>
                   <p className="text-sm text-gray-500 mt-0.5">
                     {discountView === "enter"
                       ? "Apply a code to get a discount on your enrolment"
-                      : "Submit your student details to generate a code"}
+                      : "Select a discount type and fill in the required details"}
                   </p>
                 </div>
               </div>
@@ -495,37 +486,30 @@ export default function TrackDetailClient() {
                     <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
-                      placeholder="e.g. STUDENT20"
+                      placeholder="e.g. HGFDYJKH20"
                       value={discountCode}
-                      onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        setDiscountCode(e.target.value.toUpperCase())
+                      }
                       className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 text-[#00284F] font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Are you a student? */}
-                <div className="bg-gradient-to-br from-teal/5 to-blue-50 border border-teal/20 rounded-2xl p-4 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="bg-linear-to-br from-teal/5 to-blue-50 border border-teal/20 rounded-2xl p-4 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center shrink-0 mt-0.5">
                     <GraduationCap className="w-5 h-5 text-teal" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[#00284F]">
-                      Are you a student?
+                      Need a discount code?
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5 mb-2">
-                      Students can generate a personalised discount code using their institution ID card.
+                      Students, teachers, and promo recipients can generate a
+                      code based on their discount type.
                     </p>
                     <button
-                      onClick={() => {
-                        setGenerateForm({
-                          discount_rule_id: "",
-                          institution_name: "",
-                          institution_address: "",
-                          email: user?.email ?? guestData.email ?? "",
-                          student_id_card: null,
-                        });
-                        setDiscountView("generate");
-                      }}
+                      onClick={() => setDiscountView("generate")}
                       className="text-teal text-xs font-bold hover:underline inline-flex items-center gap-1"
                     >
                       Generate a discount code
@@ -546,177 +530,25 @@ export default function TrackDetailClient() {
                     onClick={handleDiscountContinue}
                     className="flex-1 h-12 bg-[#00284F] text-white rounded-xl font-bold text-sm hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
                   >
-                    {discountCode.trim() ? "Apply & Continue" : "Skip & Continue"}
+                    {discountCode.trim()
+                      ? "Apply & Continue"
+                      : "Skip & Continue"}
                     <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* ── View B: Generate Code ── */}
             {discountView === "generate" && (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!generateForm.student_id_card) return;
-                  generateCode(
-                    {
-                      discount_rule_id: generateForm.discount_rule_id,
-                      institution_name: generateForm.institution_name,
-                      institution_address: generateForm.institution_address,
-                      email: generateForm.email,
-                      student_id_card: generateForm.student_id_card,
-                    },
-                    {
-                      onSuccess: (data: any) => {
-                        // Handle both { code } and { data: { code } } shapes
-                        const code =
-                          data?.code ||
-                          data?.data?.code ||
-                          data?.discount_code ||
-                          "";
-                        setDiscountCode(String(code).toUpperCase());
-                        setDiscountView("enter");
-                      },
-                      onError: (err: any) => {
-                        alert(
-                          err?.response?.data?.message ||
-                          "Failed to generate code. Please try again."
-                        );
-                      },
-                    }
-                  );
-                }}
-                className="p-6 space-y-4 overflow-auto max-h-[70vh]"
-              >
-                {/* Discount Rule */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Discount Type <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    required
-                    value={generateForm.discount_rule_id}
-                    onChange={(e) => setGenerateForm((f) => ({ ...f, discount_rule_id: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-[#00284F] focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all bg-white"
-                  >
-                    <option value="">Select a discount rule</option>
-                    {discountRules.map((d: any) => (
-                      <option key={d.id} value={String(d.id)}>
-                        {d.name} — {d.percentage}% off
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="your@email.com"
-                    value={generateForm.email}
-                    onChange={(e) => setGenerateForm((f) => ({ ...f, email: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-[#00284F] focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-
-                {/* Institution Name */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Institution Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="University of Example"
-                    value={generateForm.institution_name}
-                    onChange={(e) => setGenerateForm((f) => ({ ...f, institution_name: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-[#00284F] focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-
-                {/* Institution Address */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Institution Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="123 Campus Road, City"
-                    value={generateForm.institution_address}
-                    onChange={(e) => setGenerateForm((f) => ({ ...f, institution_address: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-[#00284F] focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-
-                {/* Student ID Card Upload */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Student ID Card <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    ref={idCardRef}
-                    type="file"
-                    accept="image/*,.pdf"
-                    required
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setGenerateForm((f) => ({ ...f, student_id_card: file }));
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => idCardRef.current?.click()}
-                    className={`w-full border-2 border-dashed rounded-xl p-4 flex items-center gap-3 transition-colors ${
-                      generateForm.student_id_card
-                        ? "border-teal bg-teal/5 text-teal"
-                        : "border-gray-200 hover:border-teal/40 text-gray-400 hover:text-teal"
-                    }`}
-                  >
-                    {generateForm.student_id_card ? (
-                      <>
-                        <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-                        <span className="text-sm font-semibold truncate">
-                          {generateForm.student_id_card.name}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-5 h-5 flex-shrink-0" />
-                        <span className="text-sm font-medium">Click to upload ID card (image or PDF)</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Disclaimer */}
-                <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4">
-                  <svg className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-xs text-amber-800 leading-relaxed">
-                    <span className="font-bold">Important:</span> The information provided will be verified. If any details are found to be false or misleading, the company reserves the right to revoke the discount and block access to the learning platform <span className="font-bold">without refund</span>.
-                  </p>
-                </div>
-
-                {/* Submit */}
-                <div className="pt-1">
-                  <button
-                    type="submit"
-                    disabled={isGenerating || !generateForm.student_id_card}
-                    className="w-full h-12 bg-[#00284F] text-white rounded-xl font-bold hover:bg-[#00284F]/90 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
-                  >
-                    {isGenerating && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isGenerating ? "Generating..." : "Generate My Code"}
-                  </button>
-                </div>
-              </form>
+              <div className="p-6 overflow-auto max-h-[70vh]">
+                <DiscountGenerateForm
+                  defaultEmail={user?.email ?? guestData.email ?? ""}
+                  onSuccess={(code) => {
+                    setDiscountCode(code);
+                    setDiscountView("enter");
+                  }}
+                />
+              </div>
             )}
           </div>
         </div>
