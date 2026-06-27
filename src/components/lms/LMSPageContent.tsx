@@ -9,6 +9,7 @@ import { useGetEnrollmentById } from "@/query/training/enrollments";
 import {
   useGetModuleAttendance,
   useGetModuleSessions,
+  useGetStudentProgress,
   useMarkAttendance,
   useMarkCourseAsCompleted,
 } from "@/query/training/student";
@@ -87,6 +88,8 @@ function LMSPageContent() {
     index: number;
   }>({ index: 0 });
 
+  const { data: studentProgress } = useGetStudentProgress()
+  console.log(studentProgress)
   const { data: enrollment, isLoading: isEnrollmentLoading } =
     useGetEnrollmentById(enrollmentId || "");
   const moduleId = moduleIdParam ? Number(moduleIdParam) : undefined;
@@ -293,26 +296,23 @@ function LMSPageContent() {
                     onClick={() =>
                       setSelectedSessionSelection({ moduleId, index })
                     }
-                    className={`min-w-40 rounded-xl border px-4 py-3 text-left transition-all ${
-                      isSelected
+                    className={`min-w-40 rounded-xl border px-4 py-3 text-left transition-all ${isSelected
                         ? "border-teal bg-teal text-white shadow-md shadow-teal/20"
                         : "border-gray-100 bg-white text-[#00284F] hover:border-teal/40 hover:bg-teal/5"
-                    }`}
+                      }`}
                   >
                     <span className="block text-xs font-black uppercase tracking-widest">
                       Session {index + 1}
                     </span>
                     <span
-                      className={`mt-1 block text-sm font-bold ${
-                        isSelected ? "text-white" : "text-[#00284F]"
-                      }`}
+                      className={`mt-1 block text-sm font-bold ${isSelected ? "text-white" : "text-[#00284F]"
+                        }`}
                     >
                       {sessionDateLabel}
                     </span>
                     <span
-                      className={`mt-2 block text-[11px] font-bold ${
-                        isSelected ? "text-white/80" : "text-gray-500"
-                      }`}
+                      className={`mt-2 block text-[11px] font-bold ${isSelected ? "text-white/80" : "text-gray-500"
+                        }`}
                     >
                       {session.recorded_link
                         ? "Recording"
@@ -394,9 +394,8 @@ function LMSPageContent() {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-1.5 bg-teal text-white text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full mb-4">
                 <div
-                  className={`w-1.5 h-1.5 bg-white rounded-full ${
-                    canJoinLiveSession ? "animate-pulse" : ""
-                  }`}
+                  className={`w-1.5 h-1.5 bg-white rounded-full ${canJoinLiveSession ? "animate-pulse" : ""
+                    }`}
                 ></div>
                 {canJoinLiveSession ? "Live Today" : "Session"}
               </div>
@@ -407,13 +406,13 @@ function LMSPageContent() {
               <p className="text-white/70 text-sm mb-6 leading-relaxed">
                 {selectedSession?.training_date
                   ? `Scheduled for ${formatTrainingDate(
-                      selectedSession.training_date,
-                      {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      },
-                    )}.`
+                    selectedSession.training_date,
+                    {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    },
+                  )}.`
                   : "No live session date is available yet."}
               </p>
 

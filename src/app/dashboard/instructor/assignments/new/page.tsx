@@ -59,6 +59,23 @@ export default function CreateAssignmentPage() {
   const [formStrictDeadline, setFormStrictDeadline] = useState(false);
   const [formFiles, setFormFiles] = useState<File[]>([]);
 
+  // Search & dropdown states for modules
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [moduleSearchTerm, setModuleSearchTerm] = useState("");
+
+  // Close dropdown when clicked outside
+  useEffect(() => {
+    if (!isDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".custom-select-container")) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
   // Fetch API data
   const { data: assignedTracks, isLoading: isLoadingTracks } =
     useGetInstructorAssignedTracks();
@@ -89,6 +106,8 @@ export default function CreateAssignmentPage() {
 
   useEffect(() => {
     setFormModuleId("");
+    setModuleSearchTerm("");
+    setIsDropdownOpen(false);
   }, [formTrackId]);
 
   // Prefill form when editing
@@ -290,23 +309,81 @@ export default function CreateAssignmentPage() {
                 </select>
               </div>
 
-              <div>
+              <div className="relative custom-select-container">
                 <label className="block text-sm text-gray-600 mb-1.5 font-medium">
                   Module
                 </label>
-                <select
-                  value={formModuleId}
-                  onChange={(e) => setFormModuleId(e.target.value)}
+                <button
+                  type="button"
                   disabled={!formTrackId}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-teal focus:ring-1 focus:ring-teal outline-none transition-colors text-sm text-gray-800 bg-white disabled:bg-gray-50"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-gray-200 focus:border-teal focus:ring-1 focus:ring-teal outline-none transition-all text-sm text-gray-800 bg-white disabled:bg-gray-50 text-left cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <option value="">Select Module</option>
-                  {modalModules.map((m: any) => (
-                    <option key={m.id} value={m.id}>
-                      {m.title}
-                    </option>
-                  ))}
-                </select>
+                  <span className={formModuleId ? "text-gray-800 font-medium" : "text-gray-400"}>
+                    {modalModules.find((m: any) => String(m.id) === String(formModuleId))?.title || "Select Module"}
+                  </span>
+                  <ChevronRight size={16} className={`text-gray-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-90" : ""}`} />
+                </button>
+
+                {isDropdownOpen && !(!formTrackId) && (
+                  <div className="absolute left-0 right-0 mt-1.5 z-20 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden flex flex-col max-h-75 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="p-2 border-b border-gray-100 bg-gray-50">
+                      <input
+                        type="text"
+                        placeholder="Search modules..."
+                        value={moduleSearchTerm}
+                        onChange={(e) => setModuleSearchTerm(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-md border border-gray-200 focus:border-teal outline-none text-xs text-gray-800 bg-white"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="overflow-y-auto flex-1 max-h-60 divide-y divide-gray-50">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormModuleId("");
+                          setIsDropdownOpen(false);
+                          setModuleSearchTerm("");
+                        }}
+                        className="w-full text-left px-4 py-2.5 hover:bg-gray-50 text-xs text-gray-400 transition-colors"
+                      >
+                        Select Module
+                      </button>
+                      {modalModules
+                        .filter((m: any) =>
+                          m.title.toLowerCase().includes(moduleSearchTerm.toLowerCase())
+                        )
+                        .map((m: any) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setFormModuleId(String(m.id));
+                              setIsDropdownOpen(false);
+                              setModuleSearchTerm("");
+                            }}
+                            className={`w-full text-left px-4 py-2.5 text-xs transition-colors flex items-center justify-between ${
+                              String(formModuleId) === String(m.id)
+                                ? "bg-teal/5 text-teal font-semibold"
+                                : "hover:bg-gray-50 text-gray-700"
+                            }`}
+                          >
+                            <span className="truncate pr-2">{m.title}</span>
+                            {String(formModuleId) === String(m.id) && (
+                              <CheckCircle size={14} className="text-teal shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                      {modalModules.filter((m: any) =>
+                        m.title.toLowerCase().includes(moduleSearchTerm.toLowerCase())
+                      ).length === 0 && (
+                        <div className="px-4 py-3 text-xs text-gray-400 italic text-center">
+                          No modules found.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

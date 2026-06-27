@@ -10,6 +10,7 @@ import {
   useGetTrackModules,
   useGetTypeModules,
   useGetSubTypeModules,
+  useGetAssignmentAnalytics,
 } from "@/query/training/instructor";
 import {
   ClipboardList,
@@ -44,6 +45,7 @@ export default function InstructorAssignmentsPage() {
   const [formTrackId, setFormTrackId] = useState<number | "">("");
   const [formModuleId, setFormModuleId] = useState<string>("");
 
+  const { data: analyticsData } = useGetAssignmentAnalytics()
   const { data: assignmentsData, isLoading: isLoadingAssignments } =
     useGetInstructorAssignment();
 
@@ -84,10 +86,10 @@ export default function InstructorAssignmentsPage() {
     const modName = item?.module?.title || "Module";
     const deadlineDate = item.deadline
       ? new Date(item.deadline).toLocaleDateString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        })
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
       : "No deadline";
 
     // Generate mock progress values based on ID
@@ -200,7 +202,7 @@ export default function InstructorAssignmentsPage() {
               Total Assignments
             </span>
             <span className="text-4xl font-extrabold text-[#00284F] tracking-tight">
-              {totalCount}
+              {analyticsData?.total_assignments ?? "..."}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-xs text-teal font-bold">
@@ -220,7 +222,7 @@ export default function InstructorAssignmentsPage() {
               Pending Reviews
             </span>
             <span className="text-4xl font-extrabold text-[#00284F] tracking-tight">
-              {pendingReviewsCount}
+              {analyticsData?.submitted_assignments ?? "..."}
             </span>
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-xs text-orange-600 font-bold bg-orange-50 w-fit px-2.5 py-1 rounded-full border border-orange-100">
@@ -240,7 +242,7 @@ export default function InstructorAssignmentsPage() {
               Avg. Class Score
             </span>
             <span className="text-4xl font-extrabold text-[#00284F] tracking-tight">
-              0%
+              {analyticsData?.average_score ?? "..."}%
             </span>
           </div>
           <div className="mt-4">
@@ -480,11 +482,10 @@ export default function InstructorAssignmentsPage() {
                     <button
                       key={pNum}
                       onClick={() => setCurrentPage(pNum)}
-                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                        isPageActive
-                          ? "bg-[#008080] text-white shadow-sm shadow-[#008080]/10"
-                          : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                      }`}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${isPageActive
+                        ? "bg-[#008080] text-white shadow-sm shadow-[#008080]/10"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                        }`}
                     >
                       {pNum}
                     </button>

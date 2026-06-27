@@ -42,3 +42,10 @@ export const getModuleSessions = async (
   );
   return response.data;
 };
+
+export const getStudentModuleProgress = async () => {
+  const response = await trainingClient.get(
+    `/student/module/progress`,
+  );
+  return response.data;
+};

@@ -7,7 +7,7 @@ import {
   useSubmitAssignment,
 } from "@/query/training/student/assignment";
 import { useRouter, useSearchParams } from "next/navigation";
-import { notify } from "@/utils/notify";
+import { getApiErrorMessage, notify } from "@/utils/notify";
 
 type Props = {
   assignmentId: string;
@@ -23,7 +23,7 @@ const formatSize = (bytes: number) => {
 const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
   const router = useRouter();
   const { data: assignments, isLoading } = useGetStudentAssignments();
-
+  const enrollmentId = useSearchParams().get("enrollmentId")
   const { mutate: submitAssignment, isPending: isSubmittingAssignment } =
     useSubmitAssignment();
 
@@ -62,9 +62,12 @@ const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
           setAgree(false);
           setSubmissionNote("");
           router.push(
-            `/lms/?enrollmentId=${useSearchParams().get("enrollmentId")}&assignmentId=${assignmentId}`,
+            `/lms/?enrollmentId=${enrollmentId}&view=assignments`,
           );
         },
+        onError: (error) => {
+          notify.error(getApiErrorMessage(error, "Failed to submit assignment"));
+        }
       },
     );
   };

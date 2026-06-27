@@ -4,6 +4,7 @@ import {
   getModuleAttendance,
   markCourseAsCompleted,
   getModuleSessions,
+  getStudentModuleProgress,
 } from "@/services/training/student";
 import { IStudentAttendanceRequest } from "@/types/training/student";
 
@@ -44,3 +45,11 @@ export const useGetModuleSessions = (moduleId: number) => {
     enabled: !!moduleId,
   });
 };
+
+export const useGetStudentProgress = () => {
+  return useQuery({
+    queryKey: ["student-progress"],
+    queryFn: getStudentModuleProgress,
+    select: (data) => data.data,
+  })
+}

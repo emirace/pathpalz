@@ -82,7 +82,7 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
             if (data.refresh_token)
               localStorage.setItem("refreshToken", data.refresh_token);
             onClose();
-            router.push("/training");
+            router.push("/dashboard");
           },
           onError: (err: any) => {
             setError(

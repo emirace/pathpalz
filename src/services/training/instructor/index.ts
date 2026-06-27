@@ -5,6 +5,7 @@ import {
   IAssignedTrack,
   IInstructorGetProgressRequest,
   IGetAttendanceByModule,
+  IAssignmentAnalytics,
 } from "@/types/training/instructor";
 import { trainingClient } from "../../api";
 
@@ -92,5 +93,10 @@ export const getSubTypeModules = async ({
   subTypeId: number;
 }) => {
   const response = await trainingClient.get(`/sub-types/${subTypeId}/modules`);
+  return response.data;
+};
+
+export const getAssignmentAnalytics = async (): Promise<IAssignmentAnalytics> => {
+  const response = await trainingClient.get(`/instructor/assignments/analytics`);
   return response.data;
 };

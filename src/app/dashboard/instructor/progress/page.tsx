@@ -2,11 +2,7 @@
 
 import React, { useState } from "react";
 import {
-  useGetInstructorAssignedTracks,
   useGetInstructorProgress,
-  useGetSubTypeModules,
-  useGetTrackModules,
-  useGetTypeModules,
   useUpdateInstructorProgress,
 } from "@/query/training/instructor";
 import {
@@ -16,6 +12,7 @@ import {
   Loader2,
   AlertCircle,
   ChevronRight,
+  ChevronDown,
   ShieldCheck,
   Video,
   Layout,
@@ -29,12 +26,13 @@ import {
   IInstructorProgressRequest,
   IGetProgressResponse,
 } from "@/types/training/instructor";
+import { useGetInstructorCourseOutline } from "@/query/training/instructor/modules";
 
 type ProgressItem = IGetProgressResponse["data"][number];
 type ProgressSession = ProgressItem["sessions"][number];
 
 export default function InstructorProgressPage() {
-  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [editingProgressId, setEditingProgressId] = useState<number | null>(
     null,
@@ -54,43 +52,23 @@ export default function InstructorProgressPage() {
 
   const [successMsg, setSuccessMsg] = useState("");
 
-  const { data: assignedTracks, isLoading: isAssignedTracks } =
-    useGetInstructorAssignedTracks();
+  const { data: courseOutline, isLoading } = useGetInstructorCourseOutline();
+  console.log(courseOutline);
+
   const { data: moduleProgress, isLoading: isLoadingProgress } =
     useGetInstructorProgress();
-  // determine the selected assigned track (contains assigned_to, type, sub_type)
-  const selectedAssign = assignedTracks?.find(
-    (a) => a.track.id === selectedTrackId,
-  );
 
-  const selectedTrackIdSafe = selectedAssign?.track?.id ?? 0;
-  const selectedTypeId = selectedAssign?.track?.type?.id ?? 0;
-  const selectedSubTypeId = selectedAssign?.track?.sub_type?.id ?? 0;
+  const selectedCourse = courseOutline?.find(
+    (item) => item.course.id === selectedCourseId,
+  )?.course;
 
-  // call all hooks but pass safe ids (0 when not available). hooks' `enabled` flags prevent unwanted fetches.
-  const { data: trackModulesData, isLoading: isLoadingModules } =
-    useGetTrackModules(selectedTrackIdSafe as number);
-  const { data: typeModulesData, isLoading: isLoadingTypeModules } =
-    useGetTypeModules(selectedTypeId as number);
-  const { data: subTypeModulesData, isLoading: isLoadingSubTypeModules } =
-    useGetSubTypeModules(selectedSubTypeId as number);
+  // Flatten all modules from the selected course's structure
+  const modules = (selectedCourse?.course_structure?.flatMap((h) => h.modules) || []) as any[];
 
-  // resolve the actual modules list and loading state depending on assignment type
-  const modules =
-    (selectedAssign?.assigned_to === "TrainingTrack" &&
-      trackModulesData?.modules) ||
-    (selectedAssign?.assigned_to === "Type" && typeModulesData) ||
-    (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
-    [];
-
-  const isLoadingSelectedModules =
-    selectedAssign?.assigned_to === "TrainingTrack"
-      ? isLoadingModules
-      : selectedAssign?.assigned_to === "Type"
-        ? isLoadingTypeModules
-        : selectedAssign?.assigned_to === "TypeSub"
-          ? isLoadingSubTypeModules
-          : false;
+  const [openHeaders, setOpenHeaders] = useState<Record<number, boolean>>({});
+  const toggleHeader = (id: number) => {
+    setOpenHeaders((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
   const {
     mutate: updateProgress,
     isPending,
@@ -265,38 +243,37 @@ export default function InstructorProgressPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Track Selection */}
+        {/* Course Selection */}
         <div className="lg:col-span-1 space-y-6">
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-              Your Tracks
+              Your Courses
             </h2>
-            {isAssignedTracks ? (
+            {isLoading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="animate-spin text-teal" />
               </div>
             ) : (
               <div className="space-y-2">
-                {assignedTracks?.map((assign) => (
+                {courseOutline?.map((item) => (
                   <button
-                    key={assign.track.id}
+                    key={item.course.id}
                     onClick={() => {
-                      setSelectedTrackId(assign.track.id);
+                      setSelectedCourseId(item.course.id);
                       setSelectedModuleId(null);
                     }}
-                    className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      selectedTrackId === assign.track.id
-                        ? "border-teal bg-teal/5 text-teal shadow-sm"
-                        : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
-                    }`}
+                    className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${selectedCourseId === item.course.id
+                      ? "border-teal bg-teal/5 text-teal shadow-sm"
+                      : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
+                      }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
-                      {assign.track.title}
+                      {item.course.title}
                     </span>
                     <ChevronRight
                       size={14}
                       className={
-                        selectedTrackId === assign.track.id
+                        selectedCourseId === item.course.id
                           ? "opacity-100"
                           : "opacity-0 group-hover:opacity-100"
                       }
@@ -310,14 +287,14 @@ export default function InstructorProgressPage() {
 
         {/* Modules and Form */}
         <div className="lg:col-span-3 space-y-8">
-          {!selectedTrackId ? (
+          {!selectedCourseId ? (
             <div className="h-64 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12 text-center bg-white/50">
               <BookOpen size={48} className="text-gray-200 mb-4" />
               <h3 className="text-lg font-bold text-gray-500">
-                Select a Track
+                Select a Course
               </h3>
               <p className="text-gray-400 max-w-xs">
-                Select a training track to manage its modules.
+                Select a training course to manage its modules.
               </p>
             </div>
           ) : (
@@ -329,40 +306,71 @@ export default function InstructorProgressPage() {
                     Select Module
                   </h2>
                 </div>
-                <div className="flex-1 overflow-y-auto max-h-125">
-                  {isLoadingSelectedModules ? (
+                <div className="flex-1 overflow-y-auto max-h-125 p-4">
+                  {isLoading ? (
                     <div className="flex justify-center py-10">
                       <Loader2 className="animate-spin text-teal" />
                     </div>
                   ) : (
-                    <div className="divide-y divide-gray-50">
-                      {modules.map((module: any) => (
-                        <button
-                          key={module.id}
-                          onClick={() => setSelectedModuleId(module.id)}
-                          className={`w-full text-left p-4 transition-colors flex items-center justify-between group ${
-                            selectedModuleId === module.id
-                              ? "bg-teal/5"
-                              : "hover:bg-gray-50/50"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`p-2 rounded-lg ${selectedModuleId === module.id ? "bg-teal text-white" : "bg-gray-100 text-gray-400 group-hover:bg-teal/10 group-hover:text-teal"}`}
-                            >
-                              <BookOpen size={16} />
-                            </div>
-                            <span
-                              className={`text-sm font-semibold transition-colors ${selectedModuleId === module.id ? "text-teal" : "text-gray-700"}`}
-                            >
-                              {module.title}
+                    <div className="space-y-3">
+                      {selectedCourse?.course_structure?.map((header: any, index: number) => (
+                        <div key={header.header_id} className="border border-gray-100 rounded-xl overflow-hidden">
+                          <button
+                            onClick={() => toggleHeader(header.header_id)}
+                            className="w-full flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-50 transition-colors text-left"
+                          >
+                            <span className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                              {openHeaders[header.header_id] ? (
+                                <ChevronDown size={16} className="text-gray-400" />
+                              ) : (
+                                <ChevronRight size={16} className="text-gray-400" />
+                              )}
+                              Module {index + 1}: {header.title}
                             </span>
-                          </div>
-                          {selectedModuleId === module.id && (
-                            <CheckCircle size={16} className="text-teal" />
+                          </button>
+
+                          {openHeaders[header.header_id] && (
+                            <div className="divide-y divide-gray-50 bg-white border-t border-gray-100">
+                              {header.modules.map((module: any) => (
+                                <button
+                                  key={module.id}
+                                  onClick={() => setSelectedModuleId(module.id)}
+                                  className={`w-full text-left p-4 transition-colors flex items-center justify-between group ${selectedModuleId === module.id
+                                    ? "bg-teal/5"
+                                    : "hover:bg-gray-50/50"
+                                    }`}
+                                >
+                                  <div className="flex items-center gap-3 pl-4">
+                                    <div
+                                      className={`p-2 rounded-lg ${selectedModuleId === module.id ? "bg-teal text-white" : "bg-gray-100 text-gray-400 group-hover:bg-teal/10 group-hover:text-teal"}`}
+                                    >
+                                      <BookOpen size={16} />
+                                    </div>
+                                    <span
+                                      className={`text-sm font-semibold transition-colors ${selectedModuleId === module.id ? "text-teal" : "text-gray-700"}`}
+                                    >
+                                      {module.title}
+                                    </span>
+                                  </div>
+                                  {selectedModuleId === module.id && (
+                                    <CheckCircle size={16} className="text-teal" />
+                                  )}
+                                </button>
+                              ))}
+                              {header.modules.length === 0 && (
+                                <div className="p-4 text-xs text-gray-400 italic pl-8">
+                                  No lessons available.
+                                </div>
+                              )}
+                            </div>
                           )}
-                        </button>
+                        </div>
                       ))}
+                      {(!selectedCourse?.course_structure || selectedCourse.course_structure.length === 0) && (
+                        <div className="text-center py-10 text-gray-400">
+                          No course structure available.
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -714,11 +722,11 @@ export default function InstructorProgressPage() {
                   {progressData.map((item) => {
                     const latestSession = item.sessions?.length
                       ? item.sessions.reduce((latest, s) =>
-                          new Date(s.training_date) >
+                        new Date(s.training_date) >
                           new Date(latest.training_date)
-                            ? s
-                            : latest,
-                        )
+                          ? s
+                          : latest,
+                      )
                       : null;
                     const isEditing = editingProgressId === item.progress_id;
 

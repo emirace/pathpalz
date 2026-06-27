@@ -10,6 +10,7 @@ import {
   getInstructorAssignedTracks,
   getTypeModules,
   getSubTypeModules,
+  getAssignmentAnalytics,
 } from "@/services/training/instructor";
 import { IInstructorProgressRequest } from "@/types/training/instructor";
 
@@ -96,6 +97,15 @@ export const useGetSubTypeModules = (subTypeId: number) => {
     queryKey: ["sub-type-modules", subTypeId],
     queryFn: () => getSubTypeModules({ subTypeId }),
     enabled: !!subTypeId,
+    select: (response) => response.data,
+  });
+};
+
+
+export const useGetAssignmentAnalytics = () => {
+  return useQuery({
+    queryKey: ["assignment-analytics"],
+    queryFn: getAssignmentAnalytics,
     select: (response) => response.data,
   });
 };

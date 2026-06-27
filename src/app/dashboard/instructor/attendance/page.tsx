@@ -1,15 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useGetTracks } from "@/query/training/tracks";
 import {
-  useGetTrackModules,
   useGetStudentAttendancePerModule,
   useUpdateStudentAttendance,
-  useGetInstructorAssignedTracks,
-  useGetTypeModules,
-  useGetSubTypeModules,
 } from "@/query/training/instructor";
+import { useGetInstructorCourseOutline } from "@/query/training/instructor/modules";
 import {
   CheckCircle,
   Circle,
@@ -17,6 +13,7 @@ import {
   Loader2,
   BookOpen,
   ChevronRight,
+  ChevronDown,
   ShieldCheck,
   Users,
   Search,
@@ -24,50 +21,28 @@ import {
 import { IStudentAttendace } from "@/types/training/instructor";
 
 export default function InstructorAttendancePage() {
-  const [selectedTrackId, setSelectedTrackId] = useState<number | null>(null);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [selectedModuleId, setSelectedModuleId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { data: assignedTracks, isLoading: isAssignedTracks } =
-    useGetInstructorAssignedTracks();
-
-  // determine the selected assigned track (contains assigned_to, type, sub_type)
-  const selectedAssign = assignedTracks?.find(
-    (a) => a.track.id === selectedTrackId,
-  );
-
-  const selectedTrackIdSafe = selectedAssign?.track?.id ?? 0;
-  const selectedTypeId = selectedAssign?.track?.type?.id ?? 0;
-  const selectedSubTypeId = selectedAssign?.track?.sub_type?.id ?? 0;
-
-  const { data: trackModulesData, isLoading: isLoadingModules } =
-    useGetTrackModules(selectedTrackIdSafe as number);
-  const { data: typeModulesData, isLoading: isLoadingTypeModules } =
-    useGetTypeModules(selectedTypeId as number);
-  const { data: subTypeModulesData, isLoading: isLoadingSubTypeModules } =
-    useGetSubTypeModules(selectedSubTypeId as number);
+  const { data: courseOutline, isLoading } = useGetInstructorCourseOutline();
 
   const { data: moduleAttendance, isLoading: isLoadingAttendance } =
     useGetStudentAttendancePerModule(selectedModuleId as number);
   const { mutate: updateAttendance, isPending: isUpdating } =
     useUpdateStudentAttendance();
 
-  // resolve the actual modules list and loading state depending on assignment type
-  const modules =
-    (selectedAssign?.assigned_to === "TrainingTrack" &&
-      trackModulesData?.modules) ||
-    (selectedAssign?.assigned_to === "Type" && typeModulesData) ||
-    (selectedAssign?.assigned_to === "TypeSub" && subTypeModulesData) ||
-    [];
+  const selectedCourse = courseOutline?.find(
+    (item) => item.course.id === selectedCourseId,
+  )?.course;
 
-  const isLoadingSelectedModules =
-    selectedAssign?.assigned_to === "TrainingTrack"
-      ? isLoadingModules
-      : selectedAssign?.assigned_to === "Type"
-        ? isLoadingTypeModules
-        : selectedAssign?.assigned_to === "TypeSub"
-          ? isLoadingSubTypeModules
-          : false;
+  // Flatten all modules from the selected course's structure
+  const modules = (selectedCourse?.course_structure?.flatMap((h) => h.modules) || []) as any[];
+
+  const [openHeaders, setOpenHeaders] = useState<Record<number, boolean>>({});
+  const toggleHeader = (id: number) => {
+    setOpenHeaders((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const handleToggleAttendance = (
     studentId: number,
@@ -113,38 +88,38 @@ export default function InstructorAttendancePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Track & Module Selection */}
+        {/* Course & Module Selection */}
         <div className="lg:col-span-1 space-y-6">
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <BookOpen size={16} /> Select Track
+              <BookOpen size={16} /> Select Course
             </h2>
-            {isLoadingSelectedModules ? (
+            {isLoading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="animate-spin text-teal" />
               </div>
             ) : (
               <div className="space-y-2">
-                {assignedTracks?.map((track) => (
+                {courseOutline?.map((item) => (
                   <button
-                    key={track.track.id}
+                    key={item.course.id}
                     onClick={() => {
-                      setSelectedTrackId(track.track.id);
+                      setSelectedCourseId(item.course.id);
                       setSelectedModuleId(null);
                     }}
                     className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                      selectedTrackId === track.track.id
+                      selectedCourseId === item.course.id
                         ? "border-teal bg-teal/5 text-teal shadow-sm"
                         : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
                     }`}
                   >
                     <span className="font-bold text-xs truncate pr-2">
-                      {track.track.title}
+                      {item.course.title}
                     </span>
                     <ChevronRight
                       size={14}
                       className={
-                        selectedTrackId === track.track.id
+                        selectedCourseId === item.course.id
                           ? "opacity-100"
                           : "opacity-0 group-hover:opacity-100"
                       }
@@ -155,34 +130,60 @@ export default function InstructorAttendancePage() {
             )}
           </div>
 
-          {selectedTrackId && (
+          {selectedCourseId && (
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm animate-in fade-in slide-in-from-top-2">
               <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                 <Calendar size={16} /> Select Module
               </h2>
-              {isLoadingModules ? (
+              {isLoading ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="animate-spin text-teal" />
                 </div>
               ) : (
-                <div className="space-y-2 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
-                  {modules?.map((module: any) => (
-                    <button
-                      key={module.id}
-                      onClick={() => setSelectedModuleId(module.id)}
-                      className={`w-full text-left p-3 rounded-xl border transition-all duration-200 flex items-center justify-between group ${
-                        selectedModuleId === module.id
-                          ? "border-teal bg-teal/5 text-teal shadow-sm"
-                          : "border-gray-100 hover:border-teal/30 text-gray-400 hover:bg-gray-50"
-                      }`}
-                    >
-                      <span className="font-semibold text-xs truncate pr-2">
-                        {module.title}
-                      </span>
-                      {selectedModuleId === module.id && (
-                        <CheckCircle size={14} className="text-teal" />
+                <div className="space-y-3 max-h-125 overflow-y-auto pr-2 custom-scrollbar">
+                  {selectedCourse?.course_structure?.map((header: any, index: number) => (
+                    <div key={header.header_id} className="border border-gray-100 rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => toggleHeader(header.header_id)}
+                        className="w-full flex items-center justify-between p-3 bg-gray-50/50 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <span className="text-[11px] font-bold text-gray-700 flex items-center gap-1.5 leading-tight">
+                          {openHeaders[header.header_id] ? (
+                            <ChevronDown size={14} className="text-gray-400 shrink-0" />
+                          ) : (
+                            <ChevronRight size={14} className="text-gray-400 shrink-0" />
+                          )}
+                          Mod {index + 1}: {header.title}
+                        </span>
+                      </button>
+
+                      {openHeaders[header.header_id] && (
+                        <div className="divide-y divide-gray-50 bg-white border-t border-gray-100">
+                          {header.modules.map((module: any) => (
+                            <button
+                              key={module.id}
+                              onClick={() => setSelectedModuleId(module.id)}
+                              className={`w-full text-left p-3 transition-colors flex items-center justify-between group ${selectedModuleId === module.id
+                                ? "bg-teal/5"
+                                : "hover:bg-gray-50/50"
+                                }`}
+                            >
+                              <span className={`text-[11px] font-semibold transition-colors truncate pr-2 ${selectedModuleId === module.id ? "text-teal" : "text-gray-700"}`}>
+                                {module.title}
+                              </span>
+                              {selectedModuleId === module.id && (
+                                <CheckCircle size={12} className="text-teal shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                          {header.modules.length === 0 && (
+                            <div className="p-3 text-[10px] text-gray-400 italic pl-4">
+                              No lessons available.
+                            </div>
+                          )}
+                        </div>
                       )}
-                    </button>
+                    </div>
                   ))}
                 </div>
               )}
@@ -201,7 +202,7 @@ export default function InstructorAttendancePage() {
                 No Module Selected
               </h3>
               <p className="text-gray-400 max-w-sm mt-2">
-                Please select a track and a module from the sidebar to manage
+                Please select a course and a module from the sidebar to manage
                 student attendance.
               </p>
             </div>

@@ -162,3 +162,18 @@ export interface IGetAttendanceByModule {
   };
   data: IStudentAttendace[];
 }
+
+export interface IAssignmentAnalytics {
+  success: boolean,
+  data: {
+    total_assignments: number,
+    total_submissions: number,
+    submitted_count: number,
+    graded_count: number,
+    passed_count: number,
+    failed_count: number,
+    submitted_assignments: number,
+    not_submitted_assignments: number,
+    average_score: number
+  }
+}
