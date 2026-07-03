@@ -15,8 +15,8 @@ export const generateDiscountCode = async (
   }
 
   if (payload.beneficiary_emails) {
-    payload.beneficiary_emails.forEach((email) => {
-      form.append("beneficiary_emails", email);
+    payload.beneficiary_emails.forEach((email, index) => {
+      form.append(`beneficiary_emails[${index}]`, email);
     });
   }
 

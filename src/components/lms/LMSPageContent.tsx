@@ -88,8 +88,8 @@ function LMSPageContent() {
     index: number;
   }>({ index: 0 });
 
-  const { data: studentProgress } = useGetStudentProgress()
-  console.log(studentProgress)
+  const { data: studentProgress } = useGetStudentProgress({ course_module_id: moduleIdParam ? Number(moduleIdParam) : undefined });
+
   const { data: enrollment, isLoading: isEnrollmentLoading } =
     useGetEnrollmentById(enrollmentId || "");
   const moduleId = moduleIdParam ? Number(moduleIdParam) : undefined;
@@ -126,9 +126,7 @@ function LMSPageContent() {
       {
         onSuccess: () => notify.success("Marked as attended!"),
         onError: (error) =>
-          notify.error(
-            getApiErrorMessage(error, "Failed to mark attendance"),
-          ),
+          notify.error(getApiErrorMessage(error, "Failed to mark attendance")),
       },
     );
   };
@@ -141,9 +139,7 @@ function LMSPageContent() {
       {
         onSuccess: () => notify.success("Module marked as completed!"),
         onError: (err) =>
-          notify.error(
-            getApiErrorMessage(err, "Failed to mark as completed."),
-          ),
+          notify.error(getApiErrorMessage(err, "Failed to mark as completed.")),
       },
     );
   };
@@ -297,8 +293,8 @@ function LMSPageContent() {
                       setSelectedSessionSelection({ moduleId, index })
                     }
                     className={`min-w-40 rounded-xl border px-4 py-3 text-left transition-all ${isSelected
-                        ? "border-teal bg-teal text-white shadow-md shadow-teal/20"
-                        : "border-gray-100 bg-white text-[#00284F] hover:border-teal/40 hover:bg-teal/5"
+                      ? "border-teal bg-teal text-white shadow-md shadow-teal/20"
+                      : "border-gray-100 bg-white text-[#00284F] hover:border-teal/40 hover:bg-teal/5"
                       }`}
                   >
                     <span className="block text-xs font-black uppercase tracking-widest">
@@ -481,7 +477,7 @@ function LMSPageContent() {
 
           <button
             onClick={handleMarkCompleted}
-            disabled={markCompletedMutation.isPending}
+            disabled={markCompletedMutation.isPending || studentProgress?.modules[0]?.is_completed}
             className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2"
           >
             {markCompletedMutation.isPending ? (

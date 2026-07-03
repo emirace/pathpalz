@@ -49,6 +49,7 @@ export interface ISubmission {
     file_path: string;
     file_name: string;
     file_size: number;
+    file_url: string;
   }[];
   submission_note: string;
   score?: string;

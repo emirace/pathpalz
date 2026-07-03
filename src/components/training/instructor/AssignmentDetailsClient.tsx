@@ -365,7 +365,7 @@ export default function AssignmentDetailsClient() {
                     </div>
                   </div>
                   <a
-                    href={f.file_path}
+                    href={f.file_url}
                     target="_blank"
                     className="text-teal cursor-pointer hover:text-teal/80 text-xs font-bold flex items-center gap-1"
                   >

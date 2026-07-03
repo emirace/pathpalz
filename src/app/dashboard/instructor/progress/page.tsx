@@ -83,6 +83,7 @@ export default function InstructorProgressPage() {
     setSuccessMsg("");
 
     const selectedModule = modules.find((m: any) => m.id === selectedModuleId);
+    console.log(selectedModule)
     updateProgress(
       {
         course_module_id: selectedModuleId,

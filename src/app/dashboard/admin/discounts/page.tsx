@@ -6,6 +6,7 @@ import {
   useCreateDiscount,
   useUpdateDiscount,
   useDeleteDiscount,
+  useGetDiscountCodes,
 } from "@/query/admin/discount";
 import {
   ICreateDiscountReponse,
@@ -38,15 +39,24 @@ const EMPTY_FORM = {
 };
 
 export default function AdminDiscountsPage() {
-  const { data: discountsRaw, isLoading } = useGetDiscounts();
+  const { data: discountsRaw, isLoading: isLoadingRules } = useGetDiscounts();
   const { mutate: createDiscount, isPending: isCreating } = useCreateDiscount();
   const { mutate: updateDiscount, isPending: isUpdating } = useUpdateDiscount();
   const { mutate: deleteDiscount, isPending: isDeleting } = useDeleteDiscount();
+  const { data: discountCodesRaw, isLoading: isLoadingCodes } =
+    useGetDiscountCodes();
+
+  const [activeTab, setActiveTab] = useState<"rules" | "codes">("rules");
 
   // The API returns { message, data } or just an array — handle both shapes
   const discounts: ICreateDiscountReponse[] = Array.isArray(discountsRaw)
     ? discountsRaw
     : ((discountsRaw as any)?.data ?? []);
+
+  const discountCodes = discountCodesRaw?.data ?? [];
+  console.log("discountCodesRaw", discountCodesRaw, discountCodes);
+  const usedCodesCount = discountCodes.filter((code) => code.is_used).length;
+  const unusedCodesCount = discountCodes.length - usedCodesCount;
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -165,77 +175,280 @@ export default function AdminDiscountsPage() {
             Create and manage promotional discount codes for course enrolments.
           </p>
         </div>
+        {activeTab === "rules" && (
+          <button
+            onClick={openCreate}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00284F] text-white text-sm font-bold rounded-xl hover:bg-[#001D39] transition-colors shadow-sm"
+          >
+            <Plus size={16} />
+            New Discount
+          </button>
+        )}
+      </div>
+
+      <div className="mb-6 flex flex-wrap gap-3">
         <button
-          onClick={openCreate}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00284F] text-white text-sm font-bold rounded-xl hover:bg-[#001D39] transition-colors shadow-sm"
+          type="button"
+          onClick={() => setActiveTab("rules")}
+          className={`px-4 py-2 rounded-2xl border text-sm font-bold transition-colors ${
+            activeTab === "rules"
+              ? "bg-[#00284F] text-white border-[#00284F]"
+              : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+          }`}
         >
-          <Plus size={16} />
-          New Discount
+          Discount Rules
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("codes")}
+          className={`px-4 py-2 rounded-2xl border text-sm font-bold transition-colors ${
+            activeTab === "codes"
+              ? "bg-[#00284F] text-white border-[#00284F]"
+              : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+          }`}
+        >
+          Discount Codes
         </button>
       </div>
 
       {/* ── Stats Strip ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-            <Tag size={20} />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Total
-            </p>
-            <p className="text-2xl font-extrabold text-[#00284F]">
-              {discounts.length}
-            </p>
-          </div>
-        </div>
+        {activeTab === "rules" ? (
+          <>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                <Tag size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Total Rules
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {discounts.length}
+                </p>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-          <div className="p-3 bg-green-50 text-green-600 rounded-lg">
-            <Check size={20} />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Active
-            </p>
-            <p className="text-2xl font-extrabold text-[#00284F]">
-              {activeCount}
-            </p>
-          </div>
-        </div>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-green-50 text-green-600 rounded-lg">
+                <Check size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Active Rules
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {activeCount}
+                </p>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
-          <div className="p-3 bg-orange-50 text-orange-500 rounded-lg">
-            <Percent size={20} />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Inactive
-            </p>
-            <p className="text-2xl font-extrabold text-[#00284F]">
-              {discounts.length - activeCount}
-            </p>
-          </div>
-        </div>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-orange-50 text-orange-500 rounded-lg">
+                <Percent size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Inactive Rules
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {discounts.length - activeCount}
+                </p>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                <Tag size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Total Codes
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {discountCodesRaw?.total ?? discountCodes.length}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-green-50 text-green-600 rounded-lg">
+                <Check size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Used Codes
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {usedCodesCount}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+              <div className="p-3 bg-orange-50 text-orange-500 rounded-lg">
+                <Percent size={20} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Available Codes
+                </p>
+                <p className="text-2xl font-extrabold text-[#00284F]">
+                  {unusedCodesCount}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Discounts Table ──────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
           <h2 className="text-sm font-bold text-[#00284F] uppercase tracking-wider">
-            All Discounts
+            {activeTab === "rules"
+              ? "All Discount Rules"
+              : "All Discount Codes"}
           </h2>
         </div>
 
-        {isLoading ? (
+        {activeTab === "rules" ? (
+          isLoadingRules ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="animate-spin text-teal w-6 h-6" />
+            </div>
+          ) : discounts.length === 0 ? (
+            <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
+              <Tag size={36} strokeWidth={1.5} />
+              <p className="text-sm font-medium">
+                No discounts yet. Create your first one.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm text-left">
+                <thead>
+                  <tr className="text-[10px] text-gray-400 uppercase tracking-widest border-b border-gray-100 font-black">
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Discount</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Created</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {discounts.map((discount) => (
+                    <tr
+                      key={discount.id}
+                      className="hover:bg-gray-50/50 transition-colors text-gray-600"
+                    >
+                      {/* Name */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                            <Tag size={14} />
+                          </div>
+                          <span className="font-bold text-[#00284F]">
+                            {discount.name}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Percentage */}
+                      <td className="px-6 py-4">
+                        <span className="inline-flex items-center gap-1 font-extrabold text-[#00284F] text-base">
+                          {discount.percentage}
+                          <span className="text-xs font-bold text-gray-400">
+                            %
+                          </span>
+                        </span>
+                      </td>
+
+                      {/* Active Badge */}
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            discount.is_active
+                              ? "bg-green-50 text-green-600 border border-green-100"
+                              : "bg-gray-100 text-gray-400 border border-gray-200"
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${discount.is_active ? "bg-green-500" : "bg-gray-400"}`}
+                          />
+                          {discount.is_active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+
+                      {/* Created */}
+                      <td className="px-6 py-4 text-xs text-gray-400 font-medium">
+                        {new Date(discount.created_at).toLocaleDateString(
+                          undefined,
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          },
+                        )}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2">
+                          {/* Toggle active */}
+                          <button
+                            title={
+                              discount.is_active ? "Deactivate" : "Activate"
+                            }
+                            onClick={() => handleToggleActive(discount)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                          >
+                            {discount.is_active ? (
+                              <ToggleRight
+                                size={18}
+                                className="text-green-500"
+                              />
+                            ) : (
+                              <ToggleLeft size={18} />
+                            )}
+                          </button>
+
+                          {/* Edit */}
+                          <button
+                            title="Edit"
+                            onClick={() => openEdit(discount)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-[#00284F] hover:bg-gray-100 transition-colors"
+                          >
+                            <Pencil size={15} />
+                          </button>
+
+                          {/* Delete */}
+                          <button
+                            title="Delete"
+                            onClick={() => setDeleteConfirm(discount)}
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : isLoadingCodes ? (
           <div className="flex justify-center py-16">
             <Loader2 className="animate-spin text-teal w-6 h-6" />
           </div>
-        ) : discounts.length === 0 ? (
+        ) : discountCodes.length === 0 ? (
           <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
             <Tag size={36} strokeWidth={1.5} />
             <p className="text-sm font-medium">
-              No discounts yet. Create your first one.
+              No discount codes yet. Generate your first one.
             </p>
           </div>
         ) : (
@@ -243,103 +456,54 @@ export default function AdminDiscountsPage() {
             <table className="min-w-full text-sm text-left">
               <thead>
                 <tr className="text-[10px] text-gray-400 uppercase tracking-widest border-b border-gray-100 font-black">
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Discount</th>
-                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Code</th>
+                  <th className="px-6 py-4">Rule</th>
+                  <th className="px-6 py-4">Student</th>
+                  <th className="px-6 py-4">Used</th>
+                  <th className="px-6 py-4">Expires</th>
                   <th className="px-6 py-4">Created</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">Email</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {discounts.map((discount) => (
+                {discountCodes.map((code) => (
                   <tr
-                    key={discount.id}
+                    key={code.id}
                     className="hover:bg-gray-50/50 transition-colors text-gray-600"
                   >
-                    {/* Name */}
+                    <td className="px-6 py-4 font-bold text-[#00284F]">
+                      {code.code}
+                    </td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
-                          <Tag size={14} />
-                        </div>
-                        <span className="font-bold text-[#00284F]">
-                          {discount.name}
-                        </span>
+                      <div className="text-[#00284F] font-semibold">
+                        {code.discount_rule?.name ?? "Unknown rule"}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {code.discount_rule?.percentage}%
                       </div>
                     </td>
-
-                    {/* Percentage */}
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1 font-extrabold text-[#00284F] text-base">
-                        {discount.percentage}
-                        <span className="text-xs font-bold text-gray-400">
-                          %
-                        </span>
-                      </span>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {code.is_student ? "Yes" : "No"}
                     </td>
-
-                    {/* Active Badge */}
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          discount.is_active
-                            ? "bg-green-50 text-green-600 border border-green-100"
-                            : "bg-gray-100 text-gray-400 border border-gray-200"
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${discount.is_active ? "bg-green-500" : "bg-gray-400"}`}
-                        />
-                        {discount.is_active ? "Active" : "Inactive"}
-                      </span>
+                    <td className="px-6 py-4 text-sm font-black uppercase tracking-wider">
+                      {code.is_used ? "Used" : "Available"}
                     </td>
-
-                    {/* Created */}
                     <td className="px-6 py-4 text-xs text-gray-400 font-medium">
-                      {new Date(discount.created_at).toLocaleDateString(
-                        undefined,
-                        {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        },
-                      )}
+                      {new Date(code.expires_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </td>
-
-                    {/* Actions */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        {/* Toggle active */}
-                        <button
-                          title={discount.is_active ? "Deactivate" : "Activate"}
-                          onClick={() => handleToggleActive(discount)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
-                        >
-                          {discount.is_active ? (
-                            <ToggleRight size={18} className="text-green-500" />
-                          ) : (
-                            <ToggleLeft size={18} />
-                          )}
-                        </button>
-
-                        {/* Edit */}
-                        <button
-                          title="Edit"
-                          onClick={() => openEdit(discount)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-[#00284F] hover:bg-gray-100 transition-colors"
-                        >
-                          <Pencil size={15} />
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          title="Delete"
-                          onClick={() => setDeleteConfirm(discount)}
-                          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 text-xs text-gray-400 font-medium">
+                      {new Date(code.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {code.email}
                     </td>
                   </tr>
                 ))}
@@ -641,7 +805,7 @@ export default function AdminDiscountsPage() {
           />
           <div className="relative bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 p-6">
             <div className="flex items-start gap-4 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0 mt-0.5">
+              <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
                 <Trash2 size={18} />
               </div>
               <div>

@@ -46,10 +46,14 @@ export const useGetModuleSessions = (moduleId: number) => {
   });
 };
 
-export const useGetStudentProgress = () => {
+export const useGetStudentProgress = (data: {
+  type_id?: number;
+  sub_type_id?: number;
+  track_id?: number;
+  course_module_id?: number
+}) => {
   return useQuery({
-    queryKey: ["student-progress"],
-    queryFn: getStudentModuleProgress,
-    select: (data) => data.data,
-  })
-}
+    queryKey: ["student-progress", data],
+    queryFn: () => getStudentModuleProgress(data),
+  });
+};
