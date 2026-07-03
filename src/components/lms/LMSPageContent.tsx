@@ -88,7 +88,9 @@ function LMSPageContent() {
     index: number;
   }>({ index: 0 });
 
-  const { data: studentProgress } = useGetStudentProgress({ course_module_id: moduleIdParam ? Number(moduleIdParam) : undefined });
+  const { data: studentProgress } = useGetStudentProgress({
+    course_module_id: moduleIdParam ? Number(moduleIdParam) : undefined,
+  });
 
   const { data: enrollment, isLoading: isEnrollmentLoading } =
     useGetEnrollmentById(enrollmentId || "");
@@ -292,23 +294,26 @@ function LMSPageContent() {
                     onClick={() =>
                       setSelectedSessionSelection({ moduleId, index })
                     }
-                    className={`min-w-40 rounded-xl border px-4 py-3 text-left transition-all ${isSelected
-                      ? "border-teal bg-teal text-white shadow-md shadow-teal/20"
-                      : "border-gray-100 bg-white text-[#00284F] hover:border-teal/40 hover:bg-teal/5"
-                      }`}
+                    className={`min-w-40 rounded-xl border px-4 py-3 text-left transition-all ${
+                      isSelected
+                        ? "border-teal bg-teal text-white shadow-md shadow-teal/20"
+                        : "border-gray-100 bg-white text-[#00284F] hover:border-teal/40 hover:bg-teal/5"
+                    }`}
                   >
                     <span className="block text-xs font-black uppercase tracking-widest">
                       Session {index + 1}
                     </span>
                     <span
-                      className={`mt-1 block text-sm font-bold ${isSelected ? "text-white" : "text-[#00284F]"
-                        }`}
+                      className={`mt-1 block text-sm font-bold ${
+                        isSelected ? "text-white" : "text-[#00284F]"
+                      }`}
                     >
                       {sessionDateLabel}
                     </span>
                     <span
-                      className={`mt-2 block text-[11px] font-bold ${isSelected ? "text-white/80" : "text-gray-500"
-                        }`}
+                      className={`mt-2 block text-[11px] font-bold ${
+                        isSelected ? "text-white/80" : "text-gray-500"
+                      }`}
                     >
                       {session.recorded_link
                         ? "Recording"
@@ -390,8 +395,9 @@ function LMSPageContent() {
             <div className="relative z-10">
               <div className="inline-flex items-center gap-1.5 bg-teal text-white text-[10px] uppercase tracking-widest font-bold px-2.5 py-1 rounded-full mb-4">
                 <div
-                  className={`w-1.5 h-1.5 bg-white rounded-full ${canJoinLiveSession ? "animate-pulse" : ""
-                    }`}
+                  className={`w-1.5 h-1.5 bg-white rounded-full ${
+                    canJoinLiveSession ? "animate-pulse" : ""
+                  }`}
                 ></div>
                 {canJoinLiveSession ? "Live Today" : "Session"}
               </div>
@@ -402,13 +408,13 @@ function LMSPageContent() {
               <p className="text-white/70 text-sm mb-6 leading-relaxed">
                 {selectedSession?.training_date
                   ? `Scheduled for ${formatTrainingDate(
-                    selectedSession.training_date,
-                    {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    },
-                  )}.`
+                      selectedSession.training_date,
+                      {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )}.`
                   : "No live session date is available yet."}
               </p>
 
@@ -452,7 +458,7 @@ function LMSPageContent() {
           </button>
 
           {/* Course Progress Card */}
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+          {/* <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-bold text-[#00284F]">
                 Course Progress
@@ -473,11 +479,14 @@ function LMSPageContent() {
               </p>
               <p className="text-xl font-black text-[#00284F]">12/18</p>
             </div>
-          </div>
+          </div> */}
 
           <button
             onClick={handleMarkCompleted}
-            disabled={markCompletedMutation.isPending || studentProgress?.modules[0]?.is_completed}
+            disabled={
+              markCompletedMutation.isPending ||
+              studentProgress?.modules[0]?.is_completed
+            }
             className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2"
           >
             {markCompletedMutation.isPending ? (
