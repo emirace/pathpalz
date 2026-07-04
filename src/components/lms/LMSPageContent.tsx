@@ -10,6 +10,7 @@ import {
   useGetModuleAttendance,
   useGetModuleSessions,
   useGetStudentProgress,
+  useGetStudentProgressByModuleId,
   useMarkAttendance,
   useMarkCourseAsCompleted,
 } from "@/query/training/student";
@@ -88,9 +89,9 @@ function LMSPageContent() {
     index: number;
   }>({ index: 0 });
 
-  const { data: studentProgress } = useGetStudentProgress({
-    course_module_id: moduleIdParam ? Number(moduleIdParam) : undefined,
-  });
+  const { data: studentProgress } = useGetStudentProgressByModuleId(
+    Number(moduleIdParam),
+  );
 
   const { data: enrollment, isLoading: isEnrollmentLoading } =
     useGetEnrollmentById(enrollmentId || "");
@@ -158,6 +159,10 @@ function LMSPageContent() {
     console.log("Attendance check for module", moduleId, ":", result);
     return result;
   };
+
+  const isCompleted = studentProgress?.some(
+    (progress) => progress?.course_module_id === Number(moduleId),
+  );
 
   if (isEnrollmentLoading || !enrollmentId) {
     return (
@@ -483,16 +488,13 @@ function LMSPageContent() {
 
           <button
             onClick={handleMarkCompleted}
-            disabled={
-              markCompletedMutation.isPending ||
-              studentProgress?.modules[0]?.is_completed
-            }
-            className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2"
+            disabled={markCompletedMutation.isPending || isCompleted}
+            className="w-full bg-teal text-white py-3.5 rounded-xl font-bold hover:bg-teal/90 transition-all shadow-md shadow-teal/20 flex items-center justify-center gap-2 disabled:bg-[#00284F] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {markCompletedMutation.isPending ? (
               <Loader2 size={18} className="animate-spin" />
             ) : null}
-            MARK AS COMPLETED
+            {isCompleted ? "COMPLETED" : "MARK AS COMPLETED"}
           </button>
         </div>
       </div>

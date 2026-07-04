@@ -5,6 +5,7 @@ import {
   markCourseAsCompleted,
   getModuleSessions,
   getStudentModuleProgress,
+  getStudentModuleProgressById,
 } from "@/services/training/student";
 import { IStudentAttendanceRequest } from "@/types/training/student";
 
@@ -50,10 +51,21 @@ export const useGetStudentProgress = (data: {
   type_id?: number;
   sub_type_id?: number;
   track_id?: number;
-  course_module_id?: number
+  course_module_id?: number;
 }) => {
   return useQuery({
     queryKey: ["student-progress", data],
     queryFn: () => getStudentModuleProgress(data),
+  });
+};
+
+export const useGetStudentProgressByModuleId = (course_module_id: number) => {
+  return useQuery({
+    queryKey: ["student-progress", course_module_id],
+    queryFn: () => getStudentModuleProgressById(course_module_id),
+    enabled: !!course_module_id,
+    select: (data) => {
+      return data.data;
+    },
   });
 };

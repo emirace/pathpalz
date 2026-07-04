@@ -3,6 +3,7 @@ import {
   IStudentAttendanceRequest,
   IStudentAttendanceResponse,
   IStudentModuleAttendanceResponse,
+  IStudentModuleProgressByIdResponse,
   IStudentModuleProgressResponse,
 } from "@/types/training/student";
 import { trainingClient } from "../../api";
@@ -47,19 +48,30 @@ export const getModuleSessions = async (
 export const getStudentModuleProgress = async ({
   type_id,
   sub_type_id,
-  track_id, course_module_id
+  track_id,
+  course_module_id,
 }: {
   type_id?: number;
   sub_type_id?: number;
   track_id?: number;
-  course_module_id?: number
+  course_module_id?: number;
 }): Promise<IStudentModuleProgressResponse> => {
   const response = await trainingClient.get(`/student/module/progress`, {
     params: {
       type_id,
       sub_type_id,
-      track_id, course_module_id
+      track_id,
+      course_module_id,
     },
   });
+  return response.data;
+};
+
+export const getStudentModuleProgressById = async (
+  moduleId: number,
+): Promise<IStudentModuleProgressByIdResponse> => {
+  const response = await trainingClient.get(
+    `/modules/${moduleId}/completed-students`,
+  );
   return response.data;
 };

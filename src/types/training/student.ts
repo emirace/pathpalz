@@ -82,15 +82,13 @@ export interface IModuleSession {
   }[];
 }
 
-
-
 export interface IStudentModuleProgressResponse {
   filters: {
-    "training_track_id": number,
-    "type_id": number,
-    "sub_type_id": number,
-    "course_module_id": number
-  },
+    training_track_id: number;
+    type_id: number;
+    sub_type_id: number;
+    course_module_id: number;
+  };
   total_modules: number;
   completed_modules: number;
   progress: number;
@@ -104,5 +102,28 @@ export interface IStudentModuleProgressResponse {
     instructor_marked: boolean;
     completed_at: string | null;
     sessions: IModuleSession[];
-  }[]
+  }[];
+}
+
+export interface IStudentModuleProgressByIdResponse {
+  success: boolean;
+  message: string;
+  total_students: number;
+  data: [
+    {
+      id: number;
+      user_id: number;
+      course_module_id: number;
+      status: string;
+      completed_at: string | null;
+      created_at: string;
+      updated_at: string;
+      student: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        email: string;
+      };
+    },
+  ];
 }
