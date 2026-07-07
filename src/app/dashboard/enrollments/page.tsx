@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  useGetMyEnrollments,
-  useGetEnrollmentById,
-} from "@/query/training/enrollments";
+import React, { useMemo, useState } from "react";
+import { useGetMyEnrollments } from "@/query/training/enrollments";
 import EnrollmentDetailModal from "./components/EnrollmentDetailModal";
 import { Calendar, ExternalLink, Clock } from "lucide-react";
+import { useGetStudentProgress } from "@/query/training/student";
 import Link from "next/link";
 import { IEnrollment } from "@/types/training/enrollments";
 import { getCurrencySymbol } from "@/utils/currency";
@@ -14,7 +12,7 @@ import { useSetting } from "@/states/setting";
 
 export default function MyEnrollmentsPage() {
   const { data: enrollments, isLoading } = useGetMyEnrollments();
-  const country = useSetting(data => data.country)
+  const country = useSetting((data) => data.country);
   const [selectedEnrollment, setSelectedEnrollment] =
     useState<IEnrollment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,12 +91,13 @@ export default function MyEnrollmentsPage() {
                     </div>
                   </div>
                   <div
-                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isPaid
-                      ? "bg-emerald-50 text-emerald-600"
-                      : isPending
-                        ? "bg-amber-50 text-amber-600"
-                        : "bg-red-50 text-red-600"
-                      }`}
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                      isPaid
+                        ? "bg-emerald-50 text-emerald-600"
+                        : isPending
+                          ? "bg-amber-50 text-amber-600"
+                          : "bg-red-50 text-red-600"
+                    }`}
                   >
                     {item.payment.status}
                   </div>
@@ -110,7 +109,8 @@ export default function MyEnrollmentsPage() {
                       Amount
                     </p>
                     <p className="text-sm font-bold text-[#00284F]">
-                      {getCurrencySymbol(country.currency)}{item.payment.amount}
+                      {getCurrencySymbol(country.currency)}
+                      {item.payment.amount}
                     </p>
                   </div>
                   <div className="space-y-1 text-right">
@@ -123,15 +123,24 @@ export default function MyEnrollmentsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5 text-xs text-[#424750] font-medium">
-                      <Clock size={14} className="text-teal" />
-                      Weeks
+                <div className="flex flex-col gap-4 mt-2">
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                      <span>Course progress</span>
+                      <span>
+                        {item.enrollment_id ? (
+                          <EnrollmentProgressBadge enrollment={item} />
+                        ) : (
+                          "0%"
+                        )}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                      <EnrollmentProgressBar enrollment={item} />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-between gap-4">
                     <button
                       onClick={() => handleViewDetails(item)}
                       className="flex items-center gap-1.5 text-sm font-bold text-gray-500 hover:text-teal transition-all"
@@ -160,6 +169,67 @@ export default function MyEnrollmentsPage() {
         enrollment={selectedEnrollment}
       />
     </div>
+  );
+}
+
+function EnrollmentProgressBar({ enrollment }: { enrollment: IEnrollment }) {
+  const course = enrollment?.purchased_course;
+
+  const progressFilter = useMemo(() => {
+    if (!course?.id) return {};
+
+    if (course.type === "training_track") {
+      return { track_id: Number(course.id) };
+    }
+
+    if (course.type === "type") {
+      return { type_id: Number(course.id) };
+    }
+
+    if (course.type === "sub_type") {
+      return { sub_type_id: Number(course.id) };
+    }
+
+    return {};
+  }, [course?.id, course?.type]);
+
+  const { data: studentProgress } = useGetStudentProgress(progressFilter);
+  const progressPercent = Math.round(studentProgress?.progress || 0);
+
+  return (
+    <div
+      className="h-full rounded-full bg-linear-to-r from-teal to-[#00677D] transition-all"
+      style={{ width: `${Math.min(progressPercent, 100)}%` }}
+    />
+  );
+}
+
+function EnrollmentProgressBadge({ enrollment }: { enrollment: IEnrollment }) {
+  const course = enrollment?.purchased_course;
+
+  const progressFilter = useMemo(() => {
+    if (!course?.id) return {};
+
+    if (course.type === "Track") {
+      return { track_id: Number(course.id) };
+    }
+
+    if (course.type === "Type") {
+      return { type_id: Number(course.id) };
+    }
+
+    if (course.type === "TypeSub") {
+      return { sub_type_id: Number(course.id) };
+    }
+
+    return {};
+  }, [course?.id, course?.type]);
+
+  const { data: studentProgress } = useGetStudentProgress(progressFilter);
+  const progressPercent = Math.round(studentProgress?.progress || 0);
+
+  return (
+    <span className="font-semibold text-[#00284F]">{progressPercent}%</span>
   );
 }
 

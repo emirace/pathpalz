@@ -1,11 +1,17 @@
 import { trainingClient } from "@/services/api";
 import { IAssignment, ISubmissionResponse } from "@/types/training/assignments";
 
-export const getStudentAssignments = async (): Promise<{
+export const getStudentAssignments = async ({
+  purchasable_type,
+}: {
+  purchasable_type: string;
+}): Promise<{
   success: boolean;
   data: IAssignment[];
 }> => {
-  const response = await trainingClient.get("/student/all/assignments");
+  const response = await trainingClient.get("/student/all/assignments", {
+    params: { purchasable_type },
+  });
   return response.data;
 };
 
@@ -39,6 +45,16 @@ export const submitAssignment = async ({
     {
       headers: { "Content-Type": "multipart/form-data" },
     },
+  );
+  return response.data;
+};
+export const getStudentAssignmentsPermodule = async ({
+  courseModuleHeaderId,
+}: {
+  courseModuleHeaderId: string;
+}) => {
+  const response = await trainingClient.get(
+    `/student/assignments/${courseModuleHeaderId}`,
   );
   return response.data;
 };

@@ -1,15 +1,28 @@
 "use client";
 
-import { useGetStudentAssignments } from "@/query/training/student/assignment";
+import {
+  useGetStudentAssignments,
+  useGetStudentAssignmentsPermodule,
+} from "@/query/training/student/assignment";
 import AssignmentCard from "./AssignmentCard";
 import { Calendar } from "lucide-react";
 
 type Props = {
   enrollment: any;
+  courseModuleHeaderId?: string;
 };
 
-export default function AssignmentsOverview({ enrollment }: Props) {
-  const { data: assignments } = useGetStudentAssignments();
+export default function AssignmentsOverview({
+  enrollment,
+  courseModuleHeaderId,
+}: Props) {
+  console.log("enrollment", enrollment);
+  const { data: assignments } = useGetStudentAssignments({
+    purchasable_type: courseModuleHeaderId ? undefined : "type",
+  });
+  const { data: assignmentsPerModule } = useGetStudentAssignmentsPermodule({
+    courseModuleHeaderId: courseModuleHeaderId,
+  });
 
   return (
     <div className="p-6 max-w-7xl mx-auto animate-in fade-in duration-500">

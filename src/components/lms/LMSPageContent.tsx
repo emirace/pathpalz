@@ -20,6 +20,7 @@ import AssignmentsOverview from "./AssignmentsOverview";
 import { useGetUser } from "@/query/auth";
 import AssignmentsDetailsClient from "./AssignmentsDetailsClient";
 import AssignmentSubmitClient from "./AssignmentSubmitClient";
+import StudentProgress from "./StudentProgress";
 
 const getDateKey = (date: Date) => {
   const year = date.getFullYear();
@@ -84,6 +85,7 @@ function LMSPageContent() {
   const moduleIdParam = searchParams.get("module");
   const viewParam = searchParams.get("view");
   const assignmentId = searchParams.get("assignmentId");
+  const courseModuleHeaderId = searchParams.get("courseModuleHeaderId");
   const [selectedSessionSelection, setSelectedSessionSelection] = useState<{
     moduleId?: number;
     index: number;
@@ -173,7 +175,16 @@ function LMSPageContent() {
   }
 
   if (viewParam === "assignments") {
-    return <AssignmentsOverview enrollment={enrollment} />;
+    return (
+      <AssignmentsOverview
+        enrollment={enrollment}
+        courseModuleHeaderId={courseModuleHeaderId as string}
+      />
+    );
+  }
+
+  if (viewParam === "progress") {
+    return <StudentProgress enrollment={enrollment} />;
   }
 
   if (viewParam === "submit" && assignmentId) {

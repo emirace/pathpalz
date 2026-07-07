@@ -28,6 +28,8 @@ import TutorSection from "../TutorSection";
 import { useSetting } from "@/states/setting";
 import DiscountGenerateForm from "@/components/training/DiscountGenerateForm";
 import { getApiErrorMessage, notify } from "@/utils/notify";
+import { useGetDiscountCodeRule } from "@/query/training/discount";
+import { getCurrencySymbol } from "@/utils/currency";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
@@ -58,6 +60,8 @@ export default function TrackDetailClient() {
     id: number;
   } | null>(null);
 
+  const { data: discountRule } = useGetDiscountCodeRule(discountCode);
+
   const { data: user } = useGetUser();
   const { data: tracks, isLoading: isTracksLoading } = useGetTracks();
 
@@ -81,9 +85,48 @@ export default function TrackDetailClient() {
   const { data: subTypesRes } = useGetTypeSubTypes({
     type_id: String(specializedType?.id || ""),
   });
-  const specializedSubTypes = subTypesRes?.data?.[0];
+  const specializedSubTypes = subTypesRes?.data || [];
 
   const checkoutMutation = useCheckout();
+
+  const selectedItemPrice = useMemo(() => {
+    if (!selectedItem || !track) return null;
+
+    if (selectedItem.type === "training_track") {
+      const price = Number(track.price || 0);
+      return Number.isFinite(price) ? price : 0;
+    }
+
+    if (selectedItem.type === "type") {
+      const selectedType = types.find((type) => type.id === selectedItem.id);
+      const price =
+        country?.currency === "NGN"
+          ? selectedType?.price_ngn
+          : selectedType?.price_gbp;
+      return Number(price || 0);
+    }
+
+    const selectedSubType = specializedSubTypes.find(
+      (subType) => subType.id === selectedItem.id,
+    );
+    const price =
+      country?.currency === "NGN"
+        ? selectedSubType?.price_ngn
+        : selectedSubType?.price_gbp;
+    return Number(price || 0);
+  }, [country?.currency, selectedItem, specializedSubTypes, track, types]);
+
+  const discountPercentage = Number(discountRule?.rule?.percentage || 0);
+  const discountedAmount =
+    selectedItemPrice !== null && discountPercentage > 0
+      ? Math.max(
+          0,
+          selectedItemPrice - (selectedItemPrice * discountPercentage) / 100,
+        )
+      : selectedItemPrice;
+  const hasDiscountSummary = Boolean(
+    discountCode.trim() && discountRule?.rule && selectedItemPrice !== null,
+  );
 
   if (isTracksLoading || (foundTrack && isTrackLoading)) {
     return (
@@ -517,6 +560,33 @@ export default function TrackDetailClient() {
                     </button>
                   </div>
                 </div>
+
+                {hasDiscountSummary && (
+                  <div className="rounded-2xl border border-teal/20 bg-teal/5 p-4 space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Original price</span>
+                      <span className="font-semibold text-[#00284F]">
+                        {getCurrencySymbol(country?.currency)}
+                        {selectedItemPrice?.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Discount</span>
+                      <span className="font-semibold text-emerald-600">
+                        -{discountPercentage}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between border-t border-teal/10 pt-2">
+                      <span className="font-semibold text-[#00284F]">
+                        You pay
+                      </span>
+                      <span className="font-bold text-[#00284F]">
+                        {getCurrencySymbol(country?.currency)}
+                        {discountedAmount?.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-1">

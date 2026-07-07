@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, CheckCircle2, Tag, Copy, Check } from "lucide-react";
 import DiscountGenerateForm from "./DiscountGenerateForm";
+import { useGetDiscountCodeRule } from "@/query/training/discount";
 
 interface GenerateDiscountModalProps {
   isOpen: boolean;

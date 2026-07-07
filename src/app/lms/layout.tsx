@@ -116,7 +116,7 @@ function LMSLayoutContent({ children }: { children: React.ReactNode }) {
                   ) : (
                     <ChevronRight size={14} className="text-white/60" />
                   )}
-                  Module {index + 1}: {header.title}
+                  {header.title}
                 </span>
               </button>
 
@@ -147,6 +147,22 @@ function LMSLayoutContent({ children }: { children: React.ReactNode }) {
                       No lessons available.
                     </div>
                   )}
+                  <button
+                    onClick={() => {
+                      if (enrollmentId) {
+                        router.push(
+                          `/lms?enrollmentId=${enrollmentId}&view=assignments&courseModuleHeaderId=${header.header_id}`,
+                        );
+                        setIsSidebarOpen(false);
+                      }
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-left mt-4"
+                  >
+                    <ClipboardList size={16} className="text-white/60" />
+                    <span className="text-sm font-medium text-white/80">
+                      Assignments
+                    </span>
+                  </button>
                 </div>
               )}
             </div>
@@ -167,6 +183,18 @@ function LMSLayoutContent({ children }: { children: React.ReactNode }) {
             <span className="text-sm font-medium text-white/80">
               Assignments
             </span>
+          </button>
+          <button
+            onClick={() => {
+              if (enrollmentId) {
+                router.push(`/lms?enrollmentId=${enrollmentId}&view=progress`);
+                setIsSidebarOpen(false);
+              }
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-left mt-4"
+          >
+            <ClipboardList size={16} className="text-white/60" />
+            <span className="text-sm font-medium text-white/80">Progress</span>
           </button>
         </nav>
 

@@ -107,3 +107,13 @@ export interface IDiscountCodeResponse {
   to: number;
   total: number;
 }
+
+export interface IDiscountRuleResponse {
+  message: string;
+  data: {
+    code: string;
+    email: string;
+    is_used: boolean;
+    rule: ICreateDiscountReponse;
+  };
+}

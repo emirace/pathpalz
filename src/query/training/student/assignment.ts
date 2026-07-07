@@ -1,14 +1,21 @@
 import {
   getAssignmentsPerModule,
   getStudentAssignments,
+  getStudentAssignmentsPermodule,
   submitAssignment,
 } from "@/services/training/student/assignments";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useGetStudentAssignments = () => {
+export const useGetStudentAssignments = ({
+  purchasable_type,
+}: {
+  purchasable_type?: string;
+}) => {
   return useQuery({
-    queryKey: ["student-assignments"],
-    queryFn: getStudentAssignments,
+    queryKey: ["student-assignments", purchasable_type],
+    queryFn: () =>
+      getStudentAssignments({ purchasable_type: purchasable_type || "" }),
+    enabled: !!purchasable_type,
   });
 };
 
@@ -33,5 +40,21 @@ export const useSubmitAssignment = () => {
         queryKey: ["student-assignments", variables.assignmentId],
       });
     },
+  });
+};
+
+export const useGetStudentAssignmentsPermodule = ({
+  courseModuleHeaderId,
+}: {
+  courseModuleHeaderId?: string;
+}) => {
+  return useQuery({
+    queryKey: ["student-assignments-per-module", courseModuleHeaderId],
+    queryFn: () =>
+      getStudentAssignmentsPermodule({
+        courseModuleHeaderId: courseModuleHeaderId || "",
+      }),
+    enabled: !!courseModuleHeaderId,
+    select: (data) => data.data, // Select only the 'data' property from the response
   });
 };
