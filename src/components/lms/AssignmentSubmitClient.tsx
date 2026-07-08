@@ -21,9 +21,11 @@ const formatSize = (bytes: number) => {
 };
 
 const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
-  const router = useRouter();
   const { data: assignments, isLoading } = useGetStudentAssignments();
-  const enrollmentId = useSearchParams().get("enrollmentId")
+  const router = useRouter();
+  console.log("assignmentId", assignmentId, assignments);
+
+  const enrollmentId = useSearchParams().get("enrollmentId");
   const { mutate: submitAssignment, isPending: isSubmittingAssignment } =
     useSubmitAssignment();
 
@@ -51,7 +53,9 @@ const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agree) {
-      notify.warning("Please confirm the integrity checkbox before submitting.");
+      notify.warning(
+        "Please confirm the integrity checkbox before submitting.",
+      );
       return;
     }
     submitAssignment(
@@ -61,13 +65,13 @@ const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
           setFiles([]);
           setAgree(false);
           setSubmissionNote("");
-          router.push(
-            `/lms/?enrollmentId=${enrollmentId}&view=assignments`,
-          );
+          router.push(`/lms/?enrollmentId=${enrollmentId}&view=assignments`);
         },
         onError: (error) => {
-          notify.error(getApiErrorMessage(error, "Failed to submit assignment"));
-        }
+          notify.error(
+            getApiErrorMessage(error, "Failed to submit assignment"),
+          );
+        },
       },
     );
   };

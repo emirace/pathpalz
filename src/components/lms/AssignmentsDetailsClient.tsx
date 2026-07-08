@@ -15,7 +15,6 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
   const { data: assignments, isLoading } = useGetStudentAssignments();
 
   const enrollmentId = useSearchParams().get("enrollmentId") || "";
-
   const assignment = assignments?.data?.find(
     (a) => String(a.id) === assignmentId,
   );

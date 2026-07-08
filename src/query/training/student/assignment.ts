@@ -6,16 +6,12 @@ import {
 } from "@/services/training/student/assignments";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useGetStudentAssignments = ({
-  purchasable_type,
-}: {
-  purchasable_type?: string;
-}) => {
+export const useGetStudentAssignments = (purchasable_type?: string) => {
   return useQuery({
     queryKey: ["student-assignments", purchasable_type],
     queryFn: () =>
       getStudentAssignments({ purchasable_type: purchasable_type || "" }),
-    enabled: !!purchasable_type,
+    // enabled: !!purchasable_type,
   });
 };
 

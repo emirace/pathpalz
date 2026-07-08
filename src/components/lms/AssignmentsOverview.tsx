@@ -17,9 +17,9 @@ export default function AssignmentsOverview({
   courseModuleHeaderId,
 }: Props) {
   console.log("enrollment", enrollment);
-  const { data: assignments } = useGetStudentAssignments({
-    purchasable_type: courseModuleHeaderId ? undefined : "type",
-  });
+  const { data: assignments } = useGetStudentAssignments(
+    courseModuleHeaderId ? undefined : "type",
+  );
   const { data: assignmentsPerModule } = useGetStudentAssignmentsPermodule({
     courseModuleHeaderId: courseModuleHeaderId,
   });
@@ -70,13 +70,15 @@ export default function AssignmentsOverview({
           )}
 
           <div className="space-y-4">
-            {assignments?.data?.map((a) => (
-              <AssignmentCard
-                key={a.id}
-                assignment={a}
-                enrollmentId={enrollment.enrollment_id}
-              />
-            ))}
+            {courseModuleHeaderId
+              ? assignmentsPerModule
+              : assignments?.data?.map((a) => (
+                  <AssignmentCard
+                    key={a.id}
+                    assignment={a}
+                    enrollmentId={enrollment.enrollment_id}
+                  />
+                ))}
           </div>
         </div>
       </div>
