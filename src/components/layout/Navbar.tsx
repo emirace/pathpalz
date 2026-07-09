@@ -12,8 +12,8 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "About", href: "/#stats" },
-    // { name: "Software Development", href: "/#services" },
-    { name: "Training", href: "/training" },
+    { name: "Solutions", href: "/#services" },
+    // { name: "Training", href: "/training" },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -46,9 +46,8 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-sm font-semibold transition-colors duration-200 relative py-2 ${
-                    isActive ? "text-navy" : "text-gray-600 hover:text-navy"
-                  }`}
+                  className={`text-sm font-semibold transition-colors duration-200 relative py-2 ${isActive ? "text-navy" : "text-gray-600 hover:text-navy"
+                    }`}
                 >
                   {link.name}
                   {isActive && (
@@ -126,11 +125,10 @@ const Navbar = () => {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`block px-3 py-3 rounded-md text-base font-medium transition-colors ${
-                  isActive
-                    ? "text-navy bg-teal/5"
-                    : "text-gray-600 hover:text-navy hover:bg-gray-50"
-                }`}
+                className={`block px-3 py-3 rounded-md text-base font-medium transition-colors ${isActive
+                  ? "text-navy bg-teal/5"
+                  : "text-gray-600 hover:text-navy hover:bg-gray-50"
+                  }`}
                 onClick={() => setIsOpen(false)}
               >
                 {link.name}

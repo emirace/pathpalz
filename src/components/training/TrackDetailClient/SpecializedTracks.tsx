@@ -1,13 +1,6 @@
 "use client";
 
 import React from "react";
-import {
-  Monitor,
-  Database,
-  Smartphone,
-  Globe,
-  ChevronRight,
-} from "lucide-react";
 import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
 import { ISubType, IType } from "@/types/admin/admin";
@@ -37,14 +30,6 @@ const SubTypeCard = ({
 }) => {
   const { country } = useSetting();
 
-  const getIcon = (title: string) => {
-    const t = title.toLowerCase();
-    if (t.includes("front")) return <Monitor className="w-6 h-6" />;
-    if (t.includes("back")) return <Database className="w-6 h-6" />;
-    if (t.includes("mobile")) return <Smartphone className="w-6 h-6" />;
-    return <Globe className="w-6 h-6" />;
-  };
-
   const getTags = (title: string) => {
     const t = title.toLowerCase();
     if (t.includes("front")) return ["React", "TypeScript", "Tailwind"];
@@ -53,96 +38,113 @@ const SubTypeCard = ({
     return ["React", "Node.js", "PostgreSQL"];
   };
 
+  const price = country?.currency === "NGN" ? subType.price_ngn : subType.price_gbp;
+
   return (
-    <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group h-full">
-      <div className="flex justify-between items-start mb-6">
-        <div className="w-12 h-12 rounded-xl bg-gray-50 text-[#00284F] flex items-center justify-center group-hover:bg-[#00677D]/10 group-hover:text-[#00677D] transition-colors">
-          {getIcon(subType.title)}
-        </div>
-        <div className="text-right">
-          <span className="text-2xl font-black text-[#00284F]">
-            {getCurrencySymbol(country?.currency)}
-            {parseInt(
-              country?.currency === "NGN"
-                ? subType.price_ngn
-                : subType.price_gbp,
-            )}
+    <div
+      data-reveal=""
+      className="hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(4,44,83,0.12)] hover:border-[#B5D4F4] transition-all duration-[220ms]"
+      style={{
+        background: "#fff",
+        border: "1px solid #E7E4DB",
+        borderRadius: "20px",
+        padding: "24px",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
+        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "15.5px", color: "#042C53" }}>
+          {subType.title}
+        </span>
+        {price && parseInt(price) > 0 && (
+          <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "19px", color: "#185FA5" }}>
+            {getCurrencySymbol(country?.currency)}{parseInt(price).toLocaleString()}
           </span>
-        </div>
+        )}
       </div>
-
-      <h3 className="text-xl font-bold text-[#00284F] mb-3">{subType.title}</h3>
-      <p className="text-sm text-gray-500 mb-6 leading-relaxed flex-1">
-        {subType.description ||
-          "Master industry-standard workflows and build production-ready systems with expert guidance."}
-      </p>
-
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div style={{ fontSize: "12px", color: "#5F5E5A", lineHeight: 1.55, marginBottom: "14px", flex: 1 }}>
+        {subType.description || "Master industry-standard workflows and build production-ready systems."}
+      </div>
+      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
         {getTags(subType.title).map((tag) => (
           <span
             key={tag}
-            className="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold"
+            style={{
+              font: "500 10px 'IBM Plex Mono',monospace",
+              background: "#F1EFE8",
+              color: "#5F5E5A",
+              padding: "3px 9px",
+              borderRadius: "6px",
+            }}
           >
             {tag}
           </span>
         ))}
       </div>
-
-      <div className="flex items-center justify-between pt-6 border-t border-gray-50 mt-auto">
-        <button
-          onClick={() => onViewSyllabus(subType)}
-          className="text-[#00677D] font-bold flex items-center gap-1 hover:gap-2 transition-all text-sm"
-        >
-          View Syllabus
-          <ChevronRight className="w-4 h-4" />
-        </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
         {isOpen ? (
           <button
             onClick={() => onApply("sub_type", subType.id)}
-            className="bg-[#00677D] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#00677D]/90 transition-colors shadow-lg shadow-[#00677D]/20"
+            className="hover:bg-[#0C447C] transition-colors duration-150"
+            style={{
+              font: "600 12.5px 'IBM Plex Sans',sans-serif",
+              background: "#185FA5",
+              color: "#fff",
+              padding: "9px 20px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+            }}
           >
             Apply
           </button>
         ) : (
           <button
             onClick={onJoinWaitlist}
-            className="text-[#00677D] font-semibold italic text-sm hover:underline transition-all cursor-pointer"
+            style={{
+              font: "600 12.5px 'IBM Plex Sans',sans-serif",
+              color: "#185FA5",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontStyle: "italic",
+            }}
           >
             Join Waitlist
           </button>
         )}
+        <span
+          onClick={() => onViewSyllabus(subType)}
+          style={{
+            font: "600 12px 'IBM Plex Sans',sans-serif",
+            color: "#185FA5",
+            cursor: "pointer",
+          }}
+        >
+          View Syllabus →
+        </span>
       </div>
     </div>
   );
 };
 
 const SpecializedTracksSkeleton = () => (
-  <div className="w-full space-y-12">
-    <div className="flex items-center gap-4 animate-pulse">
-      <div className="h-10 bg-gray-100 rounded-xl w-64" />
-      <div className="h-px bg-gray-100 flex-1" />
-    </div>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="bg-white rounded-3xl p-8 border border-gray-100 h-[350px] animate-pulse"
-        >
-          <div className="flex justify-between mb-8">
-            <div className="w-12 h-12 bg-gray-100 rounded-xl" />
-            <div className="w-20 h-8 bg-gray-100 rounded-lg" />
-          </div>
-          <div className="h-6 bg-gray-100 rounded-lg w-3/4 mb-4" />
-          <div className="h-4 bg-gray-100 rounded-lg w-full mb-2" />
-          <div className="h-4 bg-gray-100 rounded-lg w-5/6 mb-8" />
-          <div className="flex gap-2 mb-8">
-            <div className="h-6 bg-gray-100 rounded-full w-16" />
-            <div className="h-6 bg-gray-100 rounded-full w-20" />
-            <div className="h-6 bg-gray-100 rounded-full w-16" />
-          </div>
-        </div>
-      ))}
-    </div>
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: "14px" }}>
+    {[1, 2, 3, 4].map((i) => (
+      <div
+        key={i}
+        className="animate-pulse"
+        style={{
+          background: "#fff",
+          border: "1px solid #E7E4DB",
+          borderRadius: "14px",
+          padding: "20px",
+          height: "220px",
+        }}
+      />
+    ))}
   </div>
 );
 
@@ -178,15 +180,47 @@ export default function SpecializedTracks({
   if (!specializedType || subTypes.length === 0) return null;
 
   return (
-    <div className="w-full space-y-12">
-      <div className="flex items-center gap-6">
-        <h2 className="text-3xl font-black font-manrope text-[#00284F] whitespace-nowrap">
-          Specialized Tracks
+    <div
+      style={{
+        background: "#fff",
+        backgroundImage: "radial-gradient(rgba(24,95,165,.04) 1px,transparent 1px),radial-gradient(circle at 0% 100%,rgba(24,95,165,.06),transparent 42%)",
+        backgroundSize: "24px 24px,100% 100%",
+        padding: "clamp(48px,6vw,72px) clamp(20px,4vw,52px)",
+        borderBottom: "1px solid #E7E4DB",
+      }}
+    >
+      <div data-reveal="" style={{ textAlign: "center", maxWidth: "680px", margin: "0 auto 48px" }}>
+        <div
+          style={{
+            fontFamily: "'IBM Plex Mono', monospace",
+            fontWeight: 500,
+            fontSize: "11px",
+            color: "#8B8982",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            marginBottom: "12px",
+          }}
+        >
+          // SPECIALIZED DEEP DIVE
+        </div>
+        <h2
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 600,
+            fontSize: "clamp(24px, 3.2vw, 36px)",
+            color: "#2C2C2A",
+            letterSpacing: "-.02em",
+            marginBottom: "16px",
+            marginTop: 0,
+          }}
+        >
+          Specialized Tracks Deep Dive
         </h2>
-        <div className="h-px bg-gray-200 flex-1 hidden sm:block" />
+        <div style={{ fontSize: "15px", color: "#5F5E5A", lineHeight: 1.6 }}>
+          Choose your discipline. Each track is designed for specialized industry readiness.
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: "14px" }}>
         {subTypes.map((subType) => (
           <SubTypeCard
             key={subType.id}

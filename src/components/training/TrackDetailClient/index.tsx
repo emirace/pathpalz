@@ -1,35 +1,23 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useGetTracks, useGetTrackById } from "@/query/training/tracks";
 import { useCheckout } from "@/query/training/payments";
 import { useGetUser } from "@/query/auth";
 import PaymentGatewayModal from "@/components/training/PaymentGatewayModal";
 import WaitlistModal from "@/components/training/WaitlistModal";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  BarChart,
-  ShieldCheck,
-  Users,
-  ArrowRight,
-  X,
-  Tag,
-  GraduationCap,
-} from "lucide-react";
 import Link from "next/link";
-import TrainingPaths from "./TrainingPaths/index.ts";
+import TrainingPaths from "./TrainingPaths";
 import SpecializedTracks from "./SpecializedTracks";
 import { useGetAllTrackTypes } from "@/query/admin/types";
 import { useGetTypeSubTypes } from "@/query/admin/type-subs";
-import TutorSection from "../TutorSection";
 import { useSetting } from "@/states/setting";
 import DiscountGenerateForm from "@/components/training/DiscountGenerateForm";
 import { getApiErrorMessage, notify } from "@/utils/notify";
 import { useGetDiscountCodeRule } from "@/query/training/discount";
 import { getCurrencySymbol } from "@/utils/currency";
+import Image from "next/image";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
@@ -38,10 +26,7 @@ export default function TrackDetailClient() {
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
-  // 'enter' = enter/apply a code; 'generate' = student generate form
-  const [discountView, setDiscountView] = useState<"enter" | "generate">(
-    "enter",
-  );
+  const [discountView, setDiscountView] = useState<"enter" | "generate">("enter");
   const [discountCode, setDiscountCode] = useState("");
 
   const [guestData, setGuestData] = useState({
@@ -60,8 +45,92 @@ export default function TrackDetailClient() {
     id: number;
   } | null>(null);
 
-  const { data: discountRule } = useGetDiscountCodeRule(discountCode);
+  const rootRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const reduce =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealEls = Array.from(
+      root.querySelectorAll("[data-reveal]"),
+    ) as HTMLElement[];
+
+    if (!reduce) {
+      revealEls.forEach((el) => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(24px)";
+        el.style.willChange = "opacity, transform";
+      });
+    } else {
+      revealEls.forEach((el) => {
+        (el as any)._shown = true;
+        el.style.opacity = "1";
+        el.style.transform = "none";
+      });
+    }
+
+    const showEl = (el: HTMLElement) => {
+      if ((el as any)._shown) return;
+      (el as any)._shown = true;
+      const delay = parseFloat(el.getAttribute("data-reveal-delay") || "0");
+      el.style.transition = `opacity 0.7s cubic-bezier(.22,1,.36,1) ${delay}s, transform 0.7s cubic-bezier(.22,1,.36,1) ${delay}s`;
+      el.style.opacity = "1";
+      el.style.transform = "none";
+    };
+
+    const checkReveal = () => {
+      const h = window.innerHeight || 800;
+      revealEls.forEach((el) => {
+        if (!(el as any)._shown && el.getBoundingClientRect().top < h * 0.9) {
+          showEl(el);
+        }
+      });
+    };
+
+    checkReveal();
+    const t1 = setTimeout(checkReveal, 120);
+    const t2 = setTimeout(checkReveal, 500);
+
+    const onScroll = () => checkReveal();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    document.addEventListener("scroll", onScroll, true);
+
+    const safety = setTimeout(() => {
+      revealEls.forEach((el) => showEl(el));
+    }, 3000);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      document.removeEventListener("scroll", onScroll, true);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(safety);
+    };
+  }, []);
+
+  const ambientMotion: any = "Full";
+  const off = ambientMotion === "Off";
+  const sub = ambientMotion === "Subtle";
+
+  const motionStyles = {
+    floatMain: off
+      ? "none"
+      : sub
+        ? "floatY 9s ease-in-out infinite"
+        : "floatY 6.5s ease-in-out infinite",
+    glowMain: off ? "none" : "glowPulse 6s ease-in-out infinite",
+    kenBurns: off ? "none" : "kenBurns 16s ease-in-out infinite alternate",
+    blobA: off ? "none" : "blobDrift 9s ease-in-out infinite",
+    badgeA: off ? "none" : "floatYbig 5s ease-in-out infinite 0.3s",
+    badgeB: off ? "none" : "floatY 5.6s ease-in-out infinite 0.8s",
+  };
+
+  const { data: discountRule } = useGetDiscountCodeRule(discountCode);
   const { data: user } = useGetUser();
   const { data: tracks, isLoading: isTracksLoading } = useGetTracks();
 
@@ -120,9 +189,9 @@ export default function TrackDetailClient() {
   const discountedAmount =
     selectedItemPrice !== null && discountPercentage > 0
       ? Math.max(
-          0,
-          selectedItemPrice - (selectedItemPrice * discountPercentage) / 100,
-        )
+        0,
+        selectedItemPrice - (selectedItemPrice * discountPercentage) / 100,
+      )
       : selectedItemPrice;
   const hasDiscountSummary = Boolean(
     discountCode.trim() && discountRule?.rule && selectedItemPrice !== null,
@@ -155,12 +224,10 @@ export default function TrackDetailClient() {
   ) => {
     setSelectedItem({ type: itemType, id: itemId });
     if (user) {
-      // Logged-in: show discount modal first
       setDiscountView("enter");
       setDiscountCode("");
       setIsDiscountModalOpen(true);
     } else {
-      // Guest: show guest form first
       setIsGuestModalOpen(true);
     }
   };
@@ -169,7 +236,6 @@ export default function TrackDetailClient() {
     e.preventDefault();
     if (!guestData.fullName || !guestData.email) return;
     setIsGuestModalOpen(false);
-    // After guest form: show discount modal
     setDiscountView("enter");
     setDiscountCode("");
     setIsDiscountModalOpen(true);
@@ -182,7 +248,6 @@ export default function TrackDetailClient() {
 
   const handleGatewaySelect = (gateway: "stripe" | "paystack") => {
     if (!selectedItem) return;
-
     checkoutMutation.mutate(
       {
         track_id: track.id,
@@ -193,16 +258,16 @@ export default function TrackDetailClient() {
         ...(discountCode.trim() ? { discount_code: discountCode.trim() } : {}),
         ...(!user
           ? {
-              email: guestData.email,
-              full_name: guestData.fullName,
-              phoneNumber: guestData.phoneNumber,
-              city: guestData.city,
-              country: guestData.country,
-              state: guestData.state,
-              street: guestData.street,
-              house_number: guestData.house_number,
-              apartment_number: guestData.apartment_number,
-            }
+            email: guestData.email,
+            full_name: guestData.fullName,
+            phoneNumber: guestData.phoneNumber,
+            city: guestData.city,
+            country: guestData.country,
+            state: guestData.state,
+            street: guestData.street,
+            house_number: guestData.house_number,
+            apartment_number: guestData.apartment_number,
+          }
           : {}),
       },
       {
@@ -226,247 +291,867 @@ export default function TrackDetailClient() {
   const isOpen = track.status === "open";
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] flex flex-col">
-      {/* Hero Section */}
-      <section className="bg-[#00284F] text-white pt-32 pb-20 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-linear-to-l from-teal/20 to-transparent pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <Link
-            href="/training"
-            className="inline-flex items-center text-teal mb-8 hover:text-teal/80 transition-colors group"
+    <div
+      ref={rootRef}
+      style={{ width: "100%", fontFamily: "'IBM Plex Sans', sans-serif" }}
+    >
+      <div
+        style={{
+          width: "100%",
+        }}
+      >
+        <div>
+          {/* 1. Announcement Bar */}
+          <div
+            style={{
+              background: "#0C447C",
+              color: "#fff",
+              padding: "10px clamp(14px,2.5vw,22px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              flexWrap: "wrap",
+            }}
           >
-            <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
-            Back to Tracks
-          </Link>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <div className="inline-block px-4 py-1.5 rounded-full bg-teal/20 border border-teal/30 text-teal text-sm font-bold uppercase tracking-widest">
-                {isOpen ? "Enrollment Open" : "Coming Soon"}
-              </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold font-manrope leading-tight">
-                {track.title}
-              </h1>
-              <p className="text-lg text-gray-300 max-w-xl">
-                {track.description}
-              </p>
-
-              {/* <div className="flex flex-wrap gap-6 pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-teal" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                      Duration
-                    </p>
-                    <p className="font-bold">{track.duration_weeks} Weeks</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                    <BarChart className="w-5 h-5 text-teal" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                      Level
-                    </p>
-                    <p className="font-bold">Beginner Welcome</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-teal" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">
-                      Format
-                    </p>
-                    <p className="font-bold">Cohort-based</p>
-                  </div>
-                </div>
-              </div> */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                fontSize: "12.5px",
+                fontWeight: 500,
+                lineHeight: 1.4,
+              }}
+            >
+              <span
+                style={{
+                  width: "7px",
+                  height: "7px",
+                  borderRadius: "50%",
+                  background: "#4FB79A",
+                  boxShadow: "0 0 0 3px rgba(79,183,154,.25)",
+                  animation: "dotBlink 1.4s ease-in-out infinite",
+                  flexShrink: 0,
+                }}
+              />
+              <span>
+                August cohort now enrolling — {track.title}.{" "}
+                <span style={{ color: "#B5D4F4" }}>
+                  30 seats · closes 28 July.
+                </span>
+              </span>
             </div>
+            <button
+              onClick={() => handleApply("training_track", track.id)}
+              style={{
+                font: "600 11.5px 'IBM Plex Sans', sans-serif",
+                background: "#fff",
+                color: "#0C447C",
+                padding: "5px 14px",
+                borderRadius: "20px",
+                border: "none",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Reserve my seat →
+            </button>
+          </div>
 
-            <div className="bg-white rounded-3xl p-8 text-[#00284F] shadow-2xl">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center pb-6 border-b border-gray-100">
-                  <span className="text-gray-500 font-medium">
-                    Foundational and Specialized Track
-                  </span>
-                  {parseInt(track.price) > 0 && (
-                    <span className="text-4xl font-extrabold font-manrope">
-                      £{parseInt(track.price)}
-                    </span>
-                  )}
+          {/* 2. Navbar */}
+          <div
+            style={{
+              background: "#ffffff",
+              padding: "14px clamp(14px,2.5vw,26px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+              flexWrap: "wrap",
+              borderBottom: "1px solid rgba(133,183,235,.14)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "26px",
+                flexWrap: "wrap",
+              }}
+            >
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/logo.png"
+                  alt="PathPalz Logo"
+                  width={180}
+                  height={40}
+                  className="h-10 object-contain"
+                  style={{ height: "auto" }}
+                />
+              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+                <Link
+                  href="/"
+                  className="hover:bg-white/8 transition-colors duration-150"
+                  style={{
+                    fontSize: "13px",
+                    color: "#042C53",
+                    padding: "5px 11px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  Academy
+                </Link>
+                <a
+                  href="#types"
+                  className="hover:bg-white/8 transition-colors duration-150"
+                  style={{
+                    fontSize: "13px",
+                    color: "#042C53",
+                    padding: "5px 11px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  Curriculum
+                </a>
+                <button
+                  onClick={() => handleApply("training_track", track.id)}
+                  className="hover:bg-white/8 transition-colors duration-150"
+                  style={{
+                    fontSize: "13px",
+                    color: "#042C53",
+                    padding: "5px 11px",
+                    borderRadius: "8px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Admissions
+                </button>
+                <a
+                  href="#support"
+                  className="hover:bg-white/8 transition-colors duration-150"
+                  style={{
+                    fontSize: "13px",
+                    color: "#042C53",
+                    padding: "5px 11px",
+                    borderRadius: "8px",
+                  }}
+                >
+                  Mentorship
+                </a>
+              </div>
+            </div>
+            <button
+              onClick={() => handleApply("training_track", track.id)}
+              className="hover:bg-[#2E74BE] transition-colors duration-150"
+              style={{
+                font: "600 13px 'IBM Plex Sans', sans-serif",
+                padding: "8px 17px",
+                borderRadius: "9px",
+                border: "none",
+                cursor: "pointer",
+                background: "#185FA5",
+                color: "#fff",
+                boxShadow: "0 8px 20px rgba(24,95,165,.35)",
+              }}
+            >
+              Get Started
+            </button>
+          </div>
+
+          {/* 3. Hero Section */}
+          <div
+            style={{
+              background: "#042C53",
+              position: "relative",
+              overflow: "hidden",
+              backgroundImage:
+                "radial-gradient(circle at 86% 14%, rgba(24,95,165,.5), transparent 44%),radial-gradient(circle at 2% 96%, rgba(29,110,90,.24), transparent 40%)",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage:
+                  "radial-gradient(rgba(133,183,235,.35) 1px, transparent 1px)",
+                backgroundSize: "24px 24px",
+                opacity: 0.12,
+                animation: "gridPulse 5s ease-in-out infinite",
+                pointerEvents: "none",
+              }}
+            />
+            <div
+              style={{
+                position: "relative",
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "clamp(22px,4vw,44px)",
+                padding: "clamp(24px,4vw,44px) clamp(20px,4vw,52px)",
+              }}
+            >
+              {/* Left column */}
+              <div style={{ flex: "1 1 340px", minWidth: "min(100%,320px)" }}>
+                <Link
+                  href="/training"
+                  className="hover:text-[#B5D4F4] transition-colors"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    font: "500 12px 'IBM Plex Mono',monospace",
+                    color: "#85B7EB",
+                    marginBottom: "16px",
+                    opacity: 0,
+                    animation: "fadeIn .5s ease both .1s",
+                  }}
+                >
+                  ← Back to tracks
+                </Link>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    font: "600 10px 'IBM Plex Mono',monospace",
+                    color: "#8FD3C3",
+                    letterSpacing: ".1em",
+                    textTransform: "uppercase",
+                    marginBottom: "14px",
+                    background: "rgba(79,183,154,.12)",
+                    border: "1px solid rgba(79,183,154,.25)",
+                    padding: "5px 11px",
+                    borderRadius: "20px",
+                    opacity: 0,
+                    animation: "fadeSlideUp .5s ease both .16s",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: "7px",
+                      height: "7px",
+                      borderRadius: "50%",
+                      background: "#4FB79A",
+                      animation: "dotBlink 1.4s infinite",
+                    }}
+                  />
+                  {isOpen ? "Enrolment open" : "Coming soon"}
                 </div>
-
-                <ul className="space-y-4">
+                <h1
+                  style={{
+                    fontFamily: "'Space Grotesk',sans-serif",
+                    fontWeight: 600,
+                    fontSize: "clamp(30px,4.6vw,46px)",
+                    lineHeight: 1.06,
+                    letterSpacing: "-.022em",
+                    color: "#fff",
+                    marginBottom: "16px",
+                    opacity: 0,
+                    animation:
+                      "fadeSlideUp .6s cubic-bezier(.22,1,.36,1) both .22s",
+                  }}
+                >
+                  {track.title}
+                </h1>
+                <p
+                  style={{
+                    fontSize: "clamp(13px,1.5vw,15px)",
+                    color: "#B5D4F4",
+                    lineHeight: 1.65,
+                    maxWidth: "460px",
+                    marginBottom: "22px",
+                    opacity: 0,
+                    animation:
+                      "fadeSlideUp .6s cubic-bezier(.22,1,.36,1) both .3s",
+                  }}
+                >
+                  {track.description}
+                </p>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+                    gap: "12px 18px",
+                    marginBottom: "24px",
+                    opacity: 0,
+                    animation: "fadeSlideUp .6s ease both .4s",
+                  }}
+                >
                   {[
                     "Lifetime access to content",
                     "Certificate of completion",
                     "Discord community access",
                     "Weekly live sessions",
                   ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <ShieldCheck className="w-5 h-5 text-teal shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium">{item}</span>
-                    </li>
+                    <div
+                      key={i}
+                      style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                    >
+                      <span
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "8px",
+                          background: "rgba(133,183,235,.14)",
+                          border: "1px solid rgba(133,183,235,.22)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          font: "600 13px 'IBM Plex Mono',monospace",
+                          color: i === 3 ? "#4FB79A" : "#85B7EB",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {i === 0 ? "∞" : i === 1 ? "✓" : i === 2 ? "◇" : "●"}
+                      </span>
+                      <span style={{ fontSize: "13px", color: "#DCEAF9" }}>
+                        {item}
+                      </span>
+                    </div>
                   ))}
-                </ul>
-
-                {isOpen ? (
-                  <Link
-                    href={`/training/${track.slug}#types`}
-                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                </div>
+                <div
+                  style={{ opacity: 0, animation: "fadeSlideUp .6s ease both .5s" }}
+                >
+                  {isOpen ? (
+                    <button
+                      onClick={() => handleApply("training_track", track.id)}
+                      className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
+                      style={{
+                        display: "inline-block",
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        background: "#185FA5",
+                        color: "#fff",
+                        padding: "12px 24px",
+                        borderRadius: "10px",
+                        border: "none",
+                        cursor: "pointer",
+                        boxShadow: "0 8px 22px rgba(24,95,165,.38)",
+                      }}
+                    >
+                      Apply for this path
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsWaitlistModalOpen(true)}
+                      className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
+                      style={{
+                        display: "inline-block",
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        background: "#185FA5",
+                        color: "#fff",
+                        padding: "12px 24px",
+                        borderRadius: "10px",
+                        border: "none",
+                        cursor: "pointer",
+                        boxShadow: "0 8px 22px rgba(24,95,165,.38)",
+                      }}
+                    >
+                      Join waitlist
+                    </button>
+                  )}
+                  <div
+                    style={{
+                      font: "500 11.5px 'IBM Plex Mono',monospace",
+                      color: "#85B7EB",
+                      marginTop: "10px",
+                    }}
                   >
-                    Apply for this path
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => setIsWaitlistModalOpen(true)}
-                    className="w-full h-16 bg-[#00284F] text-white rounded-2xl font-bold text-lg hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
-                  >
-                    Join the Waitlist
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                )}
-
-                <p className="text-center text-xs text-gray-400 font-medium">
-                  {isOpen
-                    ? "Application process takes under 5 minutes"
-                    : "Get notified when the next cohort opens"}
-                </p>
+                    Application process takes under 2 minutes
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Training Paths Section */}
-      <TrainingPaths
-        trackId={String(track.id)}
-        trackTitle={track.title}
-        onApply={handleApply}
-        slug={slug as string}
-        isOpen={isOpen}
-        onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
-      />
-
-      <section className="py-12 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 w-full ">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-16">
-          {/* Left: Curriculum & Modules */}
-          <div className="lg:col-span-3 space-y-12">
-            {/* Specialized Tracks Section */}
-            <div id="sub_types" className="lg:col-span-2 ">
-              <SpecializedTracks
-                trackId={String(track.id)}
-                onApply={handleApply}
-                isOpen={isOpen}
-                onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
-              />
-            </div>
-
-            {/* <div>
-              <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
-                Curriculum Deep Dive
-              </h2>
-
-              <Curriculum
-                subTypeId={String(specializedSubTypes?.id || "")}
-                subType={specializedSubTypes}
-                onApply={handleApply}
-              />
-            </div> */}
-
-            <div>
-              <h2 className="text-3xl font-bold font-manrope text-[#00284F] mb-8 flex items-center gap-3">
-                What you'll achieve
-              </h2>
-              <div className="bg-white rounded-3xl p-10 border border-gray-100 relative overflow-hidden">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-[#00284F]">
-                      Industry Readiness
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Master the exact tools and workflows used by professional
-                      engineers in active production environments.
-                    </p>
+              {/* Right column — matches design exactly */}
+              <div
+                style={{
+                  flex: "1 1 320px",
+                  minWidth: "min(100%,300px)",
+                  position: "relative",
+                  opacity: 0,
+                  animation: "fadeIn .7s ease both .4s",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    width: "clamp(140px,40%,200px)",
+                    height: "clamp(140px,40%,200px)",
+                    top: "-6%",
+                    right: "2%",
+                    borderRadius: "50%",
+                    background:
+                      "radial-gradient(circle,rgba(79,183,154,.4),transparent 68%)",
+                    filter: "blur(18px)",
+                    animation: motionStyles.blobA,
+                    pointerEvents: "none",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    animation: motionStyles.floatMain,
+                  }}
+                >
+                  <div
+                    style={{
+                      borderRadius: "16px",
+                      overflow: "hidden",
+                      border: "1px solid rgba(255,255,255,.14)",
+                      boxShadow:
+                        "0 22px 60px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.07)",
+                      animation: motionStyles.glowMain,
+                      aspectRatio: "16/10",
+                      background: "#08192B",
+                      position: "relative",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        animation: motionStyles.kenBurns,
+                      }}
+                    >
+                      <img
+                        src="/track.png"
+                        alt="PathPalz Mockup"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-[#00284F]">
-                      Production Portfolio
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Build and deploy 5+ significant projects to your personal
-                      GitHub, ready for employer review.
-                    </p>
+
+                  {/* Badge A — dark bg "npm run deploy" (matches design) */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-14px",
+                      left: "-16px",
+                      background: "#042C53",
+                      border: "1px solid rgba(133,183,235,.3)",
+                      borderRadius: "11px",
+                      padding: "8px 12px",
+                      boxShadow: "0 12px 28px rgba(0,0,0,.32)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      animation: motionStyles.badgeA,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        background: "#1D9E75",
+                        animation: "dotBlink 1.4s infinite",
+                      }}
+                    />
+                    <span
+                      style={{
+                        font: "600 11px 'IBM Plex Mono',monospace",
+                        color: "#DCEAF9",
+                      }}
+                    >
+                      npm run deploy
+                    </span>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-[#00284F]">
-                      Network & Community
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Connect with a supportive group of peers and instructors
-                      who are equally committed to high-growth tech careers.
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-bold text-[#00284F]">
-                      Career Velocity
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Accelerate your transition from learner to earning with
-                      practical, job-first training focused on results.
-                    </p>
+
+                  {/* Badge B — white bg "Zero → job-ready / 16 weeks live" (matches design) */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "-14px",
+                      right: "-14px",
+                      background: "#fff",
+                      borderRadius: "11px",
+                      padding: "8px 13px",
+                      boxShadow: "0 12px 28px rgba(0,0,0,.3)",
+                      animation: motionStyles.badgeB,
+                    }}
+                  >
+                    <div
+                      style={{
+                        font: "500 9px 'IBM Plex Mono',monospace",
+                        color: "#8A8981",
+                        letterSpacing: ".06em",
+                        textTransform: "uppercase",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      Zero → job-ready
+                    </div>
+                    <div
+                      style={{
+                        font: "600 14px 'Space Grotesk',sans-serif",
+                        color: "#042C53",
+                      }}
+                    >
+                      16 weeks live
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right: Sidebar / Info */}
-          <div className="space-y-8">
-            {/* Tutor */}
-            <TutorSection />
+          {/* 4. Training Paths (Types) — API data */}
+          <TrainingPaths
+            trackId={String(track.id)}
+            trackTitle={track.title}
+            onApply={handleApply}
+            slug={slug as string}
+            isOpen={isOpen}
+            onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
+          />
 
-            <div className="bg-teal p-8 rounded-3xl text-white">
-              <h3 className="text-xl font-bold mb-4">
-                Questions about this track?
-              </h3>
-              <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                Our support team is available to help you choose the best path
-                for your career goals.
-              </p>
-              <button className="w-full h-12 bg-white text-teal rounded-xl font-bold hover:bg-gray-100 transition-colors">
-                Speak to an Advisor
-              </button>
+          {/* 5. Specialized Tracks Deep Dive — API data */}
+          <div id="sub_types" style={{ scrollMarginTop: "20px" }}>
+            <SpecializedTracks
+              trackId={String(track.id)}
+              onApply={handleApply}
+              isOpen={isOpen}
+              onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
+            />
+          </div>
+
+          {/* 6. What you'll achieve + Prerequisites */}
+          <div
+            style={{
+              background: "#F5F3EC",
+              backgroundImage:
+                "radial-gradient(rgba(15,110,86,.05) 1px,transparent 1px),radial-gradient(circle at 0% 0%,rgba(15,110,86,.06),transparent 44%)",
+              backgroundSize: "22px 22px,100% 100%",
+              padding: "clamp(32px,4vw,54px) clamp(20px,4vw,52px)",
+              borderBottom: "1px solid #E7E4DB",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+                gap: "28px",
+              }}
+            >
+              <div data-reveal="">
+                <div
+                  style={{
+                    fontFamily: "'Space Grotesk',sans-serif",
+                    fontWeight: 600,
+                    fontSize: "clamp(18px,2.4vw,24px)",
+                    color: "#2C2C2A",
+                    marginBottom: "18px",
+                  }}
+                >
+                  What you'll achieve
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  }}
+                >
+                  {[
+                    {
+                      icon: "◆",
+                      title: "Industry Readiness",
+                      body: "Exit with the skills to immediately contribute to real production codebases.",
+                    },
+                    {
+                      icon: "▸",
+                      title: "Production Portfolio",
+                      body: "Ship a real, working full-stack application deployed live on the internet.",
+                    },
+                    {
+                      icon: "◎",
+                      title: "Network & Community",
+                      body: "Connect with peers and mentors in our dedicated Discord channels.",
+                    },
+                    {
+                      icon: "↗",
+                      title: "Career Velocity",
+                      body: "Position yourself for developer roles with a portfolio that proves what you can build.",
+                    },
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: "13px" }}>
+                      <span
+                        style={{
+                          width: "38px",
+                          height: "38px",
+                          borderRadius: "10px",
+                          background: "#E6F1FB",
+                          color: "#0C447C",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          font: "600 15px 'IBM Plex Mono',monospace",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {item.icon}
+                      </span>
+                      <div>
+                        <div
+                          style={{
+                            font: "600 14px 'IBM Plex Sans',sans-serif",
+                            color: "#2C2C2A",
+                            marginBottom: "2px",
+                          }}
+                        >
+                          {item.title}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12.5px",
+                            color: "#5F5E5A",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {item.body}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div data-reveal="" data-reveal-delay="0.1">
+                <div
+                  style={{
+                    fontFamily: "'Space Grotesk',sans-serif",
+                    fontWeight: 600,
+                    fontSize: "clamp(18px,2.4vw,24px)",
+                    color: "#2C2C2A",
+                    marginBottom: "18px",
+                  }}
+                >
+                  Prerequisites
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "13px",
+                    marginBottom: "22px",
+                  }}
+                >
+                  {[
+                    "Basic computer literacy",
+                    "Standard laptop or desktop",
+                    "Reliable internet access",
+                    "12+ hours per week commitment",
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "11px",
+                        fontSize: "13.5px",
+                        color: "#2C2C2A",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: "22px",
+                          height: "22px",
+                          borderRadius: "50%",
+                          background: "#E1F5EE",
+                          color: "#0F6E56",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "12px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        ✓
+                      </span>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <div
+                  style={{
+                    background: "#fff",
+                    border: "1px solid #E7E4DB",
+                    borderRadius: "12px",
+                    padding: "18px",
+                  }}
+                >
+                  <div
+                    style={{
+                      font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                      color: "#2C2C2A",
+                      marginBottom: "12px",
+                    }}
+                  >
+                    Questions about this track?
+                  </div>
+                  <button
+                    onClick={() => handleApply("training_track", track.id)}
+                    className="hover:bg-[#F1EFE8] transition-colors duration-150"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      font: "600 12.5px 'IBM Plex Sans',sans-serif",
+                      background: "#fff",
+                      color: "#042C53",
+                      padding: "11px",
+                      borderRadius: "9px",
+                      border: "1px solid #C9CFD6",
+                      cursor: "pointer",
+                      width: "100%",
+                    }}
+                  >
+                    ◇ Speak to an Advisor
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div className="bg-white border border-gray-100 rounded-3xl p-8 space-y-6">
-              <h3 className="text-xl font-bold text-[#00284F]">
-                Prerequisites
-              </h3>
-              <ul className="space-y-4">
-                {[
-                  "Basic computer literacy",
-                  "Standard laptop or desktop",
-                  "Reliable internet access",
-                  "12+ hours per week commitment",
-                ].map((item, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-[#424750]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-teal mt-1.5 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+          {/* 7. CTA */}
+          <div
+            style={{
+              background: "#185FA5",
+              padding: "clamp(30px,4vw,48px) clamp(20px,4vw,52px)",
+              textAlign: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage:
+                  "radial-gradient(rgba(255,255,255,.28) 1px, transparent 1px)",
+                backgroundSize: "22px 22px",
+                opacity: 0.14,
+                pointerEvents: "none",
+              }}
+            />
+            <div data-reveal="" style={{ position: "relative" }}>
+              <div
+                style={{
+                  fontFamily: "'Space Grotesk',sans-serif",
+                  fontWeight: 600,
+                  fontSize: "clamp(20px,2.8vw,28px)",
+                  color: "#fff",
+                  marginBottom: "16px",
+                  letterSpacing: "-.01em",
+                }}
+              >
+                Ready to build your first real application?
+              </div>
+              {isOpen ? (
+                <button
+                  onClick={() => handleApply("training_track", track.id)}
+                  className="hover:-translate-y-0.5 transition-all duration-150"
+                  style={{
+                    display: "inline-block",
+                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    background: "#fff",
+                    color: "#0C447C",
+                    padding: "12px 26px",
+                    borderRadius: "10px",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 10px 26px rgba(0,0,0,.18)",
+                  }}
+                >
+                  Apply for this path
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsWaitlistModalOpen(true)}
+                  className="hover:-translate-y-0.5 transition-all duration-150"
+                  style={{
+                    display: "inline-block",
+                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    background: "#fff",
+                    color: "#0C447C",
+                    padding: "12px 26px",
+                    borderRadius: "10px",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 10px 26px rgba(0,0,0,.18)",
+                  }}
+                >
+                  Join waitlist
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 8. Simple Footer — matches design */}
+          <div
+            style={{
+              background: "#0A2036",
+              padding: "clamp(24px,3vw,36px) clamp(20px,4vw,52px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href="/"
+              style={{
+                fontFamily: "'Space Grotesk',sans-serif",
+                fontWeight: 600,
+                fontSize: "18px",
+                color: "#fff",
+              }}
+            >
+              Path<span style={{ color: "#5FA8E8" }}>Palz</span>
+            </Link>
+            <div style={{ display: "flex", gap: "18px", flexWrap: "wrap" }}>
+              <span
+                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
+              >
+                Privacy Policy
+              </span>
+              <span
+                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
+              >
+                Terms of Service
+              </span>
+              <span
+                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
+              >
+                Security
+              </span>
+              <span
+                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
+              >
+                Alumni Network
+              </span>
+            </div>
+            <div
+              style={{
+                font: "500 11px 'IBM Plex Mono',monospace",
+                color: "#5F7C99",
+              }}
+            >
+              © 2025 PathPalz · Precision in Development, Human in Approach.
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
       <PaymentGatewayModal
         isOpen={isPaymentModalOpen}
@@ -482,332 +1167,542 @@ export default function TrackDetailClient() {
         trackTitle={track.title}
       />
 
-      {/* ── Discount Code Modal ────────────────────────────────────────── */}
+      {/* Discount Code Modal */}
       {isDiscountModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00284f]/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                {discountView === "generate" && (
-                  <button
-                    onClick={() => setDiscountView("enter")}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
-                  >
-                    <ChevronRight className="w-5 h-5 rotate-180" />
-                  </button>
-                )}
-                <div>
-                  <h3 className="text-xl font-bold text-[#00284F]">
-                    {discountView === "enter"
-                      ? "Discount Code"
-                      : "Generate Discount Code"}
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    {discountView === "enter"
-                      ? "Apply a code to get a discount on your enrolment"
-                      : "Select a discount type and fill in the required details"}
-                  </p>
-                </div>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 60,
+            background: "rgba(2, 16, 33, 0.72)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            animation: "overlayIn 0.2s ease both",
+          }}
+          onClick={() => setIsDiscountModalOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "440px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 40px 90px rgba(0,0,0,0.4)",
+              animation:
+                "scaleIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both 0.06s",
+            }}
+          >
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid #EDEBE3",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                position: "sticky",
+                top: 0,
+                background: "#fff",
+                borderRadius: "16px 16px 0 0",
+                zIndex: 10,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Space Grotesk',sans-serif",
+                  fontWeight: 600,
+                  fontSize: "15px",
+                  color: "#2C2C2A",
+                }}
+              >
+                {discountView === "enter"
+                  ? "Apply a discount code"
+                  : "Generate a discount code"}
               </div>
               <button
                 onClick={() => setIsDiscountModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  background: "#F1EFE8",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                  color: "#8A8981",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <X className="w-5 h-5" />
+                ×
               </button>
             </div>
 
-            {/* ── View A: Enter Code ── */}
-            {discountView === "enter" && (
-              <div className="p-6 space-y-5">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Discount Code
-                  </label>
-                  <div className="relative">
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <div style={{ padding: "20px" }}>
+              <div
+                style={{
+                  background: "#F4F9FE",
+                  border: "1px solid #DCE9F6",
+                  borderRadius: "9px",
+                  padding: "11px 14px",
+                  marginBottom: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    color: "#0C447C",
+                  }}
+                >
+                  {track.title}
+                </div>
+                <div
+                  style={{
+                    font: "500 11px 'IBM Plex Mono',monospace",
+                    color: "#5F7C99",
+                    marginTop: "3px",
+                  }}
+                >
+                  August 2025 · {track.duration_weeks} weeks · Original:{" "}
+                  {getCurrencySymbol(country?.currency)}
+                  {selectedItemPrice?.toLocaleString()}
+                </div>
+              </div>
+
+              {discountView === "enter" ? (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+                >
+                  <div>
+                    <label
+                      style={{
+                        font: "600 12px 'IBM Plex Sans',sans-serif",
+                        color: "#5F5E5A",
+                        marginBottom: "6px",
+                        display: "block",
+                      }}
+                    >
+                      Discount code (if you already have one)
+                    </label>
                     <input
                       type="text"
-                      placeholder="e.g. HGFDYJKH20"
+                      placeholder="e.g. STUDENT-2025-XXXX"
                       value={discountCode}
                       onChange={(e) =>
                         setDiscountCode(e.target.value.toUpperCase())
                       }
-                      className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 text-[#00284F] font-mono font-bold tracking-widest focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                      style={{
+                        width: "100%",
+                        font: "400 13px 'IBM Plex Mono',monospace",
+                        padding: "10px 12px",
+                        borderRadius: "9px",
+                        border: "1px solid #D3D1C7",
+                        background: "#fff",
+                        color: "#2C2C2A",
+                      }}
                     />
                   </div>
-                </div>
-
-                <div className="bg-linear-to-br from-teal/5 to-blue-50 border border-teal/20 rounded-2xl p-4 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center shrink-0 mt-0.5">
-                    <GraduationCap className="w-5 h-5 text-teal" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#00284F]">
-                      Need a discount code?
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5 mb-2">
-                      Students, teachers, and promo recipients can generate a
-                      code based on their discount type.
-                    </p>
-                    <button
-                      onClick={() => setDiscountView("generate")}
-                      className="text-teal text-xs font-bold hover:underline inline-flex items-center gap-1"
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      margin: "8px 0",
+                      color: "#8A8981",
+                    }}
+                  >
+                    <div
+                      style={{ flex: 1, height: "1px", background: "#EDEBE3" }}
+                    />
+                    <div
+                      style={{
+                        font: "500 11.5px 'IBM Plex Mono',monospace",
+                      }}
                     >
-                      Generate a discount code
-                      <ChevronRight className="w-3 h-3" />
-                    </button>
+                      or generate a new code
+                    </div>
+                    <div
+                      style={{ flex: 1, height: "1px", background: "#EDEBE3" }}
+                    />
                   </div>
-                </div>
-
-                {hasDiscountSummary && (
-                  <div className="rounded-2xl border border-teal/20 bg-teal/5 p-4 space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Original price</span>
-                      <span className="font-semibold text-[#00284F]">
-                        {getCurrencySymbol(country?.currency)}
-                        {selectedItemPrice?.toLocaleString()}
-                      </span>
+                  <div
+                    onClick={() => setDiscountView("generate")}
+                    style={{
+                      border: "1px solid #E4E2DA",
+                      background: "#fff",
+                      borderRadius: "10px",
+                      padding: "11px 13px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div
+                      style={{
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        color: "#2C2C2A",
+                      }}
+                    >
+                      Generate Student/School/Bespoke Code
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Discount</span>
-                      <span className="font-semibold text-emerald-600">
-                        -{discountPercentage}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between border-t border-teal/10 pt-2">
-                      <span className="font-semibold text-[#00284F]">
-                        You pay
-                      </span>
-                      <span className="font-bold text-[#00284F]">
-                        {getCurrencySymbol(country?.currency)}
-                        {discountedAmount?.toLocaleString()}
-                      </span>
+                    <div
+                      style={{
+                        fontSize: "11.5px",
+                        color: "#8A8981",
+                        lineHeight: 1.45,
+                        marginTop: "3px",
+                      }}
+                    >
+                      Secondary school, college or university students, school
+                      groups, and occasion campaigns. Click here to verify and
+                      generate.
                     </div>
                   </div>
-                )}
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-1">
-                  <button
-                    onClick={() => setIsDiscountModalOpen(false)}
-                    className="flex-1 h-12 border border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleDiscountContinue}
-                    className="flex-1 h-12 bg-[#00284F] text-white rounded-xl font-bold text-sm hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
-                  >
-                    {discountCode.trim()
-                      ? "Apply & Continue"
-                      : "Skip & Continue"}
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  {hasDiscountSummary && (
+                    <div
+                      style={{
+                        background: "#E1F5EE",
+                        border: "1px solid #9FE1CB",
+                        borderRadius: "10px",
+                        padding: "12px 14px",
+                        marginTop: "12px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: "13px",
+                          color: "#085041",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        <span>Original Price</span>
+                        <span style={{ fontWeight: 600 }}>
+                          {getCurrencySymbol(country?.currency)}
+                          {selectedItemPrice?.toLocaleString()}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: "13px",
+                          color: "#085041",
+                          marginBottom: "4px",
+                        }}
+                      >
+                        <span>Discount</span>
+                        <span style={{ fontWeight: 600 }}>
+                          -{discountPercentage}%
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontSize: "14px",
+                          color: "#04342C",
+                          borderTop: "1px dashed #9FE1CB",
+                          paddingTop: "6px",
+                          marginTop: "6px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        <span>Discounted Price</span>
+                        <span>
+                          {getCurrencySymbol(country?.currency)}
+                          {discountedAmount?.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div
+                  style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+                >
+                  <DiscountGenerateForm
+                    defaultEmail={user?.email ?? guestData.email ?? ""}
+                    onSuccess={(code) => {
+                      setDiscountCode(code);
+                      setDiscountView("enter");
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
-            {discountView === "generate" && (
-              <div className="p-6 overflow-auto max-h-[70vh]">
-                <DiscountGenerateForm
-                  defaultEmail={user?.email ?? guestData.email ?? ""}
-                  onSuccess={(code) => {
-                    setDiscountCode(code);
-                    setDiscountView("enter");
+            <div
+              style={{
+                padding: "14px 20px",
+                borderTop: "1px solid #EDEBE3",
+                display: "flex",
+                gap: "10px",
+                alignItems: "center",
+                flexWrap: "wrap",
+                position: "sticky",
+                bottom: 0,
+                background: "#fff",
+                borderRadius: "0 0 16px 16px",
+              }}
+            >
+              {discountView === "generate" ? (
+                <button
+                  onClick={() => setDiscountView("enter")}
+                  style={{
+                    font: "500 12px 'IBM Plex Sans',sans-serif",
+                    color: "#185FA5",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "9px",
                   }}
-                />
-              </div>
-            )}
+                >
+                  ← Back to enter code
+                </button>
+              ) : (
+                <button
+                  onClick={handleDiscountContinue}
+                  style={{
+                    font: "500 12px 'IBM Plex Sans',sans-serif",
+                    color: "#8A8981",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: "9px",
+                  }}
+                >
+                  No discount — continue
+                </button>
+              )}
+              {discountView === "enter" && (
+                <button
+                  onClick={handleDiscountContinue}
+                  style={{
+                    flex: "1 1 auto",
+                    font: "600 13px 'IBM Plex Sans',sans-serif",
+                    background: "#185FA5",
+                    color: "#fff",
+                    padding: "11px 14px",
+                    borderRadius: "9px",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "background .15s",
+                  }}
+                >
+                  {discountCode.trim() ? "Apply & Continue →" : "Continue →"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
 
+      {/* Guest Checkout Modal */}
       {isGuestModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#00284f]/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center p-6 border-b border-gray-100">
-              <div>
-                <h3 className="text-xl font-bold text-[#00284F]">
-                  Guest Checkout
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Please enter your details to proceed
-                </p>
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 60,
+            background: "rgba(2, 16, 33, 0.72)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+            animation: "overlayIn 0.2s ease both",
+          }}
+          onClick={() => setIsGuestModalOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "440px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 40px 90px rgba(0,0,0,0.4)",
+              animation:
+                "scaleIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both 0.06s",
+            }}
+          >
+            <div
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid #EDEBE3",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                position: "sticky",
+                top: 0,
+                background: "#fff",
+                borderRadius: "16px 16px 0 0",
+                zIndex: 10,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "'Space Grotesk',sans-serif",
+                  fontWeight: 600,
+                  fontSize: "15px",
+                  color: "#2C2C2A",
+                }}
+              >
+                Guest Checkout
               </div>
               <button
                 onClick={() => setIsGuestModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  background: "#F1EFE8",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "16px",
+                  color: "#8A8981",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <X className="w-5 h-5" />
+                ×
               </button>
             </div>
 
             <form
               onSubmit={handleGuestSubmit}
-              className="p-6 space-y-4 overflow-auto max-h-[80vh]"
+              style={{
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "14px",
+              }}
             >
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#00284F]">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="John Doe"
-                  value={guestData.fullName}
-                  onChange={(e) =>
-                    setGuestData({ ...guestData, fullName: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#00284F]">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="john@example.com"
-                  value={guestData.email}
-                  onChange={(e) =>
-                    setGuestData({ ...guestData, email: e.target.value })
-                  }
-                  className="w-full px-4 py-3 text-black rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#00284F]">
-                  Phone Nmuber
-                </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="1234567890"
-                  value={guestData.phoneNumber}
-                  onChange={(e) =>
-                    setGuestData({ ...guestData, phoneNumber: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Country
+              {[
+                { label: "Full Name", field: "fullName", type: "text", placeholder: "John Doe", required: true },
+                { label: "Email Address", field: "email", type: "email", placeholder: "john@example.com", required: true },
+                { label: "Phone Number", field: "phoneNumber", type: "tel", placeholder: "e.g. +44 7123 456789 or +234 80 1234 5678", required: true },
+              ].map(({ label, field, type, placeholder, required }) => (
+                <div key={field}>
+                  <label
+                    style={{
+                      font: "600 12px 'IBM Plex Sans',sans-serif",
+                      color: "#5F5E5A",
+                      marginBottom: "6px",
+                      display: "block",
+                    }}
+                  >
+                    {label}
                   </label>
                   <input
-                    type="text"
-                    required
-                    placeholder="enter your country"
-                    value={guestData.country}
+                    type={type}
+                    required={required}
+                    placeholder={placeholder}
+                    value={(guestData as any)[field]}
                     onChange={(e) =>
-                      setGuestData({ ...guestData, country: e.target.value })
+                      setGuestData({ ...guestData, [field]: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
+                    style={{
+                      width: "100%",
+                      font: "400 13px 'IBM Plex Sans', sans-serif",
+                      padding: "10px 12px",
+                      borderRadius: "9px",
+                      border: "1px solid #D3D1C7",
+                      background: "#fff",
+                      color: "#2C2C2A",
+                    }}
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    State
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="enter your state"
-                    value={guestData.state}
-                    onChange={(e) =>
-                      setGuestData({ ...guestData, state: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    City
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="enter your city"
-                    value={guestData.city}
-                    onChange={(e) =>
-                      setGuestData({ ...guestData, city: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Street Address
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="enter your street address"
-                    value={guestData.street}
-                    onChange={(e) =>
-                      setGuestData({ ...guestData, street: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    House Number
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="enter your house number"
-                    value={guestData.house_number}
-                    onChange={(e) =>
-                      setGuestData({
-                        ...guestData,
-                        house_number: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
+              ))}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#00284F]">
-                    Apartment Number
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="enter your apartment number"
-                    value={guestData.apartment_number}
-                    onChange={(e) =>
-                      setGuestData({
-                        ...guestData,
-                        apartment_number: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-3 rounded-xl text-black border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all"
-                  />
-                </div>
+              <div
+                style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}
+              >
+                {[
+                  { label: "Country", field: "country", placeholder: "e.g. United Kingdom" },
+                  { label: "State / Region", field: "state", placeholder: "e.g. London" },
+                  { label: "City", field: "city", placeholder: "e.g. London" },
+                  { label: "Street Address", field: "street", placeholder: "e.g. High Street" },
+                  { label: "House Number", field: "house_number", placeholder: "e.g. 42" },
+                  { label: "Apartment (Optional)", field: "apartment_number", placeholder: "e.g. Flat 4", optional: true },
+                ].map(({ label, field, placeholder, optional }) => (
+                  <div key={field}>
+                    <label
+                      style={{
+                        font: "600 12px 'IBM Plex Sans',sans-serif",
+                        color: "#5F5E5A",
+                        marginBottom: "6px",
+                        display: "block",
+                      }}
+                    >
+                      {label}
+                    </label>
+                    <input
+                      type="text"
+                      required={!optional}
+                      placeholder={placeholder}
+                      value={(guestData as any)[field]}
+                      onChange={(e) =>
+                        setGuestData({ ...guestData, [field]: e.target.value })
+                      }
+                      style={{
+                        width: "100%",
+                        font: "400 13px 'IBM Plex Sans', sans-serif",
+                        padding: "10px 12px",
+                        borderRadius: "9px",
+                        border: "1px solid #D3D1C7",
+                        background: "#fff",
+                        color: "#2C2C2A",
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
 
-              <div className="pt-4">
+              <div
+                style={{
+                  padding: "14px 0 0 0",
+                  display: "flex",
+                  gap: "10px",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
                 <button
                   type="submit"
-                  className="w-full h-12 bg-[#00284F] text-white rounded-xl font-bold hover:bg-[#00284F]/90 transition-all flex items-center justify-center group"
+                  style={{
+                    flex: "1 1 auto",
+                    font: "600 13px 'IBM Plex Sans', sans-serif",
+                    background: "#185FA5",
+                    color: "#fff",
+                    padding: "11px 14px",
+                    borderRadius: "9px",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "background .15s",
+                  }}
                 >
-                  Continue to Payment
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  Continue to Discount Selection →
                 </button>
               </div>
 
-              <div className="text-center pt-2">
-                <p className="text-sm text-gray-500">
+              <div style={{ textAlign: "center", paddingTop: "8px" }}>
+                <p style={{ fontSize: "13px", color: "#8A8981" }}>
                   Already have an account?{" "}
                   <Link
                     href={`/login?redirect=/training/${slug}`}
-                    className="text-teal font-semibold hover:underline"
+                    style={{
+                      textDecoration: "none",
+                      color: "#185FA5",
+                      fontWeight: 600,
+                    }}
                   >
                     Log in
                   </Link>

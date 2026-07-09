@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { X, CheckCircle2, BookOpen } from "lucide-react";
 import { useGetSubTypeModuleHeaders } from "@/query/admin/course-module-headers";
 import { useGetHeaderModules } from "@/query/admin/course-modules";
 import { ISubType } from "@/types/admin/admin";
@@ -21,28 +20,24 @@ const ModuleList = ({ headerId }: { headerId: string }) => {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pl-16 animate-pulse">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "8px 16px", paddingLeft: "38px" }}>
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-4 bg-gray-100 rounded w-full" />
+          <div key={i} className="animate-pulse" style={{ height: "14px", background: "#F1EFE8", borderRadius: "4px" }} />
         ))}
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pl-16">
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "8px 16px", paddingLeft: "38px" }}>
       {modules.map((mod: any) => (
-        <div key={mod.id} className="flex items-start gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#00677D] mt-2 shrink-0" />
-          <span className="text-sm font-medium text-gray-600 leading-tight">
-            {mod.title}
-          </span>
+        <div key={mod.id} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4FB79A", flexShrink: 0 }}></span>
+          <span style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.4 }}>{mod.title}</span>
         </div>
       ))}
       {modules.length === 0 && (
-        <span className="text-xs text-gray-400 italic pl-1">
-          No modules listed for this section.
-        </span>
+        <span style={{ fontStyle: "italic", fontSize: "11px", color: "#8A8981" }}>No modules listed</span>
       )}
     </div>
   );
@@ -67,65 +62,125 @@ const SyllabusModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-[#00284F]/60 backdrop-blur-md transition-all duration-300"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 100,
+        background: "rgba(2, 16, 33, 0.72)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        animation: "overlayIn 0.2s ease both",
+      }}
       onClick={handleOverlayClick}
     >
-      <div className="bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl relative flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: "#fff",
+          borderRadius: "16px",
+          width: "100%",
+          maxWidth: "580px",
+          maxHeight: "90vh",
+          overflowY: "auto",
+          boxShadow: "0 40px 90px rgba(0,0,0,0.4)",
+          animation: "scaleIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both 0.06s",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {/* Header */}
-        <div className="p-8 pb-6 border-b border-gray-50 flex justify-between items-center shrink-0">
-          <div className="w-full text-center pr-8">
-            <h2 className="text-3xl font-black font-manrope text-[#00284F]">
-              12 Weeks Learning Curriculum
-            </h2>
+        <div
+          style={{
+            padding: "16px 20px",
+            borderBottom: "1px solid #EDEBE3",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            position: "sticky",
+            top: 0,
+            background: "#fff",
+            borderRadius: "16px 16px 0 0",
+            zIndex: 10,
+          }}
+        >
+          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: "15px", color: "#2C2C2A" }}>
+            {subType?.title || "Track"} Syllabus Modules
           </div>
           <button
             onClick={onClose}
-            className="absolute top-8 right-8 p-2 hover:bg-gray-100 rounded-full transition-colors group"
+            style={{
+              width: "28px",
+              height: "28px",
+              borderRadius: "50%",
+              background: "#F1EFE8",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "16px",
+              color: "#8A8981",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <X className="w-6 h-6 text-gray-400 group-hover:text-gray-600" />
+            ×
           </button>
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto flex-1 p-8 pt-6 custom-scrollbar">
-          <p className="text-gray-500 text-center max-w-2xl mx-auto mb-10 leading-relaxed">
+        <div style={{ padding: "20px", flex: 1, overflowY: "auto" }}>
+          <p style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.6, marginBottom: "20px" }}>
             {subType?.description ||
-              "Entry by completion of Foundational tracks, or by instructor recommendation after Foundation. This is not a beginner track — it assumes trainees can already build systems independently."}
+              "Entry by completion of Foundational tracks, or by instructor recommendation after Foundation. This is not a beginner track."}
           </p>
 
           {isLoading ? (
-            <div className="space-y-8 animate-pulse">
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }} className="animate-pulse">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-gray-50/50 rounded-3xl p-8 border border-gray-100"
-                >
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-8 h-8 rounded-full bg-gray-200" />
-                    <div className="h-6 bg-gray-200 rounded w-48" />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {[1, 2, 3, 4].map((j) => (
-                      <div key={j} className="h-4 bg-gray-200 rounded w-full" />
-                    ))}
-                  </div>
-                </div>
+                  style={{
+                    background: "#F8F7F1",
+                    border: "1px solid #EAE8DF",
+                    borderRadius: "14px",
+                    padding: "18px",
+                    height: "100px",
+                  }}
+                />
               ))}
             </div>
           ) : headers.length > 0 ? (
-            <div className="space-y-8 pb-4">
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
               {headers.map((header, index) => (
                 <div
                   key={header.id}
-                  className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                  style={{
+                    background: "#F8F7F1",
+                    border: "1px solid #EAE8DF",
+                    borderRadius: "14px",
+                    padding: "18px",
+                  }}
                 >
-                  <div className="flex items-center gap-6 mb-6">
-                    <div className="w-10 h-10 rounded-full bg-[#00677D]/10 text-[#00677D] flex items-center justify-center font-black text-sm shrink-0">
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+                    <div
+                      style={{
+                        width: "28px",
+                        height: "28px",
+                        borderRadius: "8px",
+                        background: "rgba(24,95,165,.1)",
+                        color: "#185FA5",
+                        font: "600 12.5px 'Space Grotesk',sans-serif",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       {index + 1}
                     </div>
-                    <h3 className="text-lg font-black text-[#00284F] tracking-wider uppercase">
+                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "14.5px", color: "#042C53" }}>
                       {header.title}
-                    </h3>
+                    </div>
                   </div>
 
                   <ModuleList headerId={String(header.id)} />
@@ -133,44 +188,46 @@ const SyllabusModal = ({
               ))}
             </div>
           ) : (
-            <div className="py-20 text-center">
-              <BookOpen className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-              <p className="text-gray-400 font-medium">
-                Curriculum details are being finalized.
-              </p>
+            <div style={{ textAlign: "center", padding: "40px 0", color: "#8A8981" }}>
+              <div style={{ fontSize: "13px" }}>Curriculum details are being finalized.</div>
             </div>
           )}
         </div>
 
         {/* Footer Action */}
-        <div className="p-8 pt-4 border-t border-gray-50 shrink-0">
+        <div
+          style={{
+            padding: "14px 20px",
+            borderTop: "1px solid #EDEBE3",
+            display: "flex",
+            justifyContent: "flex-end",
+            position: "sticky",
+            bottom: 0,
+            background: "#fff",
+            borderRadius: "0 0 16px 16px",
+          }}
+        >
           <button
             onClick={() => {
               if (subType) onApply("sub_type", subType.id);
               onClose();
             }}
-            className="w-full py-5 bg-[#00677D] text-white rounded-2xl font-bold text-lg hover:bg-[#00677D]/90 transition-all shadow-xl shadow-[#00677D]/20 active:scale-[0.98]"
+            style={{
+              width: "100%",
+              font: "600 13px 'IBM Plex Sans', sans-serif",
+              background: "#185FA5",
+              color: "#fff",
+              padding: "11px 14px",
+              borderRadius: "9px",
+              border: "none",
+              cursor: "pointer",
+              transition: "background .15s",
+            }}
           >
-            Apply for {subType?.title || "this Track"}
+            Apply for {subType?.title || "this Track"} →
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e5e7eb;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #d1d5db;
-        }
-      `}</style>
     </div>
   );
 };
