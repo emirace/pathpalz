@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const STEPS = [
   {
     num: "01",
@@ -47,10 +49,11 @@ export function HowItWorks() {
         borderBottom: "1px solid #E7E4DB",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div
         data-reveal=""
         style={{
-          font: "500 11px 'IBM Plex Mono',monospace",
+          font: "500 12px 'IBM Plex Mono',monospace",
           letterSpacing: ".1em",
           color: "#8A8981",
           textTransform: "uppercase",
@@ -66,7 +69,7 @@ export function HowItWorks() {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "clamp(20px,2.8vw,28px)",
+          fontSize: "clamp(23px,3.1vw,32px)",
           color: "#2C2C2A",
           marginBottom: "6px",
           letterSpacing: "-.01em",
@@ -78,10 +81,10 @@ export function HowItWorks() {
         data-reveal=""
         data-reveal-delay="0.1"
         style={{
-          fontSize: "14px",
+          fontSize: "16px",
           color: "#5F5E5A",
           lineHeight: 1.6,
-          maxWidth: "520px",
+          maxWidth: "560px",
           marginBottom: "24px",
         }}
       >
@@ -115,7 +118,7 @@ export function HowItWorks() {
                 borderRadius: "9px",
                 background: step.color,
                 color: step.textColor,
-                font: "600 13px 'Space Grotesk',sans-serif",
+                font: "600 14.5px 'Space Grotesk',sans-serif",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -126,7 +129,7 @@ export function HowItWorks() {
             </div>
             <div
               style={{
-                font: "600 14.5px 'IBM Plex Sans',sans-serif",
+                font: "600 16.5px 'IBM Plex Sans',sans-serif",
                 color: "#2C2C2A",
                 marginBottom: "5px",
               }}
@@ -134,12 +137,13 @@ export function HowItWorks() {
               {step.title}
             </div>
             <div
-              style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.55 }}
+              style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.55 }}
             >
               {step.body}
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

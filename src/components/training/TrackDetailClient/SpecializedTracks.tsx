@@ -55,16 +55,16 @@ const SubTypeCard = ({
       }}
     >
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: "8px", marginBottom: "8px" }}>
-        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "15.5px", color: "#042C53" }}>
+        <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "17px", color: "#042C53" }}>
           {subType.title}
         </span>
         {price && parseInt(price) > 0 && (
-          <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "19px", color: "#185FA5" }}>
+          <span style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "21px", color: "#185FA5" }}>
             {getCurrencySymbol(country?.currency)}{parseInt(price).toLocaleString()}
           </span>
         )}
       </div>
-      <div style={{ fontSize: "12px", color: "#5F5E5A", lineHeight: 1.55, marginBottom: "14px", flex: 1 }}>
+      <div style={{ fontSize: "13.5px", color: "#5F5E5A", lineHeight: 1.55, marginBottom: "14px", flex: 1 }}>
         {subType.description || "Master industry-standard workflows and build production-ready systems."}
       </div>
       <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "14px" }}>
@@ -72,7 +72,7 @@ const SubTypeCard = ({
           <span
             key={tag}
             style={{
-              font: "500 10px 'IBM Plex Mono',monospace",
+              font: "500 11.5px 'IBM Plex Mono',monospace",
               background: "#F1EFE8",
               color: "#5F5E5A",
               padding: "3px 9px",
@@ -89,7 +89,7 @@ const SubTypeCard = ({
             onClick={() => onApply("sub_type", subType.id)}
             className="hover:bg-[#0C447C] transition-colors duration-150"
             style={{
-              font: "600 12.5px 'IBM Plex Sans',sans-serif",
+              font: "600 14px 'IBM Plex Sans',sans-serif",
               background: "#185FA5",
               color: "#fff",
               padding: "9px 20px",
@@ -104,7 +104,7 @@ const SubTypeCard = ({
           <button
             onClick={onJoinWaitlist}
             style={{
-              font: "600 12.5px 'IBM Plex Sans',sans-serif",
+              font: "600 14px 'IBM Plex Sans',sans-serif",
               color: "#185FA5",
               background: "none",
               border: "none",
@@ -118,7 +118,7 @@ const SubTypeCard = ({
         <span
           onClick={() => onViewSyllabus(subType)}
           style={{
-            font: "600 12px 'IBM Plex Sans',sans-serif",
+            font: "600 13.5px 'IBM Plex Sans',sans-serif",
             color: "#185FA5",
             cursor: "pointer",
           }}
@@ -194,7 +194,7 @@ export default function SpecializedTracks({
           style={{
             fontFamily: "'IBM Plex Mono', monospace",
             fontWeight: 500,
-            fontSize: "11px",
+            fontSize: "12.5px",
             color: "#8B8982",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
@@ -207,7 +207,7 @@ export default function SpecializedTracks({
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 600,
-            fontSize: "clamp(24px, 3.2vw, 36px)",
+            fontSize: "clamp(27px, 3.6vw, 40px)",
             color: "#2C2C2A",
             letterSpacing: "-.02em",
             marginBottom: "16px",
@@ -216,11 +216,11 @@ export default function SpecializedTracks({
         >
           Specialized Tracks Deep Dive
         </h2>
-        <div style={{ fontSize: "15px", color: "#5F5E5A", lineHeight: 1.6 }}>
+        <div style={{ fontSize: "17px", color: "#5F5E5A", lineHeight: 1.6 }}>
           Choose your discipline. Each track is designed for specialized industry readiness.
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: "14px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: "14px", maxWidth: "960px", margin: "0 auto" }}>
         {subTypes.map((subType) => (
           <SubTypeCard
             key={subType.id}

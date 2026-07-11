@@ -15,19 +15,19 @@ interface ITrackVisuals {
 
 const STATIC_TRACK_VISUALS: Record<string, ITrackVisuals> = {
   "software-development": {
-    icon: <span style={{ fontSize: "16px" }}>{"{ }"}</span>,
+    icon: <span style={{ fontSize: "18px" }}>{"{ }"}</span>,
     iconBg: "#E6F1FB",
     iconColor: "#185FA5",
     level: "beginner welcome",
   },
   "data-ai": {
-    icon: <span style={{ fontSize: "16px" }}>∑</span>,
+    icon: <span style={{ fontSize: "18px" }}>∑</span>,
     iconBg: "#F1EFE8",
     iconColor: "#5F5E5A",
     level: "beginner welcome",
   },
   devops: {
-    icon: <span style={{ fontSize: "16px" }}>⚙</span>,
+    icon: <span style={{ fontSize: "18px" }}>⚙</span>,
     iconBg: "#EAF3DE",
     iconColor: "#3B6D11",
     level: "beginner welcome",
@@ -35,7 +35,7 @@ const STATIC_TRACK_VISUALS: Record<string, ITrackVisuals> = {
 };
 
 const DEFAULT_VISUALS: ITrackVisuals = {
-  icon: <span style={{ fontSize: "16px" }}>◆</span>,
+  icon: <span style={{ fontSize: "18px" }}>◆</span>,
   iconBg: "#EEEDFE",
   iconColor: "#534AB7",
   level: "beginner welcome",
@@ -122,7 +122,7 @@ export default function TrackGrid() {
                 />
                 <span
                   style={{
-                    font: "500 10px 'IBM Plex Mono',monospace",
+                    font: "500 11.5px 'IBM Plex Mono',monospace",
                     color: isOpen ? "#0F6E56" : "#5F5E5A",
                     textTransform: "uppercase",
                     letterSpacing: ".05em",
@@ -136,7 +136,7 @@ export default function TrackGrid() {
                 style={{
                   fontFamily: "'Space Grotesk',sans-serif",
                   fontWeight: 600,
-                  fontSize: "16px",
+                  fontSize: "18px",
                   color: "#042C53",
                   marginBottom: "6px",
                   display: "block",
@@ -144,7 +144,7 @@ export default function TrackGrid() {
               >
                 {track.title}
               </Link>
-              <div style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.55 }}>
+              <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.55 }}>
                 {track.description}
               </div>
             </div>
@@ -159,14 +159,14 @@ export default function TrackGrid() {
                 gap: "10px",
               }}
             >
-              <span style={{ fontSize: "11px", color: "#8A8981" }}>
+              <span style={{ fontSize: "12.5px", color: "#8A8981" }}>
                 {track.duration_weeks} weeks · {visuals.level}
               </span>
               {isOpen ? (
                 <Link
                   href={`/training/${track.slug}`}
                   style={{
-                    font: "600 12px 'IBM Plex Sans',sans-serif",
+                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
                     color: visuals.iconColor,
                     whiteSpace: "nowrap",
                   }}
@@ -177,7 +177,7 @@ export default function TrackGrid() {
                 <button
                   onClick={() => openModal("waitlist", track.id)}
                   style={{
-                    font: "600 12px 'IBM Plex Sans',sans-serif",
+                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
                     color: "#5F5E5A",
                     background: "none",
                     border: "none",

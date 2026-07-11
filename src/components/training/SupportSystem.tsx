@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 
 const features = [
   {
@@ -52,6 +53,8 @@ const SupportSystem = () => {
           gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
           gap: "32px",
           alignItems: "center",
+          maxWidth: SECTION_MAX_WIDTH,
+          marginInline: "auto",
         }}
       >
         <div data-reveal="">
@@ -59,7 +62,7 @@ const SupportSystem = () => {
             style={{
               fontFamily: "'Space Grotesk',sans-serif",
               fontWeight: 600,
-              fontSize: "clamp(19px,2.6vw,25px)",
+              fontSize: "clamp(22px,3vw,29px)",
               color: "#042C53",
               marginBottom: "8px",
             }}
@@ -68,7 +71,7 @@ const SupportSystem = () => {
           </div>
           <div
             style={{
-              fontSize: "13.5px",
+              fontSize: "15px",
               color: "#5F5E5A",
               lineHeight: 1.6,
               marginBottom: "20px",
@@ -87,7 +90,7 @@ const SupportSystem = () => {
                     color: feature.color,
                     flexShrink: 0,
                     marginTop: "1px",
-                    fontSize: "13px",
+                    fontSize: "14.5px",
                   }}
                 >
                   {feature.icon}
@@ -95,7 +98,7 @@ const SupportSystem = () => {
                 <div>
                   <div
                     style={{
-                      font: "600 13px 'IBM Plex Sans',sans-serif",
+                      font: "600 14.5px 'IBM Plex Sans',sans-serif",
                       color: "#2C2C2A",
                       marginBottom: "2px",
                     }}
@@ -104,7 +107,7 @@ const SupportSystem = () => {
                   </div>
                   <div
                     style={{
-                      fontSize: "12px",
+                      fontSize: "13.5px",
                       color: "#5F5E5A",
                       lineHeight: 1.4,
                     }}

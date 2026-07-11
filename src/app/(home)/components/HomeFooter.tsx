@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const COLUMNS = [
   {
     heading: "Training",
@@ -28,19 +30,20 @@ export function HomeFooter() {
         padding: "clamp(28px,3.5vw,44px) clamp(20px,4vw,52px)",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div style={{ marginBottom: "24px" }}>
         <div
           style={{
             fontFamily: "'Space Grotesk',sans-serif",
             fontWeight: 600,
-            fontSize: "18px",
+            fontSize: "20px",
             color: "#fff",
             marginBottom: "8px",
           }}
         >
           Path<span style={{ color: "#5FA8E8" }}>Palz</span>
         </div>
-        <div style={{ fontSize: "12.5px", color: "#7E9BB8", lineHeight: 1.6 }}>
+        <div style={{ fontSize: "14px", color: "#7E9BB8", lineHeight: 1.6 }}>
           Precision in Development, Human in Approach. Training the next
           generation of tech professionals across the UK and Nigeria.
         </div>
@@ -60,7 +63,7 @@ export function HomeFooter() {
           <div key={col.heading}>
             <div
               style={{
-                font: "600 10px 'IBM Plex Mono',monospace",
+                font: "600 11.5px 'IBM Plex Mono',monospace",
                 color: "#5FA8E8",
                 letterSpacing: ".08em",
                 textTransform: "uppercase",
@@ -74,7 +77,7 @@ export function HomeFooter() {
                 key={link}
                 className="hover:text-white transition-colors duration-150"
                 style={{
-                  fontSize: "12.5px",
+                  fontSize: "14px",
                   color: "#9FB6CE",
                   display: "block",
                   marginBottom: "8px",
@@ -101,7 +104,7 @@ export function HomeFooter() {
       >
         <div
           style={{
-            font: "500 11px 'IBM Plex Mono',monospace",
+            font: "500 12.5px 'IBM Plex Mono',monospace",
             color: "#5F7C99",
           }}
         >
@@ -119,6 +122,7 @@ export function HomeFooter() {
             </span>
           ))}
         </div> */}
+      </div>
       </div>
     </div>
   );

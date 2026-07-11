@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 interface MotionStyles {
   floatMain: string;
   glowMain: string;
@@ -58,13 +60,15 @@ export function HeroSection({
           gap: "clamp(22px, 4vw, 48px)",
           padding:
             "clamp(28px, 4.5vw, 52px) clamp(20px, 4vw, 52px) clamp(20px, 3vw, 34px)",
+          maxWidth: SECTION_MAX_WIDTH,
+          marginInline: "auto",
         }}
       >
         {/* Left side content */}
         <div style={{ flex: "1 1 340px", minWidth: "min(100%, 320px)" }}>
           <div
             style={{
-              font: "500 11px 'IBM Plex Mono', monospace",
+              font: "500 12px 'IBM Plex Mono', monospace",
               color: "#85B7EB",
               letterSpacing: ".12em",
               textTransform: "uppercase",
@@ -94,7 +98,7 @@ export function HeroSection({
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 600,
-              fontSize: "clamp(32px, 5.4vw, 56px)",
+              fontSize: "clamp(36px, 5.8vw, 62px)",
               lineHeight: 1.04,
               letterSpacing: "-.024em",
               color: "#fff",
@@ -153,7 +157,7 @@ export function HeroSection({
 
           <p
             style={{
-              fontSize: "clamp(13px, 1.55vw, 15.5px)",
+              fontSize: "clamp(15px, 1.75vw, 17.5px)",
               color: "#B5D4F4",
               lineHeight: 1.65,
               maxWidth: "600px",
@@ -182,7 +186,7 @@ export function HeroSection({
               // onClick={onOpenModal}
               className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
               style={{
-                font: "600 13.5px 'IBM Plex Sans', sans-serif",
+                font: "600 15px 'IBM Plex Sans', sans-serif",
                 background: "#185FA5",
                 color: "#fff",
                 padding: "12px 22px",
@@ -198,7 +202,7 @@ export function HeroSection({
               onClick={onOpenModal}
               className="hover:bg-white/8 transition-colors duration-150"
               style={{
-                font: "600 13.5px 'IBM Plex Sans', sans-serif",
+                font: "600 15px 'IBM Plex Sans', sans-serif",
                 color: "#DCEAF9",
                 padding: "12px 22px",
                 borderRadius: "10px",
@@ -213,7 +217,7 @@ export function HeroSection({
 
           <div
             style={{
-              font: "500 12px 'IBM Plex Mono', monospace",
+              font: "500 13.5px 'IBM Plex Mono', monospace",
               color: "#85B7EB",
               display: "flex",
               alignItems: "center",
@@ -384,7 +388,7 @@ export function HeroSection({
               />
               <span
                 style={{
-                  font: "600 11px 'IBM Plex Sans', sans-serif",
+                  font: "600 12.5px 'IBM Plex Sans', sans-serif",
                   color: "#2C2C2A",
                 }}
               >
@@ -407,7 +411,7 @@ export function HeroSection({
             >
               <div
                 style={{
-                  font: "500 9px 'IBM Plex Mono', monospace",
+                  font: "500 11px 'IBM Plex Mono', monospace",
                   color: "#85B7EB",
                   letterSpacing: ".08em",
                   textTransform: "uppercase",
@@ -428,7 +432,7 @@ export function HeroSection({
                 1,200+{" "}
                 <span
                   style={{
-                    font: "500 10px 'IBM Plex Mono', monospace",
+                    font: "500 11px 'IBM Plex Mono', monospace",
                     color: "#4FB79A",
                   }}
                 >
@@ -447,7 +451,7 @@ export function HeroSection({
                 border: "1px solid rgba(133,183,235,0.25)",
                 borderRadius: "9px",
                 padding: "7px 10px",
-                font: "500 10px 'IBM Plex Mono', monospace",
+                font: "500 11px 'IBM Plex Mono', monospace",
                 color: "#9FD0C4",
                 boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
                 animation: motionStyles.termFloat,
@@ -482,6 +486,8 @@ export function HeroSection({
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: "14px",
+          maxWidth: SECTION_MAX_WIDTH,
+          marginInline: "auto",
         }}
       >
         {[
@@ -518,7 +524,7 @@ export function HeroSection({
           >
             <div
               style={{
-                font: "500 10px 'IBM Plex Mono', monospace",
+                font: "500 11px 'IBM Plex Mono', monospace",
                 color: card.labelColor,
                 letterSpacing: ".08em",
                 textTransform: "uppercase",
@@ -531,7 +537,7 @@ export function HeroSection({
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 600,
-                fontSize: "16px",
+                fontSize: "18px",
                 color: "#fff",
                 marginBottom: "6px",
               }}
@@ -540,7 +546,7 @@ export function HeroSection({
             </div>
             <div
               style={{
-                fontSize: "12.5px",
+                fontSize: "14px",
                 color: "#B5D4F4",
                 lineHeight: 1.55,
                 marginBottom: "10px",
@@ -550,7 +556,7 @@ export function HeroSection({
             </div>
             <div
               style={{
-                font: "600 12px 'IBM Plex Sans', sans-serif",
+                font: "600 13.5px 'IBM Plex Sans', sans-serif",
                 color: "#85B7EB",
                 display: "flex",
                 alignItems: "center",

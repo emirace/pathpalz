@@ -33,11 +33,11 @@ const ModuleList = ({ headerId }: { headerId: string }) => {
       {modules.map((mod: any) => (
         <div key={mod.id} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4FB79A", flexShrink: 0 }}></span>
-          <span style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.4 }}>{mod.title}</span>
+          <span style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.4 }}>{mod.title}</span>
         </div>
       ))}
       {modules.length === 0 && (
-        <span style={{ fontStyle: "italic", fontSize: "11px", color: "#8A8981" }}>No modules listed</span>
+        <span style={{ fontStyle: "italic", fontSize: "12.5px", color: "#8A8981" }}>No modules listed</span>
       )}
     </div>
   );
@@ -105,7 +105,7 @@ const SyllabusModal = ({
             zIndex: 10,
           }}
         >
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: "15px", color: "#2C2C2A" }}>
+          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: "17px", color: "#2C2C2A" }}>
             {subType?.title || "Track"} Syllabus Modules
           </div>
           <button
@@ -130,7 +130,7 @@ const SyllabusModal = ({
 
         {/* Content */}
         <div style={{ padding: "20px", flex: 1, overflowY: "auto" }}>
-          <p style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.6, marginBottom: "20px" }}>
+          <p style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.6, marginBottom: "20px" }}>
             {subType?.description ||
               "Entry by completion of Foundational tracks, or by instructor recommendation after Foundation. This is not a beginner track."}
           </p>
@@ -170,7 +170,7 @@ const SyllabusModal = ({
                         borderRadius: "8px",
                         background: "rgba(24,95,165,.1)",
                         color: "#185FA5",
-                        font: "600 12.5px 'Space Grotesk',sans-serif",
+                        font: "600 14px 'Space Grotesk',sans-serif",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -178,7 +178,7 @@ const SyllabusModal = ({
                     >
                       {index + 1}
                     </div>
-                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "14.5px", color: "#042C53" }}>
+                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "16px", color: "#042C53" }}>
                       {header.title}
                     </div>
                   </div>
@@ -189,7 +189,7 @@ const SyllabusModal = ({
             </div>
           ) : (
             <div style={{ textAlign: "center", padding: "40px 0", color: "#8A8981" }}>
-              <div style={{ fontSize: "13px" }}>Curriculum details are being finalized.</div>
+              <div style={{ fontSize: "14.5px" }}>Curriculum details are being finalized.</div>
             </div>
           )}
         </div>
@@ -214,7 +214,7 @@ const SyllabusModal = ({
             }}
             style={{
               width: "100%",
-              font: "600 13px 'IBM Plex Sans', sans-serif",
+              font: "600 14.5px 'IBM Plex Sans', sans-serif",
               background: "#185FA5",
               color: "#fff",
               padding: "11px 14px",

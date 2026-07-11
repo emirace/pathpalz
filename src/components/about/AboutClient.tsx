@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTraining } from "@/context/TrainingContext";
 import SiteTopBar from "@/components/layout/SiteTopBar";
 import SiteFooterBar from "@/components/layout/SiteFooterBar";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 
 const ENGINES = [
   {
@@ -263,7 +264,7 @@ export default function AboutClient() {
               display: "inline-flex",
               alignItems: "center",
               gap: "7px",
-              font: "600 10px 'IBM Plex Mono',monospace",
+              font: "600 11.5px 'IBM Plex Mono',monospace",
               color: "#8FD3C3",
               letterSpacing: ".1em",
               textTransform: "uppercase",
@@ -293,7 +294,7 @@ export default function AboutClient() {
             style={{
               fontFamily: "'Space Grotesk',sans-serif",
               fontWeight: 600,
-              fontSize: "clamp(28px,4.4vw,44px)",
+              fontSize: "clamp(32px,4.8vw,50px)",
               lineHeight: 1.12,
               letterSpacing: "-.02em",
               color: "#fff",
@@ -306,7 +307,7 @@ export default function AboutClient() {
           </h1>
           <p
             style={{
-              fontSize: "clamp(13px,1.5vw,15px)",
+              fontSize: "clamp(15px,1.7vw,17px)",
               color: "#B5D4F4",
               lineHeight: 1.7,
               marginBottom: "24px",
@@ -340,7 +341,7 @@ export default function AboutClient() {
               <span
                 key={chip}
                 style={{
-                  font: "500 11px 'IBM Plex Mono',monospace",
+                  font: "500 12.5px 'IBM Plex Mono',monospace",
                   padding: "6px 14px",
                   borderRadius: "20px",
                   border: "1px solid rgba(255,255,255,.2)",
@@ -367,20 +368,20 @@ export default function AboutClient() {
         }}
       >
         <div data-reveal="" style={{ textAlign: "center", maxWidth: "620px", margin: "0 auto 26px" }}>
-          <div style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
+          <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
             // What we do
           </div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(20px,2.8vw,28px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(23px,3.1vw,32px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
             Two sides of one mission
           </div>
-          <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6 }}>
+          <div style={{ fontSize: "16px", color: "#5F5E5A", lineHeight: 1.6 }}>
             PathPalz operates two arms that reinforce each other. The training arm
             produces job-ready engineers. The software arm employs the best of
             them — and uses that real-world client work to keep our curriculum
             sharp and current.
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "16px", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
           {ENGINES.map((engine, i) => (
             <div
               key={engine.title}
@@ -406,19 +407,19 @@ export default function AboutClient() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    font: "600 15px 'IBM Plex Mono',monospace",
+                    font: "600 17px 'IBM Plex Mono',monospace",
                     marginBottom: "14px",
                   }}
                 >
                   {engine.icon}
                 </span>
-                <div style={{ font: "600 10px 'IBM Plex Mono',monospace", letterSpacing: ".08em", textTransform: "uppercase", color: engine.eyebrowColor, marginBottom: "8px" }}>
+                <div style={{ font: "600 11.5px 'IBM Plex Mono',monospace", letterSpacing: ".08em", textTransform: "uppercase", color: engine.eyebrowColor, marginBottom: "8px" }}>
                   {engine.eyebrow}
                 </div>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "17px", color: "#042C53", marginBottom: "10px" }}>
+                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "19px", color: "#042C53", marginBottom: "10px" }}>
                   {engine.title}
                 </div>
-                <div style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.65 }}>
+                <div style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.65 }}>
                   {engine.body}
                 </div>
               </div>
@@ -427,7 +428,7 @@ export default function AboutClient() {
                   <span
                     key={tag.label}
                     style={{
-                      font: "500 10px 'IBM Plex Mono',monospace",
+                      font: "500 11.5px 'IBM Plex Mono',monospace",
                       background: tag.bg,
                       color: tag.color,
                       padding: "3px 10px",
@@ -465,14 +466,14 @@ export default function AboutClient() {
           }}
         />
         <div data-reveal="" style={{ position: "relative", textAlign: "center", maxWidth: "620px", margin: "0 auto 26px" }}>
-          <div style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#85B7EB", textTransform: "uppercase", marginBottom: "10px" }}>
+          <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#85B7EB", textTransform: "uppercase", marginBottom: "10px" }}>
             // Methodology
           </div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(19px,2.6vw,26px)", color: "#fff", letterSpacing: "-.01em" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(22px,3vw,29px)", color: "#fff", letterSpacing: "-.01em" }}>
             The PathPalz model
           </div>
         </div>
-        <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "14px" }}>
+        <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "14px", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
           {MODEL_ITEMS.map((item, i) => (
             <div
               key={item.title}
@@ -497,17 +498,17 @@ export default function AboutClient() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  font: "600 15px 'IBM Plex Mono',monospace",
+                  font: "600 17px 'IBM Plex Mono',monospace",
                   marginBottom: "14px",
                   animation: `floatY 5s ease-in-out infinite ${i * 0.3}s`,
                 }}
               >
                 {item.icon}
               </span>
-              <div style={{ font: "600 14px 'IBM Plex Sans',sans-serif", color: "#fff", marginBottom: "6px" }}>
+              <div style={{ font: "600 16px 'IBM Plex Sans',sans-serif", color: "#fff", marginBottom: "6px" }}>
                 {item.title}
               </div>
-              <div style={{ fontSize: "12.5px", color: "#85B7EB", lineHeight: 1.6 }}>
+              <div style={{ fontSize: "14px", color: "#85B7EB", lineHeight: 1.6 }}>
                 {item.body}
               </div>
             </div>
@@ -539,15 +540,15 @@ export default function AboutClient() {
               pointerEvents: "none",
             }}
           />
-          <div style={{ position: "relative", fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: "56px", lineHeight: 1, color: "#185FA5", marginBottom: "6px" }}>
+          <div style={{ position: "relative", fontFamily: "'Space Grotesk',sans-serif", fontWeight: 700, fontSize: "60px", lineHeight: 1, color: "#185FA5", marginBottom: "6px" }}>
             &quot;
           </div>
-          <div style={{ position: "relative", fontSize: "17px", color: "#fff", lineHeight: 1.65, fontStyle: "italic", textAlign: "center", marginBottom: "14px" }}>
+          <div style={{ position: "relative", fontSize: "19px", color: "#fff", lineHeight: 1.65, fontStyle: "italic", textAlign: "center", marginBottom: "14px" }}>
             &quot;The tech industry doesn&apos;t just need more coders; it needs
             engineers who understand systems, communicate effectively, and take
             ownership. That&apos;s the gap PathPalz fills.&quot;
           </div>
-          <div style={{ position: "relative", font: "500 11px 'IBM Plex Mono',monospace", color: "#85B7EB", textAlign: "center" }}>
+          <div style={{ position: "relative", font: "500 12.5px 'IBM Plex Mono',monospace", color: "#85B7EB", textAlign: "center" }}>
             PathPalz founders
           </div>
         </div>
@@ -565,20 +566,20 @@ export default function AboutClient() {
         }}
       >
         <div data-reveal="" style={{ textAlign: "center", maxWidth: "620px", margin: "0 auto 24px" }}>
-          <div style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
+          <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
             // Our story
           </div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(19px,2.6vw,26px)", color: "#2C2C2A", letterSpacing: "-.01em" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(22px,3vw,29px)", color: "#2C2C2A", letterSpacing: "-.01em" }}>
             Where PathPalz came from
           </div>
         </div>
 
-        <div data-reveal="" style={{ display: "flex", flexWrap: "wrap", border: "1px solid #E7E4DB", borderRadius: "14px", overflow: "hidden" }}>
+        <div data-reveal="" style={{ display: "flex", flexWrap: "wrap", border: "1px solid #E7E4DB", borderRadius: "14px", overflow: "hidden", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
           <div style={{ flex: "2 1 340px", padding: "26px", background: "#FBFAF6" }}>
-            <div style={{ font: "600 13px 'IBM Plex Sans',sans-serif", color: "#2C2C2A", marginBottom: "10px" }}>
+            <div style={{ font: "600 15px 'IBM Plex Sans',sans-serif", color: "#2C2C2A", marginBottom: "10px" }}>
               The problem we kept seeing
             </div>
-            <div style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.75, marginBottom: "16px" }}>
+            <div style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.75, marginBottom: "16px" }}>
               Bootcamps that were too expensive. YouTube tutorials that went
               nowhere. LinkedIn posts from people who had been &quot;learning to
               code for two years&quot; and had nothing to show for it. Online
@@ -586,7 +587,7 @@ export default function AboutClient() {
               that was widening while the tools to close it were sitting unused
               because nobody had built the right structure around them.
             </div>
-            <div style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.75 }}>
+            <div style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.75 }}>
               So we built that structure. Live cohorts. Peer partners.
               Accountability managers. Real deadlines. Real projects. A subdomain
               that belongs to you when you graduate. And a pathway — for the best
@@ -594,25 +595,25 @@ export default function AboutClient() {
             </div>
           </div>
           <div style={{ flex: "1 1 220px", background: "#042C53", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <div style={{ font: "600 10px 'IBM Plex Mono',monospace", color: "#85B7EB", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "14px" }}>
+            <div style={{ font: "600 11.5px 'IBM Plex Mono',monospace", color: "#85B7EB", letterSpacing: ".08em", textTransform: "uppercase", marginBottom: "14px" }}>
               Operating in
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
               <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#5FA8E8" }} />
               <div>
-                <div style={{ font: "600 13px 'IBM Plex Sans',sans-serif", color: "#fff" }}>United Kingdom</div>
-                <div style={{ fontSize: "11px", color: "#85B7EB" }}>Training and software</div>
+                <div style={{ font: "600 15px 'IBM Plex Sans',sans-serif", color: "#fff" }}>United Kingdom</div>
+                <div style={{ fontSize: "12.5px", color: "#85B7EB" }}>Training and software</div>
               </div>
             </div>
             <div style={{ width: "100%", height: "1px", background: "#0C3057", margin: "6px 0 12px" }} />
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4FB79A" }} />
               <div>
-                <div style={{ font: "600 13px 'IBM Plex Sans',sans-serif", color: "#fff" }}>Nigeria</div>
-                <div style={{ fontSize: "11px", color: "#85B7EB" }}>Training and software</div>
+                <div style={{ font: "600 15px 'IBM Plex Sans',sans-serif", color: "#fff" }}>Nigeria</div>
+                <div style={{ fontSize: "12.5px", color: "#85B7EB" }}>Training and software</div>
               </div>
             </div>
-            <div style={{ marginTop: "18px", paddingTop: "14px", borderTop: "1px solid #0C3057", fontSize: "11px", color: "#85B7EB", lineHeight: 1.6 }}>
+            <div style={{ marginTop: "18px", paddingTop: "14px", borderTop: "1px solid #0C3057", fontSize: "12.5px", color: "#85B7EB", lineHeight: 1.6 }}>
               Built for the UK. Built for Nigeria. Built for anyone in both
               countries who is serious about building a tech career.
             </div>
@@ -632,19 +633,19 @@ export default function AboutClient() {
         }}
       >
         <div data-reveal="" style={{ textAlign: "center", maxWidth: "620px", margin: "0 auto 24px" }}>
-          <div style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
+          <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
             // Geographic presence
           </div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(19px,2.6vw,26px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(22px,3vw,29px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
             Two countries, one standard
           </div>
-          <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6 }}>
+          <div style={{ fontSize: "16px", color: "#5F5E5A", lineHeight: 1.6 }}>
             Every PathPalz cohort runs to the same curriculum, the same
             accountability model, and the same graduation standard regardless of
             location.
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: "16px", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
           {COUNTRIES.map((country, i) => (
             <div
               key={country.code}
@@ -670,16 +671,16 @@ export default function AboutClient() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    font: "600 14px 'IBM Plex Mono',monospace",
+                    font: "600 16px 'IBM Plex Mono',monospace",
                     marginBottom: "12px",
                   }}
                 >
                   {country.code}
                 </span>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "16px", color: "#042C53", marginBottom: "6px" }}>
+                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "18px", color: "#042C53", marginBottom: "6px" }}>
                   {country.title}
                 </div>
-                <div style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.65 }}>
+                <div style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.65 }}>
                   {country.body}
                 </div>
               </div>
@@ -688,7 +689,7 @@ export default function AboutClient() {
                   <span
                     key={tag}
                     style={{
-                      font: "500 10px 'IBM Plex Mono',monospace",
+                      font: "500 11.5px 'IBM Plex Mono',monospace",
                       background: country.tagBg,
                       color: country.tagColor,
                       padding: "3px 9px",
@@ -716,13 +717,13 @@ export default function AboutClient() {
         }}
       >
         <div data-reveal="" style={{ textAlign: "center", maxWidth: "620px", margin: "0 auto 24px" }}>
-          <div style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
+          <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "10px" }}>
             // What we stand for
           </div>
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(19px,2.6vw,26px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(22px,3vw,29px)", color: "#2C2C2A", letterSpacing: "-.01em", marginBottom: "8px" }}>
             Four values. All operational.
           </div>
-          <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6 }}>
+          <div style={{ fontSize: "16px", color: "#5F5E5A", lineHeight: 1.6 }}>
             These are not wall decorations. Each one has a specific implication
             for how PathPalz is run.
           </div>
@@ -741,7 +742,7 @@ export default function AboutClient() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "15px",
+                  fontSize: "17px",
                   flexShrink: 0,
                   animation: `floatY 5s ease-in-out infinite ${i * 0.2}s`,
                 }}
@@ -749,10 +750,10 @@ export default function AboutClient() {
                 {value.icon}
               </span>
               <div>
-                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "15px", color: "#042C53", marginBottom: "4px" }}>
+                <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "17px", color: "#042C53", marginBottom: "4px" }}>
                   {value.title}
                 </div>
-                <div style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.6 }}>
+                <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6 }}>
                   {value.body}
                 </div>
               </div>
@@ -773,12 +774,12 @@ export default function AboutClient() {
             pointerEvents: "none",
           }}
         />
-        <div data-reveal="" style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px", flexWrap: "wrap" }}>
+        <div data-reveal="" style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "20px", flexWrap: "wrap", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
           <div>
-            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(18px,2.4vw,24px)", color: "#fff", marginBottom: "6px", letterSpacing: "-.01em" }}>
+            <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(21px,2.8vw,27px)", color: "#fff", marginBottom: "6px", letterSpacing: "-.01em" }}>
               Ready to be part of what PathPalz is building?
             </div>
-            <div style={{ fontSize: "13px", color: "#DCEAF9", lineHeight: 1.5 }}>
+            <div style={{ fontSize: "14.5px", color: "#DCEAF9", lineHeight: 1.5 }}>
               August 2025 cohort — 30 seats. Two tracks open now. Enrolment closes
               28 July.
             </div>
@@ -788,7 +789,7 @@ export default function AboutClient() {
               onClick={() => openModal("apply")}
               className="hover:-translate-y-0.5 transition-transform duration-150"
               style={{
-                font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                font: "600 15px 'IBM Plex Sans',sans-serif",
                 background: "#fff",
                 color: "#0C447C",
                 padding: "12px 22px",
@@ -804,7 +805,7 @@ export default function AboutClient() {
             <Link
               href="/contact"
               style={{
-                font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                font: "600 15px 'IBM Plex Sans',sans-serif",
                 color: "#DCEAF9",
                 padding: "12px 22px",
                 borderRadius: "10px",

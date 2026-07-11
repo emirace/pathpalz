@@ -1,3 +1,5 @@
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const steps = [
   {
     number: "01",
@@ -35,11 +37,12 @@ const PathToMastery = () => {
         borderBottom: "1px solid #E7E4DB",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div
         data-reveal=""
         style={{
           textAlign: "center",
-          maxWidth: "520px",
+          maxWidth: "560px",
           margin: "0 auto 28px",
         }}
       >
@@ -47,14 +50,14 @@ const PathToMastery = () => {
           style={{
             fontFamily: "'Space Grotesk',sans-serif",
             fontWeight: 600,
-            fontSize: "clamp(19px,2.6vw,25px)",
+            fontSize: "clamp(22px,3vw,29px)",
             color: "#042C53",
             marginBottom: "6px",
           }}
         >
           The Path to Mastery
         </div>
-        <div style={{ fontSize: "13.5px", color: "#5F5E5A" }}>
+        <div style={{ fontSize: "15px", color: "#5F5E5A" }}>
           Four simple steps to transform your professional trajectory.
         </div>
       </div>
@@ -76,7 +79,7 @@ const PathToMastery = () => {
               style={{
                 fontFamily: "'Space Grotesk',sans-serif",
                 fontWeight: 700,
-                fontSize: "44px",
+                fontSize: "48px",
                 color: "#DAD8CE",
                 lineHeight: 1,
                 marginBottom: "6px",
@@ -86,18 +89,19 @@ const PathToMastery = () => {
             </div>
             <div
               style={{
-                font: "600 14px 'IBM Plex Sans',sans-serif",
+                font: "600 16px 'IBM Plex Sans',sans-serif",
                 color: "#042C53",
                 marginBottom: "6px",
               }}
             >
               {step.title}
             </div>
-            <div style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.6 }}>
+            <div style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6 }}>
               {step.description}
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

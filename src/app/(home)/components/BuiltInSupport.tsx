@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const CARDS = [
   {
     badge: "THE PEER PARTNER",
@@ -31,10 +33,11 @@ export function BuiltInSupport() {
         borderBottom: "1px solid #E7E4DB",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div
         data-reveal=""
         style={{
-          font: "500 11px 'IBM Plex Mono',monospace",
+          font: "500 12px 'IBM Plex Mono',monospace",
           letterSpacing: ".1em",
           color: "#8A8981",
           textTransform: "uppercase",
@@ -49,7 +52,7 @@ export function BuiltInSupport() {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "clamp(20px,2.8vw,28px)",
+          fontSize: "clamp(23px,3.1vw,32px)",
           color: "#2C2C2A",
           marginBottom: "6px",
           letterSpacing: "-.01em",
@@ -61,10 +64,10 @@ export function BuiltInSupport() {
         data-reveal=""
         data-reveal-delay="0.1"
         style={{
-          fontSize: "14px",
+          fontSize: "16px",
           color: "#5F5E5A",
           lineHeight: 1.6,
-          maxWidth: "480px",
+          maxWidth: "520px",
           marginBottom: "24px",
         }}
       >
@@ -94,7 +97,7 @@ export function BuiltInSupport() {
             <div
               style={{
                 display: "inline-block",
-                font: "600 10px 'IBM Plex Mono',monospace",
+                font: "600 11.5px 'IBM Plex Mono',monospace",
                 background: card.badgeBg,
                 color: card.badgeColor,
                 padding: "4px 10px",
@@ -109,7 +112,7 @@ export function BuiltInSupport() {
               style={{
                 fontFamily: "'Space Grotesk',sans-serif",
                 fontWeight: 600,
-                fontSize: "16px",
+                fontSize: "18px",
                 color: "#2C2C2A",
                 marginBottom: "6px",
               }}
@@ -117,12 +120,13 @@ export function BuiltInSupport() {
               {card.title}
             </div>
             <div
-              style={{ fontSize: "13px", color: "#5F5E5A", lineHeight: 1.6 }}
+              style={{ fontSize: "14.5px", color: "#5F5E5A", lineHeight: 1.6 }}
             >
               {card.body}
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

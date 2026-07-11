@@ -38,7 +38,7 @@ const FAQ = () => {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "18px",
+          fontSize: "20px",
           color: "#042C53",
           marginBottom: "16px",
         }}
@@ -62,7 +62,7 @@ const FAQ = () => {
                 onClick={() => toggleFAQ(index)}
                 style={{
                   padding: "13px 16px",
-                  font: "600 13px 'IBM Plex Sans',sans-serif",
+                  font: "600 14.5px 'IBM Plex Sans',sans-serif",
                   color: "#2C2C2A",
                   cursor: "pointer",
                   display: "flex",
@@ -75,14 +75,14 @@ const FAQ = () => {
                 }}
               >
                 <span>{faq.question}</span>
-                <span style={{ color: "#8A8981", fontSize: "12px" }}>
+                <span style={{ color: "#8A8981", fontSize: "13.5px" }}>
                   {isOpen ? "▲" : "▼"}
                 </span>
               </button>
               {isOpen && (
                 <div
                   style={{
-                    fontSize: "12.5px",
+                    fontSize: "14px",
                     color: "#5F5E5A",
                     lineHeight: 1.65,
                     padding: "0 16px 14px",

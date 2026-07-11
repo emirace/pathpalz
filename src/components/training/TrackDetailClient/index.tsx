@@ -19,6 +19,7 @@ import DiscountGenerateForm from "@/components/training/DiscountGenerateForm";
 import { getApiErrorMessage, notify } from "@/utils/notify";
 import { useGetDiscountCodeRule } from "@/query/training/discount";
 import { getCurrencySymbol } from "@/utils/currency";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
@@ -212,10 +213,10 @@ export default function TrackDetailClient() {
   if (!track) {
     return (
       <div className="min-h-screen bg-[#F3F3F8] flex flex-col items-center justify-center p-4">
-        <h1 className="text-3xl font-bold text-[#00284F] mb-4">
+        <h1 className="text-4xl font-bold text-[#00284F] mb-4">
           Track not found
         </h1>
-        <Link href="/training" className="text-teal hover:underline">
+        <Link href="/training" className="text-lg text-teal hover:underline">
           Return to training overview
         </Link>
       </div>
@@ -350,6 +351,8 @@ export default function TrackDetailClient() {
                 alignItems: "center",
                 gap: "clamp(22px,4vw,44px)",
                 padding: "clamp(24px,4vw,44px) clamp(20px,4vw,52px)",
+                maxWidth: SECTION_MAX_WIDTH,
+                marginInline: "auto",
               }}
             >
               {/* Left column */}
@@ -361,7 +364,7 @@ export default function TrackDetailClient() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    font: "500 12px 'IBM Plex Mono',monospace",
+                    font: "500 13.5px 'IBM Plex Mono',monospace",
                     color: "#85B7EB",
                     marginBottom: "16px",
                     opacity: 0,
@@ -375,7 +378,7 @@ export default function TrackDetailClient() {
                     display: "inline-flex",
                     alignItems: "center",
                     gap: "7px",
-                    font: "600 10px 'IBM Plex Mono',monospace",
+                    font: "600 11.5px 'IBM Plex Mono',monospace",
                     color: "#8FD3C3",
                     letterSpacing: ".1em",
                     textTransform: "uppercase",
@@ -403,7 +406,7 @@ export default function TrackDetailClient() {
                   style={{
                     fontFamily: "'Space Grotesk',sans-serif",
                     fontWeight: 600,
-                    fontSize: "clamp(30px,4.6vw,46px)",
+                    fontSize: "clamp(34px,5vw,52px)",
                     lineHeight: 1.06,
                     letterSpacing: "-.022em",
                     color: "#fff",
@@ -417,10 +420,10 @@ export default function TrackDetailClient() {
                 </h1>
                 <p
                   style={{
-                    fontSize: "clamp(13px,1.5vw,15px)",
+                    fontSize: "clamp(15px,1.7vw,17px)",
                     color: "#B5D4F4",
                     lineHeight: 1.65,
-                    maxWidth: "460px",
+                    maxWidth: "500px",
                     marginBottom: "22px",
                     opacity: 0,
                     animation:
@@ -463,14 +466,14 @@ export default function TrackDetailClient() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          font: "600 13px 'IBM Plex Mono',monospace",
+                          font: "600 14.5px 'IBM Plex Mono',monospace",
                           color: i === 3 ? "#4FB79A" : "#85B7EB",
                           flexShrink: 0,
                         }}
                       >
                         {i === 0 ? "∞" : i === 1 ? "✓" : i === 2 ? "◇" : "●"}
                       </span>
-                      <span style={{ fontSize: "13px", color: "#DCEAF9" }}>
+                      <span style={{ fontSize: "14.5px", color: "#DCEAF9" }}>
                         {item}
                       </span>
                     </div>
@@ -488,7 +491,7 @@ export default function TrackDetailClient() {
                       className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
                       style={{
                         display: "inline-block",
-                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        font: "600 15px 'IBM Plex Sans',sans-serif",
                         background: "#185FA5",
                         color: "#fff",
                         padding: "12px 24px",
@@ -506,7 +509,7 @@ export default function TrackDetailClient() {
                       className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
                       style={{
                         display: "inline-block",
-                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        font: "600 15px 'IBM Plex Sans',sans-serif",
                         background: "#185FA5",
                         color: "#fff",
                         padding: "12px 24px",
@@ -521,7 +524,7 @@ export default function TrackDetailClient() {
                   )}
                   <div
                     style={{
-                      font: "500 11.5px 'IBM Plex Mono',monospace",
+                      font: "500 13px 'IBM Plex Mono',monospace",
                       color: "#85B7EB",
                       marginTop: "10px",
                     }}
@@ -622,7 +625,7 @@ export default function TrackDetailClient() {
                     />
                     <span
                       style={{
-                        font: "600 11px 'IBM Plex Mono',monospace",
+                        font: "600 12.5px 'IBM Plex Mono',monospace",
                         color: "#DCEAF9",
                       }}
                     >
@@ -645,7 +648,7 @@ export default function TrackDetailClient() {
                   >
                     <div
                       style={{
-                        font: "500 9px 'IBM Plex Mono',monospace",
+                        font: "500 10.5px 'IBM Plex Mono',monospace",
                         color: "#8A8981",
                         letterSpacing: ".06em",
                         textTransform: "uppercase",
@@ -656,7 +659,7 @@ export default function TrackDetailClient() {
                     </div>
                     <div
                       style={{
-                        font: "600 14px 'Space Grotesk',sans-serif",
+                        font: "600 16px 'Space Grotesk',sans-serif",
                         color: "#042C53",
                       }}
                     >
@@ -709,6 +712,8 @@ export default function TrackDetailClient() {
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
                 gap: "28px",
+                maxWidth: SECTION_MAX_WIDTH,
+                marginInline: "auto",
               }}
             >
               <div data-reveal="">
@@ -716,7 +721,7 @@ export default function TrackDetailClient() {
                   style={{
                     fontFamily: "'Space Grotesk',sans-serif",
                     fontWeight: 600,
-                    fontSize: "clamp(18px,2.4vw,24px)",
+                    fontSize: "clamp(21px,2.8vw,27px)",
                     color: "#2C2C2A",
                     marginBottom: "18px",
                   }}
@@ -763,7 +768,7 @@ export default function TrackDetailClient() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          font: "600 15px 'IBM Plex Mono',monospace",
+                          font: "600 17px 'IBM Plex Mono',monospace",
                           flexShrink: 0,
                         }}
                       >
@@ -772,7 +777,7 @@ export default function TrackDetailClient() {
                       <div>
                         <div
                           style={{
-                            font: "600 14px 'IBM Plex Sans',sans-serif",
+                            font: "600 16px 'IBM Plex Sans',sans-serif",
                             color: "#2C2C2A",
                             marginBottom: "2px",
                           }}
@@ -781,7 +786,7 @@ export default function TrackDetailClient() {
                         </div>
                         <div
                           style={{
-                            fontSize: "12.5px",
+                            fontSize: "14px",
                             color: "#5F5E5A",
                             lineHeight: 1.5,
                           }}
@@ -799,7 +804,7 @@ export default function TrackDetailClient() {
                   style={{
                     fontFamily: "'Space Grotesk',sans-serif",
                     fontWeight: 600,
-                    fontSize: "clamp(18px,2.4vw,24px)",
+                    fontSize: "clamp(21px,2.8vw,27px)",
                     color: "#2C2C2A",
                     marginBottom: "18px",
                   }}
@@ -826,7 +831,7 @@ export default function TrackDetailClient() {
                         display: "flex",
                         alignItems: "center",
                         gap: "11px",
-                        fontSize: "13.5px",
+                        fontSize: "15px",
                         color: "#2C2C2A",
                       }}
                     >
@@ -840,7 +845,7 @@ export default function TrackDetailClient() {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          fontSize: "12px",
+                          fontSize: "13.5px",
                           flexShrink: 0,
                         }}
                       >
@@ -860,7 +865,7 @@ export default function TrackDetailClient() {
                 >
                   <div
                     style={{
-                      font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                      font: "600 15px 'IBM Plex Sans',sans-serif",
                       color: "#2C2C2A",
                       marginBottom: "12px",
                     }}
@@ -875,7 +880,7 @@ export default function TrackDetailClient() {
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "8px",
-                      font: "600 12.5px 'IBM Plex Sans',sans-serif",
+                      font: "600 14px 'IBM Plex Sans',sans-serif",
                       background: "#fff",
                       color: "#042C53",
                       padding: "11px",
@@ -913,12 +918,12 @@ export default function TrackDetailClient() {
                 pointerEvents: "none",
               }}
             />
-            <div data-reveal="" style={{ position: "relative" }}>
+            <div data-reveal="" style={{ position: "relative", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
               <div
                 style={{
                   fontFamily: "'Space Grotesk',sans-serif",
                   fontWeight: 600,
-                  fontSize: "clamp(20px,2.8vw,28px)",
+                  fontSize: "clamp(23px,3.1vw,32px)",
                   color: "#fff",
                   marginBottom: "16px",
                   letterSpacing: "-.01em",
@@ -932,7 +937,7 @@ export default function TrackDetailClient() {
                   className="hover:-translate-y-0.5 transition-all duration-150"
                   style={{
                     display: "inline-block",
-                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    font: "600 15px 'IBM Plex Sans',sans-serif",
                     background: "#fff",
                     color: "#0C447C",
                     padding: "12px 26px",
@@ -950,7 +955,7 @@ export default function TrackDetailClient() {
                   className="hover:-translate-y-0.5 transition-all duration-150"
                   style={{
                     display: "inline-block",
-                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    font: "600 15px 'IBM Plex Sans',sans-serif",
                     background: "#fff",
                     color: "#0C447C",
                     padding: "12px 26px",
@@ -1032,7 +1037,7 @@ export default function TrackDetailClient() {
                 style={{
                   fontFamily: "'Space Grotesk',sans-serif",
                   fontWeight: 600,
-                  fontSize: "15px",
+                  fontSize: "17px",
                   color: "#2C2C2A",
                 }}
               >
@@ -1072,7 +1077,7 @@ export default function TrackDetailClient() {
               >
                 <div
                   style={{
-                    font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                    font: "600 15px 'IBM Plex Sans',sans-serif",
                     color: "#0C447C",
                   }}
                 >
@@ -1080,7 +1085,7 @@ export default function TrackDetailClient() {
                 </div>
                 <div
                   style={{
-                    font: "500 11px 'IBM Plex Mono',monospace",
+                    font: "500 12.5px 'IBM Plex Mono',monospace",
                     color: "#5F7C99",
                     marginTop: "3px",
                   }}
@@ -1102,7 +1107,7 @@ export default function TrackDetailClient() {
                   <div>
                     <label
                       style={{
-                        font: "600 12px 'IBM Plex Sans',sans-serif",
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
                         color: "#5F5E5A",
                         marginBottom: "6px",
                         display: "block",
@@ -1119,7 +1124,7 @@ export default function TrackDetailClient() {
                       }
                       style={{
                         width: "100%",
-                        font: "400 13px 'IBM Plex Mono',monospace",
+                        font: "400 14.5px 'IBM Plex Mono',monospace",
                         padding: "10px 12px",
                         borderRadius: "9px",
                         border: "1px solid #D3D1C7",
@@ -1142,7 +1147,7 @@ export default function TrackDetailClient() {
                     />
                     <div
                       style={{
-                        font: "500 11.5px 'IBM Plex Mono',monospace",
+                        font: "500 13px 'IBM Plex Mono',monospace",
                       }}
                     >
                       or generate a new code
@@ -1163,7 +1168,7 @@ export default function TrackDetailClient() {
                   >
                     <div
                       style={{
-                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                        font: "600 15px 'IBM Plex Sans',sans-serif",
                         color: "#2C2C2A",
                       }}
                     >
@@ -1171,7 +1176,7 @@ export default function TrackDetailClient() {
                     </div>
                     <div
                       style={{
-                        fontSize: "11.5px",
+                        fontSize: "13px",
                         color: "#8A8981",
                         lineHeight: 1.45,
                         marginTop: "3px",
@@ -1196,7 +1201,7 @@ export default function TrackDetailClient() {
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          fontSize: "13px",
+                          fontSize: "14.5px",
                           color: "#085041",
                           marginBottom: "4px",
                         }}
@@ -1211,7 +1216,7 @@ export default function TrackDetailClient() {
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          fontSize: "13px",
+                          fontSize: "14.5px",
                           color: "#085041",
                           marginBottom: "4px",
                         }}
@@ -1225,7 +1230,7 @@ export default function TrackDetailClient() {
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          fontSize: "14px",
+                          fontSize: "15.5px",
                           color: "#04342C",
                           borderTop: "1px dashed #9FE1CB",
                           paddingTop: "6px",
@@ -1279,7 +1284,7 @@ export default function TrackDetailClient() {
                 <button
                   onClick={() => setDiscountView("enter")}
                   style={{
-                    font: "500 12px 'IBM Plex Sans',sans-serif",
+                    font: "500 13.5px 'IBM Plex Sans',sans-serif",
                     color: "#185FA5",
                     background: "none",
                     border: "none",
@@ -1293,7 +1298,7 @@ export default function TrackDetailClient() {
                 <button
                   onClick={handleDiscountContinue}
                   style={{
-                    font: "500 12px 'IBM Plex Sans',sans-serif",
+                    font: "500 13.5px 'IBM Plex Sans',sans-serif",
                     color: "#8A8981",
                     background: "none",
                     border: "none",
@@ -1309,7 +1314,7 @@ export default function TrackDetailClient() {
                   onClick={handleDiscountContinue}
                   style={{
                     flex: "1 1 auto",
-                    font: "600 13px 'IBM Plex Sans',sans-serif",
+                    font: "600 14.5px 'IBM Plex Sans',sans-serif",
                     background: "#185FA5",
                     color: "#fff",
                     padding: "11px 14px",
@@ -1375,7 +1380,7 @@ export default function TrackDetailClient() {
                 style={{
                   fontFamily: "'Space Grotesk',sans-serif",
                   fontWeight: 600,
-                  fontSize: "15px",
+                  fontSize: "17px",
                   color: "#2C2C2A",
                 }}
               >
@@ -1436,7 +1441,7 @@ export default function TrackDetailClient() {
                 <div key={field}>
                   <label
                     style={{
-                      font: "600 12px 'IBM Plex Sans',sans-serif",
+                      font: "600 13.5px 'IBM Plex Sans',sans-serif",
                       color: "#5F5E5A",
                       marginBottom: "6px",
                       display: "block",
@@ -1454,7 +1459,7 @@ export default function TrackDetailClient() {
                     }
                     style={{
                       width: "100%",
-                      font: "400 13px 'IBM Plex Sans', sans-serif",
+                      font: "400 14.5px 'IBM Plex Sans', sans-serif",
                       padding: "10px 12px",
                       borderRadius: "9px",
                       border: "1px solid #D3D1C7",
@@ -1504,7 +1509,7 @@ export default function TrackDetailClient() {
                   <div key={field}>
                     <label
                       style={{
-                        font: "600 12px 'IBM Plex Sans',sans-serif",
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
                         color: "#5F5E5A",
                         marginBottom: "6px",
                         display: "block",
@@ -1522,7 +1527,7 @@ export default function TrackDetailClient() {
                       }
                       style={{
                         width: "100%",
-                        font: "400 13px 'IBM Plex Sans', sans-serif",
+                        font: "400 14.5px 'IBM Plex Sans', sans-serif",
                         padding: "10px 12px",
                         borderRadius: "9px",
                         border: "1px solid #D3D1C7",
@@ -1547,7 +1552,7 @@ export default function TrackDetailClient() {
                   type="submit"
                   style={{
                     flex: "1 1 auto",
-                    font: "600 13px 'IBM Plex Sans', sans-serif",
+                    font: "600 14.5px 'IBM Plex Sans', sans-serif",
                     background: "#185FA5",
                     color: "#fff",
                     padding: "11px 14px",
@@ -1562,7 +1567,7 @@ export default function TrackDetailClient() {
               </div>
 
               <div style={{ textAlign: "center", paddingTop: "8px" }}>
-                <p style={{ fontSize: "13px", color: "#8A8981" }}>
+                <p style={{ fontSize: "14.5px", color: "#8A8981" }}>
                   Already have an account?{" "}
                   <Link
                     href={`/login?redirect=/training/${slug}`}

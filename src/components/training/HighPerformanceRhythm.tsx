@@ -1,4 +1,5 @@
 import React from "react";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 
 const scheduleCards = [
   {
@@ -60,6 +61,8 @@ const HighPerformanceRhythm = () => {
           gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
           gap: "24px",
           alignItems: "center",
+          maxWidth: SECTION_MAX_WIDTH,
+          marginInline: "auto",
         }}
       >
         <div data-reveal="">
@@ -67,7 +70,7 @@ const HighPerformanceRhythm = () => {
             style={{
               fontFamily: "'Space Grotesk',sans-serif",
               fontWeight: 600,
-              fontSize: "clamp(19px,2.6vw,25px)",
+              fontSize: "clamp(22px,3vw,29px)",
               color: "#fff",
               marginBottom: "10px",
             }}
@@ -76,7 +79,7 @@ const HighPerformanceRhythm = () => {
           </div>
           <div
             style={{
-              fontSize: "13px",
+              fontSize: "15px",
               color: "#B5D4F4",
               lineHeight: 1.65,
               marginBottom: "18px",
@@ -95,7 +98,7 @@ const HighPerformanceRhythm = () => {
           >
             <div
               style={{
-                font: "600 10px 'IBM Plex Mono',monospace",
+                font: "600 11.5px 'IBM Plex Mono',monospace",
                 color: "#85B7EB",
                 letterSpacing: ".06em",
                 textTransform: "uppercase",
@@ -106,7 +109,7 @@ const HighPerformanceRhythm = () => {
             </div>
             <div
               style={{
-                font: "600 14px 'IBM Plex Sans',sans-serif",
+                font: "600 16px 'IBM Plex Sans',sans-serif",
                 color: "#fff",
                 marginBottom: "8px",
               }}
@@ -152,7 +155,7 @@ const HighPerformanceRhythm = () => {
             >
               <div
                 style={{
-                  font: "600 9px 'IBM Plex Mono',monospace",
+                  font: "600 10.5px 'IBM Plex Mono',monospace",
                   color: card.highlight ? "#B7EAD9" : "#5DCAA5",
                   letterSpacing: ".06em",
                   textTransform: "uppercase",
@@ -163,7 +166,7 @@ const HighPerformanceRhythm = () => {
               </div>
               <div
                 style={{
-                  font: "600 13px 'IBM Plex Sans',sans-serif",
+                  font: "600 14.5px 'IBM Plex Sans',sans-serif",
                   color: "#fff",
                   marginBottom: "3px",
                 }}
@@ -172,7 +175,7 @@ const HighPerformanceRhythm = () => {
               </div>
               <div
                 style={{
-                  fontSize: "11px",
+                  fontSize: "12.5px",
                   color: card.highlight ? "#DDF5EC" : "#85B7EB",
                   lineHeight: 1.5,
                 }}

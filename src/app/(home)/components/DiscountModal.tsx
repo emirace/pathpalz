@@ -190,7 +190,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
             zIndex: 10,
           }}
         >
-          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "15px", color: "#2C2C2A" }}>
+          <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "17px", color: "#2C2C2A" }}>
             {generatedCode ? "Your Discount Code" : "Apply a discount code"}
           </div>
           <button
@@ -286,7 +286,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
           <div style={{ padding: "20px", flex: 1, overflowY: "auto" }}>
             {/* Email Address */}
             <div style={{ marginBottom: "16px" }}>
-              <label style={{ font: "600 12px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
+              <label style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
                 Email address <span style={{ color: "#EF4444" }}>*</span>
               </label>
               <input
@@ -297,7 +297,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                 onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: "100%",
-                  font: "400 13px 'IBM Plex Sans',sans-serif",
+                  font: "400 14.5px 'IBM Plex Sans',sans-serif",
                   padding: "10px 12px",
                   borderRadius: "9px",
                   border: "1px solid #D3D1C7",
@@ -309,7 +309,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
 
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px", color: "#8A8981" }}>
               <div style={{ flex: 1, height: "1px", background: "#EDEBE3" }} />
-              <div style={{ font: "500 11px 'IBM Plex Mono',monospace" }}>select discount type</div>
+              <div style={{ font: "500 12.5px 'IBM Plex Mono',monospace" }}>select discount type</div>
               <div style={{ flex: 1, height: "1px", background: "#EDEBE3" }} />
             </div>
 
@@ -336,8 +336,8 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     transition: "border-color .15s, background .15s",
                   }}
                 >
-                  <div style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#2C2C2A" }}>{title}</div>
-                  <div style={{ fontSize: "11.5px", color: "#8A8981", lineHeight: 1.45, marginTop: "3px" }}>{desc}</div>
+                  <div style={{ font: "600 15px 'IBM Plex Sans',sans-serif", color: "#2C2C2A" }}>{title}</div>
+                  <div style={{ fontSize: "13px", color: "#8A8981", lineHeight: 1.45, marginTop: "3px" }}>{desc}</div>
                 </div>
               ))}
             </div>
@@ -346,7 +346,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
             {dtype === "student" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div>
-                  <label style={{ font: "600 12px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
+                  <label style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
                     Institution name <span style={{ color: "#EF4444" }}>*</span>
                   </label>
                   <input
@@ -357,7 +357,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     onChange={(e) => setInstitutionName(e.target.value)}
                     style={{
                       width: "100%",
-                      font: "400 13px 'IBM Plex Sans',sans-serif",
+                      font: "400 14.5px 'IBM Plex Sans',sans-serif",
                       padding: "10px 12px",
                       borderRadius: "9px",
                       border: "1px solid #D3D1C7",
@@ -366,7 +366,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                   />
                 </div>
                 <div>
-                  <label style={{ font: "600 12px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
+                  <label style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
                     Student ID Card (Image or PDF) <span style={{ color: "#EF4444" }}>*</span>
                   </label>
                   <input
@@ -376,12 +376,12 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     onChange={(e) => setStudentIdCard(e.target.files?.[0] || null)}
                     style={{
                       width: "100%",
-                      fontSize: "12px",
+                      fontSize: "13.5px",
                       padding: "4px 0",
                     }}
                   />
                 </div>
-                <div style={{ background: "#F4F9FE", borderRadius: "9px", padding: "11px 13px", fontSize: "12px", color: "#185FA5", lineHeight: 1.5 }}>
+                <div style={{ background: "#F4F9FE", borderRadius: "9px", padding: "11px 13px", fontSize: "13.5px", color: "#185FA5", lineHeight: 1.5 }}>
                   Your discount code is generated instantly from your institution name. We verify ID card uploads randomly at enrollment.
                 </div>
               </div>
@@ -390,7 +390,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
             {dtype === "school" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div>
-                  <label style={{ font: "600 12px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
+                  <label style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
                     School or organisation name <span style={{ color: "#EF4444" }}>*</span>
                   </label>
                   <input
@@ -401,7 +401,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     onChange={(e) => setSchoolName(e.target.value)}
                     style={{
                       width: "100%",
-                      font: "400 13px 'IBM Plex Sans',sans-serif",
+                      font: "400 14.5px 'IBM Plex Sans',sans-serif",
                       padding: "10px 12px",
                       borderRadius: "9px",
                       border: "1px solid #D3D1C7",
@@ -418,7 +418,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                       type="button"
                       onClick={addBeneficiaryEmail}
                       style={{
-                        font: "600 11px 'IBM Plex Sans',sans-serif",
+                        font: "600 12.5px 'IBM Plex Sans',sans-serif",
                         color: "#185FA5",
                         background: "none",
                         border: "none",
@@ -443,7 +443,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                           }}
                           style={{
                             flex: 1,
-                            font: "400 13px 'IBM Plex Sans',sans-serif",
+                            font: "400 14.5px 'IBM Plex Sans',sans-serif",
                             padding: "8px 12px",
                             borderRadius: "8px",
                             border: "1px solid #D3D1C7",
@@ -469,7 +469,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     ))}
                   </div>
                 </div>
-                <div style={{ background: "#EAF3DE", borderRadius: "9px", padding: "11px 13px", fontSize: "12px", color: "#3B6D11", lineHeight: 1.5 }}>
+                <div style={{ background: "#EAF3DE", borderRadius: "9px", padding: "11px 13px", fontSize: "13.5px", color: "#3B6D11", lineHeight: 1.5 }}>
                   Group codes cover up to 20 places. Each enrolling person enters the same code; the system tracks remaining slots automatically.
                 </div>
               </div>
@@ -478,7 +478,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
             {dtype === "bespoke" && (
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <div>
-                  <label style={{ font: "600 12px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
+                  <label style={{ font: "600 13.5px 'IBM Plex Sans',sans-serif", color: "#5F5E5A", marginBottom: "6px", display: "block" }}>
                     Occasion code <span style={{ color: "#EF4444" }}>*</span>
                   </label>
                   <input
@@ -497,7 +497,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
                     }}
                   />
                 </div>
-                <div style={{ background: "#FAEEDA", borderRadius: "9px", padding: "11px 13px", fontSize: "12px", color: "#633806", lineHeight: 1.5 }}>
+                <div style={{ background: "#FAEEDA", borderRadius: "9px", padding: "11px 13px", fontSize: "13.5px", color: "#633806", lineHeight: 1.5 }}>
                   <strong style={{ display: "block", marginBottom: "2px", color: "#412402" }}>Where to find your code</strong>
                   Bespoke codes are published in PathPalz announcements, newsletters and social posts for each campaign.
                 </div>
@@ -525,7 +525,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
           >
             <button
               onClick={handleClose}
-              style={{ font: "500 12px 'IBM Plex Sans',sans-serif", color: "#8A8981", background: "none", border: "none", cursor: "pointer", padding: "9px" }}
+              style={{ font: "500 13.5px 'IBM Plex Sans',sans-serif", color: "#8A8981", background: "none", border: "none", cursor: "pointer", padding: "9px" }}
             >
               Cancel
             </button>
@@ -535,7 +535,7 @@ export function DiscountModal({ modalOpen, dtype, setDtype, onCloseModal }: Prop
               className="hover:bg-[#0C447C] transition-colors duration-150"
               style={{
                 flex: "1 1 auto",
-                font: "600 13px 'IBM Plex Sans',sans-serif",
+                font: "600 14.5px 'IBM Plex Sans',sans-serif",
                 background: isSubmitDisabled() ? "#A1A09A" : "#185FA5",
                 color: "#fff",
                 padding: "11px 14px",

@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const STATS = [
   { count: 30, label: "Seats per cohort — small by design, so no one gets left behind", delay: 0 },
   { count: 2, label: "Dedicated supporters each — a peer partner and an accountability manager", delay: 0.08 },
@@ -15,6 +17,8 @@ export function StatsBar() {
         borderBottom: "1px solid #E7E4DB",
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+        maxWidth: SECTION_MAX_WIDTH,
+        marginInline: "auto",
       }}
     >
       {STATS.map((stat, i) => (
@@ -35,14 +39,14 @@ export function StatsBar() {
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 600,
-              fontSize: "34px",
+              fontSize: "38px",
               color: "color" in stat ? stat.color : "#185FA5",
               marginBottom: "6px",
             }}
           >
             {"pre" in stat ? stat.pre : ""}{stat.count}{"suf" in stat ? stat.suf : ""}
           </div>
-          <div style={{ fontSize: "12px", color: "#5F5E5A", lineHeight: 1.45, maxWidth: "180px", margin: "0 auto" }}>
+          <div style={{ fontSize: "13.5px", color: "#5F5E5A", lineHeight: 1.45, maxWidth: "200px", margin: "0 auto" }}>
             {stat.label}
           </div>
         </div>

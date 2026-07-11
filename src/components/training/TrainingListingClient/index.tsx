@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTraining } from "@/context/TrainingContext";
 import { useGetTracks } from "@/query/training/tracks";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 import TrainingTopBar from "@/components/layout/SiteTopBar";
 import TrainingPageFooter from "@/components/layout/SiteFooterBar";
 import TrackGrid from "./TrackGrid";
@@ -135,12 +136,14 @@ export default function TrainingListingClient() {
             flexWrap: "wrap",
             alignItems: "center",
             gap: "clamp(20px,4vw,40px)",
+            maxWidth: SECTION_MAX_WIDTH,
+            marginInline: "auto",
           }}
         >
           <div style={{ flex: "1 1 380px", minWidth: "min(100%,320px)" }}>
             <div
               style={{
-                font: "600 10px 'IBM Plex Mono',monospace",
+                font: "600 11.5px 'IBM Plex Mono',monospace",
                 letterSpacing: ".1em",
                 textTransform: "uppercase",
                 color: "#85B7EB",
@@ -155,7 +158,7 @@ export default function TrainingListingClient() {
               style={{
                 fontFamily: "'Space Grotesk',sans-serif",
                 fontWeight: 600,
-                fontSize: "clamp(24px,4vw,38px)",
+                fontSize: "clamp(27px,4.4vw,43px)",
                 lineHeight: 1.18,
                 color: "#fff",
                 marginBottom: "14px",
@@ -170,10 +173,10 @@ export default function TrainingListingClient() {
             </div>
             <div
               style={{
-                fontSize: "clamp(13px,1.4vw,15px)",
+                fontSize: "clamp(15px,1.6vw,17px)",
                 color: "#B5D4F4",
                 lineHeight: 1.65,
-                maxWidth: "480px",
+                maxWidth: "520px",
                 marginBottom: "18px",
                 opacity: 0,
                 animation: "fadeSlideUp .55s ease both .26s",
@@ -201,7 +204,7 @@ export default function TrainingListingClient() {
                 <span
                   key={chip}
                   style={{
-                    font: "500 11px 'IBM Plex Mono',monospace",
+                    font: "500 12.5px 'IBM Plex Mono',monospace",
                     padding: "6px 14px",
                     borderRadius: "20px",
                     border: "1px solid rgba(255,255,255,.2)",
@@ -278,7 +281,7 @@ export default function TrainingListingClient() {
       </div>
 
       {/* Status strip + track grid */}
-      <div style={{ padding: "clamp(20px,3vw,32px) clamp(20px,4vw,52px)" }}>
+      <div style={{ padding: "clamp(20px,3vw,32px) clamp(20px,4vw,52px)", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
         <div
           style={{
             background: "#FBFAF6",
@@ -303,7 +306,7 @@ export default function TrainingListingClient() {
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: "13px", color: "#2C2C2A" }}>
+            <span style={{ fontSize: "14.5px", color: "#2C2C2A" }}>
               <strong style={{ fontWeight: 600 }}>August cohort</strong> —
               starts {COHORT_START_DATE} · enrolment closes {COHORT_CLOSE_DATE}
             </span>
@@ -329,7 +332,7 @@ export default function TrainingListingClient() {
             </div>
             <span
               style={{
-                fontSize: "12px",
+                fontSize: "13.5px",
                 color: "#5F5E5A",
                 whiteSpace: "nowrap",
               }}
@@ -353,13 +356,13 @@ export default function TrainingListingClient() {
             style={{
               fontFamily: "'Space Grotesk',sans-serif",
               fontWeight: 600,
-              fontSize: "19px",
+              fontSize: "21px",
               color: "#042C53",
             }}
           >
             Open tracks — August cohort
           </div>
-          <div style={{ fontSize: "12.5px", color: "#8A8981" }}>
+          <div style={{ fontSize: "14px", color: "#8A8981" }}>
             Select a track for the full curriculum
           </div>
         </div>
@@ -373,7 +376,7 @@ export default function TrainingListingClient() {
       <HighPerformanceRhythm />
       <SupportSystem />
 
-      <div style={{ padding: "clamp(28px,4vw,44px) clamp(20px,4vw,52px)" }}>
+      <div style={{ padding: "clamp(28px,4vw,44px) clamp(20px,4vw,52px)", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
         <div
           style={{ height: "1px", background: "#E7E4DB", marginBottom: "26px" }}
         />
@@ -399,14 +402,14 @@ export default function TrainingListingClient() {
           <div>
             <div
               style={{
-                font: "600 15px 'IBM Plex Sans',sans-serif",
+                font: "600 17px 'IBM Plex Sans',sans-serif",
                 color: "#fff",
                 marginBottom: "4px",
               }}
             >
               The August cohort is PathPalz's founding cohort.
             </div>
-            <div style={{ fontSize: "12.5px", color: "#85B7EB" }}>
+            <div style={{ fontSize: "14px", color: "#85B7EB" }}>
               There is only ever one founding cohort — 30 seats, live tracks,
               one start date.
             </div>
@@ -417,7 +420,7 @@ export default function TrainingListingClient() {
                 key={track.id}
                 href={`/training/${track.slug}`}
                 style={{
-                  font: "600 13px 'IBM Plex Sans',sans-serif",
+                  font: "600 14.5px 'IBM Plex Sans',sans-serif",
                   background: i === 0 ? "#fff" : "transparent",
                   color: i === 0 ? "#042C53" : "#B5D4F4",
                   padding: "10px 18px",

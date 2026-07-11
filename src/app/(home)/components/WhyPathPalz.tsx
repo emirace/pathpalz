@@ -1,5 +1,7 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
+
 const CARDS = [
   {
     tag: "{ real }",
@@ -47,10 +49,11 @@ export function WhyPathPalz() {
         borderBottom: "1px solid #E7E4DB",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div
         data-reveal=""
         style={{
-          font: "500 11px 'IBM Plex Mono',monospace",
+          font: "500 12px 'IBM Plex Mono',monospace",
           letterSpacing: ".1em",
           color: "#8A8981",
           textTransform: "uppercase",
@@ -65,11 +68,11 @@ export function WhyPathPalz() {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "clamp(20px,2.8vw,28px)",
+          fontSize: "clamp(23px,3.1vw,32px)",
           color: "#2C2C2A",
           marginBottom: "24px",
           letterSpacing: "-.01em",
-          maxWidth: "640px",
+          maxWidth: "680px",
         }}
       >
         What makes this different from every other course you&apos;ve seen
@@ -96,7 +99,7 @@ export function WhyPathPalz() {
           >
             <div
               style={{
-                font: "600 13px 'IBM Plex Mono',monospace",
+                font: "600 14.5px 'IBM Plex Mono',monospace",
                 color: card.tagColor,
                 marginBottom: "10px",
               }}
@@ -105,7 +108,7 @@ export function WhyPathPalz() {
             </div>
             <div
               style={{
-                font: "600 14.5px 'IBM Plex Sans',sans-serif",
+                font: "600 16.5px 'IBM Plex Sans',sans-serif",
                 color: "#2C2C2A",
                 marginBottom: "5px",
               }}
@@ -113,12 +116,13 @@ export function WhyPathPalz() {
               {card.title}
             </div>
             <div
-              style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.55 }}
+              style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.55 }}
             >
               {card.body}
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   );

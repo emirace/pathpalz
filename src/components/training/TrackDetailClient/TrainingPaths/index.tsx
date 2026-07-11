@@ -62,7 +62,7 @@ export default function TrainingPaths({
           style={{
             fontFamily: "'IBM Plex Mono', monospace",
             fontWeight: 500,
-            fontSize: "11px",
+            fontSize: "12.5px",
             color: "#8B8982",
             letterSpacing: "0.15em",
             textTransform: "uppercase",
@@ -75,7 +75,7 @@ export default function TrainingPaths({
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 600,
-            fontSize: "clamp(24px, 3.2vw, 36px)",
+            fontSize: "clamp(27px, 3.6vw, 40px)",
             color: "#2C2C2A",
             letterSpacing: "-.02em",
             marginBottom: "16px",
@@ -84,7 +84,7 @@ export default function TrainingPaths({
         >
           {trackTitle} training paths
         </h2>
-        <div style={{ fontSize: "15px", color: "#5F5E5A", lineHeight: 1.6 }}>
+        <div style={{ fontSize: "17px", color: "#5F5E5A", lineHeight: 1.6 }}>
           Our curriculum is split into two rigorous phases designed to
           take you from core logic to professional deployment.
         </div>

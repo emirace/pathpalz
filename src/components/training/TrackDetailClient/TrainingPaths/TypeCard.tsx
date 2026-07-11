@@ -76,7 +76,7 @@ const TypeCard = ({
                 justifyContent: "center",
                 fontFamily: "'IBM Plex Mono', monospace",
                 fontWeight: 600,
-                fontSize: "16px",
+                fontSize: "18px",
               }}
             >
               {isSpecialized ? "</>" : "{ }"}
@@ -85,7 +85,7 @@ const TypeCard = ({
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 600,
-                fontSize: "19px",
+                fontSize: "21px",
                 color: "#042C53",
               }}
             >
@@ -97,7 +97,7 @@ const TypeCard = ({
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 fontWeight: 600,
-                fontSize: "19px",
+                fontSize: "21px",
                 color: isSpecialized ? "#107B43" : "#185FA5",
               }}
             >
@@ -109,7 +109,7 @@ const TypeCard = ({
         {/* Card Description */}
         <div
           style={{
-            fontSize: "14px",
+            fontSize: "15.5px",
             color: "#5F5E5A",
             lineHeight: 1.6,
             marginBottom: "24px",
@@ -139,7 +139,7 @@ const TypeCard = ({
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 700,
-              fontSize: "11px",
+              fontSize: "12.5px",
               color: "#8B8982",
               letterSpacing: "0.05em",
               textTransform: "uppercase",
@@ -163,7 +163,7 @@ const TypeCard = ({
                 />
               ))
             ) : items.length === 0 ? (
-              <div style={{ fontSize: "13px", color: "#8A8981", fontStyle: "italic" }}>
+              <div style={{ fontSize: "14.5px", color: "#8A8981", fontStyle: "italic" }}>
                 No items available
               </div>
             ) : (
@@ -187,7 +187,7 @@ const TypeCard = ({
                   />
                   <span
                     style={{
-                      fontSize: "13.5px",
+                      fontSize: "15px",
                       color: "#2C2C2A",
                       fontWeight: 500,
                       lineHeight: 1.4,
@@ -220,7 +220,7 @@ const TypeCard = ({
               justifyContent: "center",
               fontFamily: "'IBM Plex Sans', sans-serif",
               fontWeight: 600,
-              fontSize: "13px",
+              fontSize: "14.5px",
               color: "#185FA5",
               backgroundColor: "transparent",
               border: "1px solid #B5D4F4",
@@ -244,7 +244,7 @@ const TypeCard = ({
               justifyContent: "center",
               fontFamily: "'IBM Plex Sans', sans-serif",
               fontWeight: 600,
-              fontSize: "13px",
+              fontSize: "14.5px",
               color: "#185FA5",
               backgroundColor: "transparent",
               border: "1px solid #B5D4F4",
@@ -269,7 +269,7 @@ const TypeCard = ({
               justifyContent: "center",
               fontFamily: "'IBM Plex Sans', sans-serif",
               fontWeight: 600,
-              fontSize: "13px",
+              fontSize: "14.5px",
               backgroundColor: "#185FA5",
               color: "#fff",
               border: "none",
@@ -292,7 +292,7 @@ const TypeCard = ({
               justifyContent: "center",
               fontFamily: "'IBM Plex Sans', sans-serif",
               fontWeight: 600,
-              fontSize: "13px",
+              fontSize: "14.5px",
               backgroundColor: "#185FA5",
               color: "#fff",
               border: "none",
@@ -377,7 +377,7 @@ const TypeModulesModal = ({
             zIndex: 10,
           }}
         >
-          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: "15px", color: "#2C2C2A" }}>
+          <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600, fontSize: "17px", color: "#2C2C2A" }}>
             {title} Modules
           </div>
           <button
@@ -409,7 +409,7 @@ const TypeModulesModal = ({
               ))}
             </div>
           ) : modules.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "30px 0", color: "#8A8981", fontSize: "13px" }}>
+            <div style={{ textAlign: "center", padding: "30px 0", color: "#8A8981", fontSize: "14.5px" }}>
               No modules found.
             </div>
           ) : (
@@ -422,7 +422,7 @@ const TypeModulesModal = ({
                     border: "1px solid #EAE8DF",
                     borderRadius: "10px",
                     padding: "12px 14px",
-                    fontSize: "13px",
+                    fontSize: "14.5px",
                     fontWeight: 500,
                     color: "#2C2C2A",
                   }}
@@ -450,7 +450,7 @@ const TypeModulesModal = ({
           <button
             onClick={onClose}
             style={{
-              font: "600 13px 'IBM Plex Sans', sans-serif",
+              font: "600 14.5px 'IBM Plex Sans', sans-serif",
               background: "#F1EFE8",
               color: "#2C2C2A",
               padding: "9px 18px",

@@ -1,5 +1,6 @@
 "use client";
 
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 import { useGetTracks } from "@/query/training/tracks";
 import Link from "next/link";
 
@@ -104,10 +105,11 @@ export function TrainingTracks({ onOpenModal }: Props) {
         borderBottom: "1px solid #E7E4DB",
       }}
     >
+      <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
       <div
         data-reveal=""
         style={{
-          font: "500 11px 'IBM Plex Mono',monospace",
+          font: "500 12px 'IBM Plex Mono',monospace",
           letterSpacing: ".1em",
           color: "#8A8981",
           textTransform: "uppercase",
@@ -122,7 +124,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "clamp(20px,2.8vw,28px)",
+          fontSize: "clamp(23px,3.1vw,32px)",
           color: "#2C2C2A",
           marginBottom: "6px",
           letterSpacing: "-.01em",
@@ -134,10 +136,10 @@ export function TrainingTracks({ onOpenModal }: Props) {
         data-reveal=""
         data-reveal-delay="0.1"
         style={{
-          fontSize: "14px",
+          fontSize: "16px",
           color: "#5F5E5A",
           lineHeight: 1.6,
-          maxWidth: "540px",
+          maxWidth: "580px",
           marginBottom: "24px",
         }}
       >
@@ -189,7 +191,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
                         display: "inline-flex",
                         alignItems: "center",
                         gap: "5px",
-                        font: "600 10px 'IBM Plex Mono',monospace",
+                        font: "600 11.5px 'IBM Plex Mono',monospace",
                         background: theme.badgeBg,
                         color: theme.badgeText,
                         padding: "3px 9px",
@@ -211,7 +213,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
                       style={{
                         fontFamily: "'Space Grotesk',sans-serif",
                         fontWeight: 600,
-                        fontSize: "17px",
+                        fontSize: "19px",
                         color: theme.titleColor,
                         marginBottom: "5px",
                       }}
@@ -220,7 +222,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
                     </div>
                     <div
                       style={{
-                        fontSize: "12.5px",
+                        fontSize: "14px",
                         color: theme.descColor,
                         lineHeight: 1.55,
                       }}
@@ -240,7 +242,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
                   >
                     <span
                       style={{
-                        font: "500 11px 'IBM Plex Mono',monospace",
+                        font: "500 12.5px 'IBM Plex Mono',monospace",
                         color: theme.bottomText,
                       }}
                     >
@@ -249,7 +251,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
                     <Link
                       href={`/training/${track.slug}`}
                       style={{
-                        font: "600 12px 'IBM Plex Sans',sans-serif",
+                        font: "600 13.5px 'IBM Plex Sans',sans-serif",
                         color: theme.btnColor,
                         textDecoration: "none",
                         background: "none",
@@ -284,7 +286,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
         <div style={{ maxWidth: "600px" }}>
           <div
             style={{
-              font: "600 14px 'IBM Plex Sans',sans-serif",
+              font: "600 16px 'IBM Plex Sans',sans-serif",
               color: "#04342C",
               marginBottom: "3px",
             }}
@@ -292,7 +294,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
             Student, school, or occasion discount?
           </div>
           <div
-            style={{ fontSize: "12.5px", color: "#085041", lineHeight: 1.55 }}
+            style={{ fontSize: "14px", color: "#085041", lineHeight: 1.55 }}
           >
             Three discount types — student, school group, and bespoke occasion
             codes. Generate yours in seconds at checkout.
@@ -302,7 +304,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
           onClick={onOpenModal}
           className="hover:bg-[#0B5A46] hover:-translate-y-0.5 transition-all duration-150"
           style={{
-            font: "600 12.5px 'IBM Plex Sans',sans-serif",
+            font: "600 14px 'IBM Plex Sans',sans-serif",
             background: "#0F6E56",
             color: "#fff",
             padding: "10px 18px",
@@ -314,6 +316,7 @@ export function TrainingTracks({ onOpenModal }: Props) {
         >
           See how discounts work →
         </button>
+      </div>
       </div>
     </div>
   );

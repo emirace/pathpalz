@@ -38,7 +38,7 @@ export default function WhatEveryTrackIncludes() {
         style={{
           fontFamily: "'Space Grotesk',sans-serif",
           fontWeight: 600,
-          fontSize: "18px",
+          fontSize: "20px",
           color: "#042C53",
           marginBottom: "16px",
         }}
@@ -72,7 +72,7 @@ export default function WhatEveryTrackIncludes() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "15px",
+                fontSize: "17px",
                 marginBottom: "10px",
               }}
             >
@@ -80,14 +80,14 @@ export default function WhatEveryTrackIncludes() {
             </span>
             <div
               style={{
-                font: "600 13.5px 'IBM Plex Sans',sans-serif",
+                font: "600 15.5px 'IBM Plex Sans',sans-serif",
                 color: "#2C2C2A",
                 marginBottom: "4px",
               }}
             >
               {item.title}
             </div>
-            <div style={{ fontSize: "12px", color: "#5F5E5A", lineHeight: 1.55 }}>
+            <div style={{ fontSize: "13.5px", color: "#5F5E5A", lineHeight: 1.55 }}>
               {item.body}
             </div>
           </div>

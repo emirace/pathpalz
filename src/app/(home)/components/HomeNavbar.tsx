@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetUser } from "@/query/auth";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 import { User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +41,8 @@ export function HomeNavbar() {
         gap: "16px",
         flexWrap: "wrap",
         borderBottom: "1px solid rgba(133, 183, 235, 0.14)",
+        maxWidth: SECTION_MAX_WIDTH,
+        marginInline: "auto",
       }}
     >
       <div
@@ -67,7 +70,7 @@ export function HomeNavbar() {
               key={nav.label}
               className="hover:bg-white/8 transition-colors"
               style={{
-                fontSize: "13px",
+                fontSize: "14.5px",
                 color: "#042C53",
                 padding: "5px 11px",
                 borderRadius: "8px",
@@ -82,7 +85,7 @@ export function HomeNavbar() {
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span
           style={{
-            font: "500 11.5px 'IBM Plex Mono', monospace",
+            font: "500 13px 'IBM Plex Mono', monospace",
             background: "#FAEEDA",
             color: "#633806",
             padding: "5px 12px",
@@ -102,7 +105,7 @@ export function HomeNavbar() {
             onClick={() => router.push("/login")}
             className="hover:bg-white/8 transition-colors"
             style={{
-              font: "600 13px 'IBM Plex Sans', sans-serif",
+              font: "600 14.5px 'IBM Plex Sans', sans-serif",
               border: "1px solid rgba(133, 183, 235, 0.35)",
               padding: "6px 15px",
               borderRadius: "8px",

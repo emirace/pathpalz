@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useGetUser } from "@/query/auth";
+import { SECTION_MAX_WIDTH } from "@/utils/layout";
 import { User } from "lucide-react";
 
 interface SiteTopBarProps {
@@ -37,58 +38,65 @@ export default function SiteTopBar({
           background: "#0C447C",
           color: "#fff",
           padding: "10px clamp(14px,2.5vw,22px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          flexWrap: "wrap",
         }}
       >
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            fontSize: "12.5px",
-            fontWeight: 500,
-            lineHeight: 1.4,
+            justifyContent: "space-between",
+            gap: "12px",
+            flexWrap: "wrap",
+            maxWidth: SECTION_MAX_WIDTH,
+            marginInline: "auto",
           }}
         >
-          <span
+          <div
             style={{
-              width: "7px",
-              height: "7px",
-              borderRadius: "50%",
-              background: "#4FB79A",
-              boxShadow: "0 0 0 3px rgba(79,183,154,.25)",
-              animation: "dotBlink 1.4s ease-in-out infinite",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              fontSize: "14px",
+              fontWeight: 500,
+              lineHeight: 1.4,
+            }}
+          >
+            <span
+              style={{
+                width: "7px",
+                height: "7px",
+                borderRadius: "50%",
+                background: "#4FB79A",
+                boxShadow: "0 0 0 3px rgba(79,183,154,.25)",
+                animation: "dotBlink 1.4s ease-in-out infinite",
+                flexShrink: 0,
+              }}
+            />
+            <span style={{ whiteSpace: "nowrap" }}>
+              {mode === "detail" && track
+                ? `August cohort now enrolling — ${track.title}.`
+                : "August cohort enrolling now."}{" "}
+              <span style={{ color: "#B5D4F4" }}>30 seats · closes 28 July.</span>
+            </span>
+          </div>
+          <button
+            onClick={onReserveSeat}
+            className="hover:-translate-y-0.5 transition-transform duration-150"
+            style={{
+              font: "600 14.5px 'IBM Plex Sans', sans-serif",
+              background: "#fff",
+              color: "#0C447C",
+              padding: "5px 14px",
+              borderRadius: "20px",
+              border: "none",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
               flexShrink: 0,
             }}
-          />
-          <span style={{ whiteSpace: "nowrap" }}>
-            {mode === "detail" && track
-              ? `August cohort now enrolling — ${track.title}.`
-              : "August cohort enrolling now."}{" "}
-            <span style={{ color: "#B5D4F4" }}>30 seats · closes 28 July.</span>
-          </span>
+          >
+            Reserve my seat →
+          </button>
         </div>
-        <button
-          onClick={onReserveSeat}
-          className="hover:-translate-y-0.5 transition-transform duration-150"
-          style={{
-            font: "600 11.5px 'IBM Plex Sans', sans-serif",
-            background: "#fff",
-            color: "#0C447C",
-            padding: "5px 14px",
-            borderRadius: "20px",
-            border: "none",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-          }}
-        >
-          Reserve my seat →
-        </button>
       </div>
 
       {/* Navbar */}
@@ -102,6 +110,8 @@ export default function SiteTopBar({
           gap: "16px",
           flexWrap: "wrap",
           borderBottom: "1px solid rgba(133,183,235,.14)",
+          maxWidth: SECTION_MAX_WIDTH,
+          marginInline: "auto",
         }}
       >
         <div
@@ -134,7 +144,7 @@ export default function SiteTopBar({
                   href={link.href}
                   className="hover:bg-white/8 transition-colors duration-150"
                   style={{
-                    fontSize: "13px",
+                    fontSize: "14.5px",
                     color: isActive ? "#fff" : "#042C53",
                     padding: "5px 11px",
                     borderRadius: "8px",
@@ -152,7 +162,7 @@ export default function SiteTopBar({
             onClick={onReserveSeat}
             className="hover:bg-[#2E74BE] transition-colors duration-150"
             style={{
-              font: "600 13px 'IBM Plex Sans', sans-serif",
+              font: "600 14.5px 'IBM Plex Sans', sans-serif",
               padding: "8px 17px",
               borderRadius: "9px",
               border: "none",
@@ -176,7 +186,7 @@ export default function SiteTopBar({
               onClick={() => router.push("/login")}
               className="hover:bg-white/8 transition-colors"
               style={{
-                font: "600 13px 'IBM Plex Sans', sans-serif",
+                font: "600 14.5px 'IBM Plex Sans', sans-serif",
                 border: "1px solid rgba(133, 183, 235, 0.35)",
                 padding: "6px 15px",
                 borderRadius: "8px",
