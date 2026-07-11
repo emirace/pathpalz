@@ -7,6 +7,8 @@ import { useCheckout } from "@/query/training/payments";
 import { useGetUser } from "@/query/auth";
 import PaymentGatewayModal from "@/components/training/PaymentGatewayModal";
 import WaitlistModal from "@/components/training/WaitlistModal";
+import TrainingTopBar from "@/components/layout/SiteTopBar";
+import TrainingPageFooter from "@/components/layout/SiteFooterBar";
 import Link from "next/link";
 import TrainingPaths from "./TrainingPaths";
 import SpecializedTracks from "./SpecializedTracks";
@@ -17,7 +19,6 @@ import DiscountGenerateForm from "@/components/training/DiscountGenerateForm";
 import { getApiErrorMessage, notify } from "@/utils/notify";
 import { useGetDiscountCodeRule } from "@/query/training/discount";
 import { getCurrencySymbol } from "@/utils/currency";
-import Image from "next/image";
 
 export default function TrackDetailClient() {
   const { slug } = useParams();
@@ -301,166 +302,11 @@ export default function TrackDetailClient() {
         }}
       >
         <div>
-          {/* 1. Announcement Bar */}
-          <div
-            style={{
-              background: "#0C447C",
-              color: "#fff",
-              padding: "10px clamp(14px,2.5vw,22px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                fontSize: "12.5px",
-                fontWeight: 500,
-                lineHeight: 1.4,
-              }}
-            >
-              <span
-                style={{
-                  width: "7px",
-                  height: "7px",
-                  borderRadius: "50%",
-                  background: "#4FB79A",
-                  boxShadow: "0 0 0 3px rgba(79,183,154,.25)",
-                  animation: "dotBlink 1.4s ease-in-out infinite",
-                  flexShrink: 0,
-                }}
-              />
-              <span>
-                August cohort now enrolling — {track.title}.{" "}
-                <span style={{ color: "#B5D4F4" }}>
-                  30 seats · closes 28 July.
-                </span>
-              </span>
-            </div>
-            <button
-              onClick={() => handleApply("training_track", track.id)}
-              style={{
-                font: "600 11.5px 'IBM Plex Sans', sans-serif",
-                background: "#fff",
-                color: "#0C447C",
-                padding: "5px 14px",
-                borderRadius: "20px",
-                border: "none",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Reserve my seat →
-            </button>
-          </div>
-
-          {/* 2. Navbar */}
-          <div
-            style={{
-              background: "#ffffff",
-              padding: "14px clamp(14px,2.5vw,26px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "16px",
-              flexWrap: "wrap",
-              borderBottom: "1px solid rgba(133,183,235,.14)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "26px",
-                flexWrap: "wrap",
-              }}
-            >
-              <Link href="/" className="flex items-center">
-                <Image
-                  src="/logo.png"
-                  alt="PathPalz Logo"
-                  width={180}
-                  height={40}
-                  className="h-10 object-contain"
-                  style={{ height: "auto" }}
-                />
-              </Link>
-              <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-                <Link
-                  href="/"
-                  className="hover:bg-white/8 transition-colors duration-150"
-                  style={{
-                    fontSize: "13px",
-                    color: "#042C53",
-                    padding: "5px 11px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Academy
-                </Link>
-                <a
-                  href="#types"
-                  className="hover:bg-white/8 transition-colors duration-150"
-                  style={{
-                    fontSize: "13px",
-                    color: "#042C53",
-                    padding: "5px 11px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Curriculum
-                </a>
-                <button
-                  onClick={() => handleApply("training_track", track.id)}
-                  className="hover:bg-white/8 transition-colors duration-150"
-                  style={{
-                    fontSize: "13px",
-                    color: "#042C53",
-                    padding: "5px 11px",
-                    borderRadius: "8px",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Admissions
-                </button>
-                <a
-                  href="#support"
-                  className="hover:bg-white/8 transition-colors duration-150"
-                  style={{
-                    fontSize: "13px",
-                    color: "#042C53",
-                    padding: "5px 11px",
-                    borderRadius: "8px",
-                  }}
-                >
-                  Mentorship
-                </a>
-              </div>
-            </div>
-            <button
-              onClick={() => handleApply("training_track", track.id)}
-              className="hover:bg-[#2E74BE] transition-colors duration-150"
-              style={{
-                font: "600 13px 'IBM Plex Sans', sans-serif",
-                padding: "8px 17px",
-                borderRadius: "9px",
-                border: "none",
-                cursor: "pointer",
-                background: "#185FA5",
-                color: "#fff",
-                boxShadow: "0 8px 20px rgba(24,95,165,.35)",
-              }}
-            >
-              Get Started
-            </button>
-          </div>
+          <TrainingTopBar
+            mode="detail"
+            track={{ id: track.id, title: track.title }}
+            onReserveSeat={() => handleApply("training_track", track.id)}
+          />
 
           {/* 3. Hero Section */}
           <div
@@ -1096,60 +942,7 @@ export default function TrackDetailClient() {
             </div>
           </div>
 
-          {/* 8. Simple Footer — matches design */}
-          <div
-            style={{
-              background: "#0A2036",
-              padding: "clamp(24px,3vw,36px) clamp(20px,4vw,52px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "16px",
-              flexWrap: "wrap",
-            }}
-          >
-            <Link
-              href="/"
-              style={{
-                fontFamily: "'Space Grotesk',sans-serif",
-                fontWeight: 600,
-                fontSize: "18px",
-                color: "#fff",
-              }}
-            >
-              Path<span style={{ color: "#5FA8E8" }}>Palz</span>
-            </Link>
-            <div style={{ display: "flex", gap: "18px", flexWrap: "wrap" }}>
-              <span
-                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
-              >
-                Privacy Policy
-              </span>
-              <span
-                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
-              >
-                Terms of Service
-              </span>
-              <span
-                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
-              >
-                Security
-              </span>
-              <span
-                style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
-              >
-                Alumni Network
-              </span>
-            </div>
-            <div
-              style={{
-                font: "500 11px 'IBM Plex Mono',monospace",
-                color: "#5F7C99",
-              }}
-            >
-              © 2025 PathPalz · Precision in Development, Human in Approach.
-            </div>
-          </div>
+          <TrainingPageFooter />
         </div>
       </div>
 

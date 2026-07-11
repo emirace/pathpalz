@@ -77,14 +77,9 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
       verifyOtpMutation.mutate(
         { email, otp: pasted },
         {
-          onSuccess: (data) => {
-            if (data.token) localStorage.setItem("authToken", data.token);
-            if (data.refresh_token)
-              localStorage.setItem("refreshToken", data.refresh_token);
+          onSuccess: () => {
             onClose();
-            setTimeout(() => {
-              router.push("/dashboard");
-            }, 3000);
+            router.push("/dashboard");
           },
           onError: (err: any) => {
             setError(
@@ -107,19 +102,9 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
     verifyOtpMutation.mutate(
       { email, otp: otpValue },
       {
-        onSuccess: (data) => {
-          console.log(data);
-          // Assuming data contains tokens based on standard practice
-          if (data.token) {
-            localStorage.setItem("authToken", data.token);
-          }
-          if (data.refresh_token) {
-            localStorage.setItem("refreshToken", data.refresh_token);
-          }
+        onSuccess: () => {
           onClose();
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 3000);
+          router.push("/dashboard");
         },
         onError: (err: any) => {
           setError(

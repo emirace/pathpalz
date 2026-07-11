@@ -23,8 +23,13 @@ export const useVerifyOtp = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: verifyOtp,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+    onSuccess: async (data) => {
+      // Store the token before invalidating "user" — otherwise the
+      // refetch this triggers runs with no token yet, caches `user: null`,
+      // and the dashboard guard bounces straight back to /login.
+      if (data.token) localStorage.setItem("authToken", data.token);
+      if (data.refresh_token) localStorage.setItem("refreshToken", data.refresh_token);
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
     },
   });
 };

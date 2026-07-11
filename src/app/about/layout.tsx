@@ -3,19 +3,19 @@
 import { TrainingProvider, useTraining } from "@/context/TrainingContext";
 import ApplicationModal from "@/components/training/ApplicationModal";
 
-export default function TrainingLayout({
+export default function AboutLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <TrainingProvider>
-      <TrainingLayoutInner>{children}</TrainingLayoutInner>
+      <AboutLayoutInner>{children}</AboutLayoutInner>
     </TrainingProvider>
   );
 }
 
-function TrainingLayoutInner({ children }: { children: React.ReactNode }) {
+function AboutLayoutInner({ children }: { children: React.ReactNode }) {
   const { isModalOpen, modalTab, closeModal } = useTraining();
 
   return (

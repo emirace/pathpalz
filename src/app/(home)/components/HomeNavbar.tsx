@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 const navs = [
   {
     label: "Training",
-    path: "/#",
+    path: "/training",
   },
   {
     label: "Solutions",
@@ -17,16 +17,16 @@ const navs = [
   },
   {
     label: "About",
-    path: "/",
+    path: "/about",
   },
   {
     label: "Contact",
     path: "/contact",
   },
-]
+];
 
 export function HomeNavbar() {
-  const { data: user, isLoading } = useGetUser()
+  const { data: user, isLoading } = useGetUser();
   const router = useRouter();
 
   return (
@@ -42,7 +42,14 @@ export function HomeNavbar() {
         borderBottom: "1px solid rgba(133, 183, 235, 0.14)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "26px", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "26px",
+          flexWrap: "wrap",
+        }}
+      >
         <Link href="/" className="flex items-center">
           <Image
             src="/logo.png"
@@ -84,23 +91,29 @@ export function HomeNavbar() {
         >
           August · open now
         </span>
-        {isLoading ? <div className="animate-spin border-l border-y  w-6 h-6 rounded-full" /> : user ? <Link href="/dashboard" className="ml-8">
-          <User className="text-[#042C53]" />
-        </Link> : <button
-          onClick={() => router.push("/login")}
-          className="hover:bg-white/8 transition-colors"
-          style={{
-            font: "600 13px 'IBM Plex Sans', sans-serif",
-            border: "1px solid rgba(133, 183, 235, 0.35)",
-            padding: "6px 15px",
-            borderRadius: "8px",
-            background: "transparent",
-            color: "#fff",
-            cursor: "pointer",
-          }}
-        >
-          Log in
-        </button>}
+        {isLoading ? (
+          <div className="animate-spin border-l border-y  w-6 h-6 rounded-full" />
+        ) : user ? (
+          <Link href="/dashboard" className="ml-8">
+            <User className="text-[#042C53]" />
+          </Link>
+        ) : (
+          <button
+            onClick={() => router.push("/login")}
+            className="hover:bg-white/8 transition-colors"
+            style={{
+              font: "600 13px 'IBM Plex Sans', sans-serif",
+              border: "1px solid rgba(133, 183, 235, 0.35)",
+              padding: "6px 15px",
+              borderRadius: "8px",
+              background: "#042C53",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            Log in
+          </button>
+        )}
       </div>
     </div>
   );

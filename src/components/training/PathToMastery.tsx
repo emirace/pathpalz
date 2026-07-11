@@ -27,44 +27,79 @@ const steps = [
 
 const PathToMastery = () => {
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-10 space-y-3">
-          <h2 className="text-3xl md:text-4xl font-extrabold font-manrope text-[#00284F]">
-            The Path to Mastery
-          </h2>
-          <p className="text-gray-500 text-base">
-            Four simple steps to transform your professional trajectory.
-          </p>
+    <div
+      style={{
+        background: "#F5F3EC",
+        padding: "clamp(28px,4vw,44px) clamp(20px,4vw,52px)",
+        borderTop: "1px solid #E7E4DB",
+        borderBottom: "1px solid #E7E4DB",
+      }}
+    >
+      <div
+        data-reveal=""
+        style={{
+          textAlign: "center",
+          maxWidth: "520px",
+          margin: "0 auto 28px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "'Space Grotesk',sans-serif",
+            fontWeight: 600,
+            fontSize: "clamp(19px,2.6vw,25px)",
+            color: "#042C53",
+            marginBottom: "6px",
+          }}
+        >
+          The Path to Mastery
         </div>
-
-        {/* Steps Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="flex flex-col space-y-4 relative pt-16"
-            >
-              {/* Step Number (large background) */}
-              <span className="absolute top-0 left-0 text-8xl font-extrabold font-manrope text-[#00284F]/10 leading-none select-none">
-                {step.number}
-              </span>
-
-              {/* Content */}
-              <div className="space-y-2 -mt-2">
-                <h3 className="text-xl font-bold font-manrope text-[#00284F]">
-                  {step.title}
-                </h3>
-                <p className="text-gray-500 text-sm leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            </div>
-          ))}
+        <div style={{ fontSize: "13.5px", color: "#5F5E5A" }}>
+          Four simple steps to transform your professional trajectory.
         </div>
       </div>
-    </section>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
+          gap: "20px",
+        }}
+      >
+        {steps.map((step, i) => (
+          <div
+            key={step.number}
+            data-reveal=""
+            data-reveal-delay={(i * 0.1).toFixed(1)}
+            style={{ position: "relative" }}
+          >
+            <div
+              style={{
+                fontFamily: "'Space Grotesk',sans-serif",
+                fontWeight: 700,
+                fontSize: "44px",
+                color: "#DAD8CE",
+                lineHeight: 1,
+                marginBottom: "6px",
+              }}
+            >
+              {step.number}
+            </div>
+            <div
+              style={{
+                font: "600 14px 'IBM Plex Sans',sans-serif",
+                color: "#042C53",
+                marginBottom: "6px",
+              }}
+            >
+              {step.title}
+            </div>
+            <div style={{ fontSize: "12.5px", color: "#5F5E5A", lineHeight: 1.6 }}>
+              {step.description}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
