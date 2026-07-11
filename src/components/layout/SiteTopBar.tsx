@@ -3,7 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useGetUser } from "@/query/auth";
+import { User } from "lucide-react";
 
 interface SiteTopBarProps {
   mode: "listing" | "detail";
@@ -24,6 +26,8 @@ export default function SiteTopBar({
   onReserveSeat,
 }: SiteTopBarProps) {
   const pathname = usePathname();
+  const { data: user, isLoading } = useGetUser();
+  const router = useRouter();
 
   return (
     <div>
@@ -90,7 +94,7 @@ export default function SiteTopBar({
       {/* Navbar */}
       <div
         style={{
-          background: "#042C53",
+          background: "#ffffff",
           padding: "14px clamp(14px,2.5vw,26px)",
           display: "flex",
           alignItems: "center",
@@ -131,10 +135,10 @@ export default function SiteTopBar({
                   className="hover:bg-white/8 transition-colors duration-150"
                   style={{
                     fontSize: "13px",
-                    color: isActive ? "#fff" : "#B5D4F4",
+                    color: isActive ? "#fff" : "#042C53",
                     padding: "5px 11px",
                     borderRadius: "8px",
-                    background: isActive ? "rgba(133,183,235,.14)" : "none",
+                    background: isActive ? "#416181" : "none",
                   }}
                 >
                   {link.name}
@@ -143,23 +147,48 @@ export default function SiteTopBar({
             })}
           </div>
         </div>
-        <button
-          onClick={onReserveSeat}
-          className="hover:bg-[#2E74BE] transition-colors duration-150"
-          style={{
-            font: "600 13px 'IBM Plex Sans', sans-serif",
-            padding: "8px 17px",
-            borderRadius: "9px",
-            border: "none",
-            cursor: "pointer",
-            background: "#185FA5",
-            color: "#fff",
-            boxShadow: "0 8px 20px rgba(24,95,165,.35)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {mode === "detail" ? "Get Started" : "August cohort"}
-        </button>
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={onReserveSeat}
+            className="hover:bg-[#2E74BE] transition-colors duration-150"
+            style={{
+              font: "600 13px 'IBM Plex Sans', sans-serif",
+              padding: "8px 17px",
+              borderRadius: "9px",
+              border: "none",
+              cursor: "pointer",
+              background: "#185FA5",
+              color: "#fff",
+              boxShadow: "0 8px 20px rgba(24,95,165,.35)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {mode === "detail" ? "Get Started" : "August cohort"}
+          </button>
+          {isLoading ? (
+            <div className="animate-spin border-l border-y  w-6 h-6 rounded-full" />
+          ) : user ? (
+            <Link href="/dashboard" className="ml-8">
+              <User className="text-[#042C53]" />
+            </Link>
+          ) : (
+            <button
+              onClick={() => router.push("/login")}
+              className="hover:bg-white/8 transition-colors"
+              style={{
+                font: "600 13px 'IBM Plex Sans', sans-serif",
+                border: "1px solid rgba(133, 183, 235, 0.35)",
+                padding: "6px 15px",
+                borderRadius: "8px",
+                background: "#042C53",
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Log in
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

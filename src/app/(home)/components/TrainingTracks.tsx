@@ -97,17 +97,61 @@ export function TrainingTracks({ onOpenModal }: Props) {
     <div
       style={{
         background: "#fff",
-        backgroundImage: "radial-gradient(rgba(24,95,165,.04) 1px,transparent 1px),radial-gradient(circle at 0% 100%,rgba(24,95,165,.07),transparent 42%)",
+        backgroundImage:
+          "radial-gradient(rgba(24,95,165,.04) 1px,transparent 1px),radial-gradient(circle at 0% 100%,rgba(24,95,165,.07),transparent 42%)",
         backgroundSize: "24px 24px,100% 100%",
         padding: "clamp(30px,4vw,52px) clamp(20px,4vw,52px)",
         borderBottom: "1px solid #E7E4DB",
       }}
     >
-      <div data-reveal="" style={{ font: "500 11px 'IBM Plex Mono',monospace", letterSpacing: ".1em", color: "#8A8981", textTransform: "uppercase", marginBottom: "8px" }}>// Training tracks</div>
-      <div data-reveal="" data-reveal-delay="0.05" style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "clamp(20px,2.8vw,28px)", color: "#2C2C2A", marginBottom: "6px", letterSpacing: "-.01em" }}>Choose your path. Start in August.</div>
-      <div data-reveal="" data-reveal-delay="0.1" style={{ fontSize: "14px", color: "#5F5E5A", lineHeight: 1.6, maxWidth: "540px", marginBottom: "24px" }}>Two tracks open for August. Data Science &amp; AI opens September — join the waitlist to lock in early-access pricing.</div>
+      <div
+        data-reveal=""
+        style={{
+          font: "500 11px 'IBM Plex Mono',monospace",
+          letterSpacing: ".1em",
+          color: "#8A8981",
+          textTransform: "uppercase",
+          marginBottom: "8px",
+        }}
+      >
+        Training tracks
+      </div>
+      <div
+        data-reveal=""
+        data-reveal-delay="0.05"
+        style={{
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontWeight: 600,
+          fontSize: "clamp(20px,2.8vw,28px)",
+          color: "#2C2C2A",
+          marginBottom: "6px",
+          letterSpacing: "-.01em",
+        }}
+      >
+        Choose your path. Start in August.
+      </div>
+      <div
+        data-reveal=""
+        data-reveal-delay="0.1"
+        style={{
+          fontSize: "14px",
+          color: "#5F5E5A",
+          lineHeight: 1.6,
+          maxWidth: "540px",
+          marginBottom: "24px",
+        }}
+      >
+        Two tracks open for August. Data Science &amp; AI opens September — join
+        the waitlist to lock in early-access pricing.
+      </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: "14px" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+          gap: "14px",
+        }}
+      >
         {isLoading
           ? [1, 2, 3].map((i) => <SkeletonCard key={i} />)
           : tracks?.map((track, index) => {
@@ -116,8 +160,8 @@ export function TrainingTracks({ onOpenModal }: Props) {
               const badgeLabel = isOpen
                 ? "OPEN NOW"
                 : track.slug === "data-science-ai"
-                ? "SEPTEMBER"
-                : "COMING SOON";
+                  ? "SEPTEMBER"
+                  : "COMING SOON";
 
               return (
                 <div
@@ -133,7 +177,13 @@ export function TrainingTracks({ onOpenModal }: Props) {
                     justifyContent: "space-between",
                   }}
                 >
-                  <div style={{ padding: "18px", background: theme.background, flex: 1 }}>
+                  <div
+                    style={{
+                      padding: "18px",
+                      background: theme.background,
+                      flex: 1,
+                    }}
+                  >
                     <div
                       style={{
                         display: "inline-flex",
@@ -157,10 +207,24 @@ export function TrainingTracks({ onOpenModal }: Props) {
                       />
                       {badgeLabel}
                     </div>
-                    <div style={{ fontFamily: "'Space Grotesk',sans-serif", fontWeight: 600, fontSize: "17px", color: theme.titleColor, marginBottom: "5px" }}>
+                    <div
+                      style={{
+                        fontFamily: "'Space Grotesk',sans-serif",
+                        fontWeight: 600,
+                        fontSize: "17px",
+                        color: theme.titleColor,
+                        marginBottom: "5px",
+                      }}
+                    >
                       {track.title}
                     </div>
-                    <div style={{ fontSize: "12.5px", color: theme.descColor, lineHeight: 1.55 }}>
+                    <div
+                      style={{
+                        fontSize: "12.5px",
+                        color: theme.descColor,
+                        lineHeight: 1.55,
+                      }}
+                    >
                       {track.description}
                     </div>
                   </div>
@@ -174,7 +238,12 @@ export function TrainingTracks({ onOpenModal }: Props) {
                       background: theme.bottomBg,
                     }}
                   >
-                    <span style={{ font: "500 11px 'IBM Plex Mono',monospace", color: theme.bottomText }}>
+                    <span
+                      style={{
+                        font: "500 11px 'IBM Plex Mono',monospace",
+                        color: theme.bottomText,
+                      }}
+                    >
                       {track.duration_weeks} weeks · beginner
                     </span>
                     <Link
@@ -197,12 +266,54 @@ export function TrainingTracks({ onOpenModal }: Props) {
       </div>
 
       {/* Discount Banner */}
-      <div data-reveal="" style={{ marginTop: "20px", background: "#E1F5EE", border: "1px solid #9FE1CB", borderRadius: "13px", padding: "18px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
+      <div
+        data-reveal=""
+        style={{
+          marginTop: "20px",
+          background: "#E1F5EE",
+          border: "1px solid #9FE1CB",
+          borderRadius: "13px",
+          padding: "18px 22px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "16px",
+          flexWrap: "wrap",
+        }}
+      >
         <div style={{ maxWidth: "600px" }}>
-          <div style={{ font: "600 14px 'IBM Plex Sans',sans-serif", color: "#04342C", marginBottom: "3px" }}>Student, school, or occasion discount?</div>
-          <div style={{ fontSize: "12.5px", color: "#085041", lineHeight: 1.55 }}>Three discount types — student, school group, and bespoke occasion codes. Generate yours in seconds at checkout.</div>
+          <div
+            style={{
+              font: "600 14px 'IBM Plex Sans',sans-serif",
+              color: "#04342C",
+              marginBottom: "3px",
+            }}
+          >
+            Student, school, or occasion discount?
+          </div>
+          <div
+            style={{ fontSize: "12.5px", color: "#085041", lineHeight: 1.55 }}
+          >
+            Three discount types — student, school group, and bespoke occasion
+            codes. Generate yours in seconds at checkout.
+          </div>
         </div>
-        <button onClick={onOpenModal} className="hover:bg-[#0B5A46] hover:-translate-y-0.5 transition-all duration-150" style={{ font: "600 12.5px 'IBM Plex Sans',sans-serif", background: "#0F6E56", color: "#fff", padding: "10px 18px", borderRadius: "9px", border: "none", cursor: "pointer", whiteSpace: "nowrap" }}>See how discounts work →</button>
+        <button
+          onClick={onOpenModal}
+          className="hover:bg-[#0B5A46] hover:-translate-y-0.5 transition-all duration-150"
+          style={{
+            font: "600 12.5px 'IBM Plex Sans',sans-serif",
+            background: "#0F6E56",
+            color: "#fff",
+            padding: "10px 18px",
+            borderRadius: "9px",
+            border: "none",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          See how discounts work →
+        </button>
       </div>
     </div>
   );

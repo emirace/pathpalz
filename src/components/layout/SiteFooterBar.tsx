@@ -26,17 +26,14 @@ export default function SiteFooterBar() {
         Path<span style={{ color: "#5FA8E8" }}>Palz</span>
       </Link>
       <div style={{ display: "flex", gap: "18px", flexWrap: "wrap" }}>
-        <span style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}>
+        <Link
+          href={"/privacy"}
+          style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}
+        >
           Privacy Policy
-        </span>
+        </Link>
         <span style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}>
           Terms of Service
-        </span>
-        <span style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}>
-          Security
-        </span>
-        <span style={{ fontSize: "12px", color: "#9FB6CE", cursor: "pointer" }}>
-          Alumni Network
         </span>
       </div>
       <div

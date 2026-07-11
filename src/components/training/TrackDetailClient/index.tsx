@@ -27,7 +27,9 @@ export default function TrackDetailClient() {
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
-  const [discountView, setDiscountView] = useState<"enter" | "generate">("enter");
+  const [discountView, setDiscountView] = useState<"enter" | "generate">(
+    "enter",
+  );
   const [discountCode, setDiscountCode] = useState("");
 
   const [guestData, setGuestData] = useState({
@@ -47,6 +49,7 @@ export default function TrackDetailClient() {
   } | null>(null);
 
   const rootRef = useRef<HTMLDivElement>(null);
+  const trainingPathsSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -190,9 +193,9 @@ export default function TrackDetailClient() {
   const discountedAmount =
     selectedItemPrice !== null && discountPercentage > 0
       ? Math.max(
-        0,
-        selectedItemPrice - (selectedItemPrice * discountPercentage) / 100,
-      )
+          0,
+          selectedItemPrice - (selectedItemPrice * discountPercentage) / 100,
+        )
       : selectedItemPrice;
   const hasDiscountSummary = Boolean(
     discountCode.trim() && discountRule?.rule && selectedItemPrice !== null,
@@ -233,6 +236,15 @@ export default function TrackDetailClient() {
     }
   };
 
+  const scrollToType = () => {
+    requestAnimationFrame(() => {
+      trainingPathsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
   const handleGuestSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!guestData.fullName || !guestData.email) return;
@@ -259,16 +271,16 @@ export default function TrackDetailClient() {
         ...(discountCode.trim() ? { discount_code: discountCode.trim() } : {}),
         ...(!user
           ? {
-            email: guestData.email,
-            full_name: guestData.fullName,
-            phoneNumber: guestData.phoneNumber,
-            city: guestData.city,
-            country: guestData.country,
-            state: guestData.state,
-            street: guestData.street,
-            house_number: guestData.house_number,
-            apartment_number: guestData.apartment_number,
-          }
+              email: guestData.email,
+              full_name: guestData.fullName,
+              phoneNumber: guestData.phoneNumber,
+              city: guestData.city,
+              country: guestData.country,
+              state: guestData.state,
+              street: guestData.street,
+              house_number: guestData.house_number,
+              apartment_number: guestData.apartment_number,
+            }
           : {}),
       },
       {
@@ -435,7 +447,11 @@ export default function TrackDetailClient() {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
                     >
                       <span
                         style={{
@@ -461,11 +477,14 @@ export default function TrackDetailClient() {
                   ))}
                 </div>
                 <div
-                  style={{ opacity: 0, animation: "fadeSlideUp .6s ease both .5s" }}
+                  style={{
+                    opacity: 0,
+                    animation: "fadeSlideUp .6s ease both .5s",
+                  }}
                 >
                   {isOpen ? (
                     <button
-                      onClick={() => handleApply("training_track", track.id)}
+                      onClick={() => scrollToType()}
                       className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
                       style={{
                         display: "inline-block",
@@ -650,14 +669,19 @@ export default function TrackDetailClient() {
           </div>
 
           {/* 4. Training Paths (Types) — API data */}
-          <TrainingPaths
-            trackId={String(track.id)}
-            trackTitle={track.title}
-            onApply={handleApply}
-            slug={slug as string}
-            isOpen={isOpen}
-            onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
-          />
+          <div
+            ref={trainingPathsSectionRef}
+            style={{ scrollMarginTop: "90px" }}
+          >
+            <TrainingPaths
+              trackId={String(track.id)}
+              trackTitle={track.title}
+              onApply={handleApply}
+              slug={slug as string}
+              isOpen={isOpen}
+              onJoinWaitlist={() => setIsWaitlistModalOpen(true)}
+            />
+          </div>
 
           {/* 5. Specialized Tracks Deep Dive — API data */}
           <div id="sub_types" style={{ scrollMarginTop: "20px" }}>
@@ -904,7 +928,7 @@ export default function TrackDetailClient() {
               </div>
               {isOpen ? (
                 <button
-                  onClick={() => handleApply("training_track", track.id)}
+                  onClick={() => scrollToType()}
                   className="hover:-translate-y-0.5 transition-all duration-150"
                   style={{
                     display: "inline-block",
@@ -1069,7 +1093,11 @@ export default function TrackDetailClient() {
 
               {discountView === "enter" ? (
                 <div
-                  style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
                 >
                   <div>
                     <label
@@ -1216,7 +1244,11 @@ export default function TrackDetailClient() {
                 </div>
               ) : (
                 <div
-                  style={{ display: "flex", flexDirection: "column", gap: "12px" }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
                 >
                   <DiscountGenerateForm
                     defaultEmail={user?.email ?? guestData.email ?? ""}
@@ -1379,9 +1411,27 @@ export default function TrackDetailClient() {
               }}
             >
               {[
-                { label: "Full Name", field: "fullName", type: "text", placeholder: "John Doe", required: true },
-                { label: "Email Address", field: "email", type: "email", placeholder: "john@example.com", required: true },
-                { label: "Phone Number", field: "phoneNumber", type: "tel", placeholder: "e.g. +44 7123 456789 or +234 80 1234 5678", required: true },
+                {
+                  label: "Full Name",
+                  field: "fullName",
+                  type: "text",
+                  placeholder: "John Doe",
+                  required: true,
+                },
+                {
+                  label: "Email Address",
+                  field: "email",
+                  type: "email",
+                  placeholder: "john@example.com",
+                  required: true,
+                },
+                {
+                  label: "Phone Number",
+                  field: "phoneNumber",
+                  type: "tel",
+                  placeholder: "e.g. +44 7123 456789 or +234 80 1234 5678",
+                  required: true,
+                },
               ].map(({ label, field, type, placeholder, required }) => (
                 <div key={field}>
                   <label
@@ -1416,15 +1466,40 @@ export default function TrackDetailClient() {
               ))}
 
               <div
-                style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: "10px",
+                }}
               >
                 {[
-                  { label: "Country", field: "country", placeholder: "e.g. United Kingdom" },
-                  { label: "State / Region", field: "state", placeholder: "e.g. London" },
+                  {
+                    label: "Country",
+                    field: "country",
+                    placeholder: "e.g. United Kingdom",
+                  },
+                  {
+                    label: "State / Region",
+                    field: "state",
+                    placeholder: "e.g. London",
+                  },
                   { label: "City", field: "city", placeholder: "e.g. London" },
-                  { label: "Street Address", field: "street", placeholder: "e.g. High Street" },
-                  { label: "House Number", field: "house_number", placeholder: "e.g. 42" },
-                  { label: "Apartment (Optional)", field: "apartment_number", placeholder: "e.g. Flat 4", optional: true },
+                  {
+                    label: "Street Address",
+                    field: "street",
+                    placeholder: "e.g. High Street",
+                  },
+                  {
+                    label: "House Number",
+                    field: "house_number",
+                    placeholder: "e.g. 42",
+                  },
+                  {
+                    label: "Apartment (Optional)",
+                    field: "apartment_number",
+                    placeholder: "e.g. Flat 4",
+                    optional: true,
+                  },
                 ].map(({ label, field, placeholder, optional }) => (
                   <div key={field}>
                     <label

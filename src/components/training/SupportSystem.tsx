@@ -25,9 +25,15 @@ const features = [
   },
 ];
 
-const photos = [
+const photos1 = [
   { src: "/support_1.png", alt: "PathPalz peer partner", aspect: "3/4" },
-  { src: "/support_2.png", alt: "PathPalz accountability manager", aspect: "4/3" },
+  {
+    src: "/support_2.png",
+    alt: "PathPalz accountability manager",
+    aspect: "4/3",
+  },
+];
+const photos2 = [
   { src: "/support_3.png", alt: "PathPalz code review", aspect: "4/3" },
   { src: "/support_4.png", alt: "PathPalz support success", aspect: "4/3" },
 ];
@@ -68,10 +74,12 @@ const SupportSystem = () => {
               marginBottom: "20px",
             }}
           >
-            Self-learning is hard. That's why every PathPalz student is
-            flanked by two dedicated supporters from day one.
+            Self-learning is hard. That's why every PathPalz student is flanked
+            by two dedicated supporters from day one.
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+          >
             {features.map((feature, idx) => (
               <div key={idx} style={{ display: "flex", gap: "10px" }}>
                 <span
@@ -94,7 +102,13 @@ const SupportSystem = () => {
                   >
                     {feature.title}
                   </div>
-                  <div style={{ fontSize: "12px", color: "#5F5E5A", lineHeight: 1.4 }}>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#5F5E5A",
+                      lineHeight: 1.4,
+                    }}
+                  >
                     {feature.description}
                   </div>
                 </div>
@@ -103,34 +117,39 @@ const SupportSystem = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "10px",
-          }}
-        >
-          {photos.map((photo, i) => (
-            <div
-              key={photo.src}
-              style={{
-                position: "relative",
-                aspectRatio: photo.aspect,
-                borderRadius: "12px",
-                overflow: "hidden",
-                alignSelf: i % 2 === 1 ? "start" : undefined,
-                animation: `floatY 7s ease-in-out infinite ${i * 0.3}s`,
-              }}
-            >
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
-            </div>
-          ))}
+        <div className="grid grid-cols-2 gap-4 lg:gap-6">
+          <div className="flex flex-col gap-4 lg:gap-6 pt-0 lg:pt-10">
+            {photos1.map((photo, i) => (
+              <div
+                key={photo.src}
+                className="relative w-full aspect-4/5 rounded-[20px] overflow-hidden shadow-md"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col gap-4 lg:gap-6 pt-0 lg:pt-10">
+            {photos2.map((photo, i) => (
+              <div
+                key={photo.src}
+                className="relative w-full aspect-4/5 rounded-[20px] overflow-hidden shadow-md"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

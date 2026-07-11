@@ -263,7 +263,7 @@ export default function TrainingListingClient() {
                   }}
                 >
                   <Image
-                    src="/training_hero.png"
+                    src="/training_hero1.png"
                     alt="Students collaborating in a modern tech workspace"
                     fill
                     className="object-cover"

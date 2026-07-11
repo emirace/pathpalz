@@ -19,7 +19,12 @@ interface Props {
   onOpenModal: () => void;
 }
 
-export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenModal }: Props) {
+export function HeroSection({
+  typedWord,
+  seatsRemaining,
+  motionStyles,
+  onOpenModal,
+}: Props) {
   return (
     <div
       style={{
@@ -35,7 +40,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage: "radial-gradient(rgba(133,183,235,0.35) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(rgba(133,183,235,0.35) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
           opacity: 0.13,
           animation: "gridPulse 5s ease-in-out infinite",
@@ -50,7 +56,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
           flexWrap: "wrap",
           alignItems: "center",
           gap: "clamp(22px, 4vw, 48px)",
-          padding: "clamp(28px, 4.5vw, 52px) clamp(20px, 4vw, 52px) clamp(20px, 3vw, 34px)",
+          padding:
+            "clamp(28px, 4.5vw, 52px) clamp(20px, 4vw, 52px) clamp(20px, 3vw, 34px)",
         }}
       >
         {/* Left side content */}
@@ -99,7 +106,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                 display: "block",
                 color: "#fff",
                 opacity: 0,
-                animation: "fadeSlideUp .6s cubic-bezier(.22,1,.36,1) both .18s",
+                animation:
+                  "fadeSlideUp .6s cubic-bezier(.22,1,.36,1) both .18s",
               }}
             >
               Zero experience.
@@ -116,7 +124,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
               <span>Real&nbsp;</span>
               <span
                 style={{
-                  background: "linear-gradient(100deg, #85B7EB, #fff 45%, #4FB79A)",
+                  background:
+                    "linear-gradient(100deg, #85B7EB, #fff 45%, #4FB79A)",
                   WebkitBackgroundClip: "text",
                   backgroundClip: "text",
                   WebkitTextFillColor: "transparent",
@@ -153,9 +162,10 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
               animation: "cascadeUp .7s cubic-bezier(.22,1,.36,1) both .6s",
             }}
           >
-            Live cohort training that turns complete beginners and career-changers into job-ready
-            developers and DevOps engineers — with a dedicated peer partner, weekly
-            accountability, and a real project shipped every single week.
+            Live cohort training that turns complete beginners and
+            career-changers into job-ready developers and DevOps engineers —
+            with a dedicated peer partner, weekly accountability, and a real
+            project shipped every single week.
           </p>
 
           <div
@@ -169,7 +179,7 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
             }}
           >
             <button
-              onClick={onOpenModal}
+              // onClick={onOpenModal}
               className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
               style={{
                 font: "600 13.5px 'IBM Plex Sans', sans-serif",
@@ -185,6 +195,7 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
               Secure my August seat
             </button>
             <button
+              onClick={onOpenModal}
               className="hover:bg-white/8 transition-colors duration-150"
               style={{
                 font: "600 13.5px 'IBM Plex Sans', sans-serif",
@@ -196,7 +207,7 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                 cursor: "pointer",
               }}
             >
-              Download curriculum
+              Get Discount Code
             </button>
           </div>
 
@@ -221,7 +232,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                 animation: "dotBlink 1.4s ease-in-out infinite",
               }}
             />
-            30 seats per cohort — {seatsRemaining} remaining · enrolment closes 28 July
+            30 seats per cohort — {seatsRemaining} remaining · enrolment closes
+            28 July
           </div>
         </div>
 
@@ -248,7 +260,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
               top: 0,
               right: "4%",
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(79,183,154,0.5), transparent 68%)",
+              background:
+                "radial-gradient(circle, rgba(79,183,154,0.5), transparent 68%)",
               filter: "blur(16px)",
               animation: motionStyles.blobA,
               pointerEvents: "none",
@@ -262,7 +275,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
               bottom: 0,
               left: 0,
               borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(24,95,165,0.6), transparent 66%)",
+              background:
+                "radial-gradient(circle, rgba(24,95,165,0.6), transparent 66%)",
               filter: "blur(18px)",
               animation: motionStyles.blobB,
               pointerEvents: "none",
@@ -320,14 +334,21 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                 borderRadius: "18px",
                 overflow: "hidden",
                 border: "1px solid rgba(255,255,255,0.14)",
-                boxShadow: "0 22px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.07)",
+                boxShadow:
+                  "0 22px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.07)",
                 animation: motionStyles.glowMain,
                 aspectRatio: "4/3",
                 background: "#0A3763",
                 position: "relative",
               }}
             >
-              <div style={{ position: "absolute", inset: 0, animation: motionStyles.kenBurns }}>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  animation: motionStyles.kenBurns,
+                }}
+              >
                 <img
                   src="/new-hero.png"
                   alt="PathPalz Cohort"
@@ -361,7 +382,12 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                   animation: "dotBlink 1.4s infinite",
                 }}
               />
-              <span style={{ font: "600 11px 'IBM Plex Sans', sans-serif", color: "#2C2C2A" }}>
+              <span
+                style={{
+                  font: "600 11px 'IBM Plex Sans', sans-serif",
+                  color: "#2C2C2A",
+                }}
+              >
                 Live cohort
               </span>
             </div>
@@ -400,7 +426,12 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                 }}
               >
                 1,200+{" "}
-                <span style={{ font: "500 10px 'IBM Plex Mono', monospace", color: "#4FB79A" }}>
+                <span
+                  style={{
+                    font: "500 10px 'IBM Plex Mono', monospace",
+                    color: "#4FB79A",
+                  }}
+                >
                   projects
                 </span>
               </div>
@@ -432,7 +463,8 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
                   whiteSpace: "nowrap",
                   verticalAlign: "bottom",
                   borderRight: "1.5px solid #4FB79A",
-                  animation: "typing 2.4s steps(18) 1.2s both, caret .8s step-end infinite",
+                  animation:
+                    "typing 2.4s steps(18) 1.2s both, caret .8s step-end infinite",
                 }}
               >
                 git push origin main
@@ -506,7 +538,14 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
             >
               {card.title}
             </div>
-            <div style={{ fontSize: "12.5px", color: "#B5D4F4", lineHeight: 1.55, marginBottom: "10px" }}>
+            <div
+              style={{
+                fontSize: "12.5px",
+                color: "#B5D4F4",
+                lineHeight: 1.55,
+                marginBottom: "10px",
+              }}
+            >
               {card.body}
             </div>
             <div
@@ -524,7 +563,16 @@ export function HeroSection({ typedWord, seatsRemaining, motionStyles, onOpenMod
         ))}
       </div>
 
-      <span data-hero-end="" style={{ position: "absolute", bottom: 0, left: 0, width: "1px", height: "1px" }} />
+      <span
+        data-hero-end=""
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          width: "1px",
+          height: "1px",
+        }}
+      />
     </div>
   );
 }

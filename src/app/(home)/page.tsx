@@ -18,7 +18,9 @@ import { DiscountModal } from "./components/DiscountModal";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [dtype, setDtype] = useState<"student" | "school" | "bespoke">("student");
+  const [dtype, setDtype] = useState<"student" | "school" | "bespoke">(
+    "student",
+  );
   const [seatsRemaining] = useState(8);
   const [typedWord, setTypedWord] = useState("career");
 
@@ -26,7 +28,14 @@ export default function Home() {
 
   // Dynamic typing loop
   useEffect(() => {
-    const words = ["career", "developer", "portfolio", "future", "income", "skill"];
+    const words = [
+      "career",
+      "developer",
+      "portfolio",
+      "future",
+      "income",
+      "skill",
+    ];
     let wordIndex = 0;
     let charIndex = words[0].length;
     let isDeleting = true;
@@ -64,9 +73,15 @@ export default function Home() {
     const root = rootRef.current;
     if (!root) return;
 
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const revealEls = Array.from(root.querySelectorAll("[data-reveal]")) as HTMLElement[];
-    const countEls = Array.from(root.querySelectorAll("[data-count]")) as HTMLElement[];
+    const reduce =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealEls = Array.from(
+      root.querySelectorAll("[data-reveal]"),
+    ) as HTMLElement[];
+    const countEls = Array.from(
+      root.querySelectorAll("[data-count]"),
+    ) as HTMLElement[];
     const stickyBar = root.querySelector("[data-sticky]") as HTMLElement;
     const heroEnd = root.querySelector("[data-hero-end]") as HTMLElement;
 
@@ -123,7 +138,10 @@ export default function Home() {
       });
       if (!reduce) {
         countEls.forEach((el) => {
-          if (!(el as any)._counted && el.getBoundingClientRect().top < h * 0.85) {
+          if (
+            !(el as any)._counted &&
+            el.getBoundingClientRect().top < h * 0.85
+          ) {
             (el as any)._counted = true;
             animateCount(el);
           }
@@ -165,7 +183,11 @@ export default function Home() {
   const sub = ambientMotion === "Subtle";
 
   const motionStyles = {
-    floatMain: off ? "none" : sub ? "floatY 9s ease-in-out infinite" : "floatY 6.5s ease-in-out infinite",
+    floatMain: off
+      ? "none"
+      : sub
+        ? "floatY 9s ease-in-out infinite"
+        : "floatY 6.5s ease-in-out infinite",
     glowMain: off ? "none" : "glowPulse 6s ease-in-out infinite",
     kenBurns: off ? "none" : "kenBurns 16s ease-in-out infinite alternate",
     orbit: off ? "none" : "spin 26s linear infinite",
@@ -187,15 +209,14 @@ export default function Home() {
         fontFamily: "'IBM Plex Sans', sans-serif",
       }}
     >
-      <div
-      >
-        <HomeAnnouncementBar onOpenModal={() => { }} />
+      <div>
+        <HomeAnnouncementBar onOpenModal={() => {}} />
         <HomeNavbar />
         <HeroSection
           typedWord={typedWord}
           seatsRemaining={seatsRemaining}
           motionStyles={motionStyles}
-          onOpenModal={() => { }}
+          onOpenModal={openModal}
         />
         <TechMarquee />
         <StatsBar />
@@ -203,12 +224,12 @@ export default function Home() {
         <TrainingTracks onOpenModal={openModal} />
         <BuiltInSupport />
         <WhyPathPalz />
-        <FoundingCohortBanner onOpenModal={() => { }} />
-        <BottomCTA onOpenModal={() => { }} />
+        <FoundingCohortBanner onOpenModal={() => {}} />
+        <BottomCTA onOpenModal={() => {}} />
         <HomeFooter />
       </div>
 
-      <StickySeatsBar seatsRemaining={seatsRemaining} onOpenModal={() => { }} />
+      <StickySeatsBar seatsRemaining={seatsRemaining} onOpenModal={() => {}} />
       <DiscountModal
         modalOpen={modalOpen}
         dtype={dtype}
