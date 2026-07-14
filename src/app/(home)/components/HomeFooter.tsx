@@ -1,23 +1,33 @@
 "use client";
 
+import Link from "next/link";
 import { SECTION_MAX_WIDTH } from "@/utils/layout";
 
 const COLUMNS = [
   {
     heading: "Training",
-    links: ["Software Development", "DevOps Engineering", "Data Science & AI"],
+    links: [
+      { label: "Software Development", href: "/training" },
+      { label: "DevOps Engineering", href: "/training" },
+      { label: "Data Science & AI", href: "/training" },
+    ],
   },
   {
     heading: "Company",
-    links: ["About", "Tech Solutions", "Partner Programme", "Contact"],
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Tech Solutions", href: "/solutions" },
+      { label: "Partner Programme", href: "/contact" },
+      { label: "Contact", href: "/contact" },
+    ],
   },
   {
     heading: "Legal",
     links: [
-      "Privacy Policy",
-      "Terms of Service",
-      "Cookie Policy",
-      "Discount Policy",
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/privacy" },
+      { label: "Cookie Policy", href: "/privacy" },
+      { label: "Discount Policy", href: "/privacy" },
     ],
   },
 ];
@@ -31,87 +41,90 @@ export function HomeFooter() {
       }}
     >
       <div style={{ maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
-      <div style={{ marginBottom: "24px" }}>
+        <div style={{ marginBottom: "24px" }}>
+          <div
+            style={{
+              fontFamily: "'Space Grotesk',sans-serif",
+              fontWeight: 600,
+              fontSize: "20px",
+              color: "#fff",
+              marginBottom: "8px",
+            }}
+          >
+            Path<span style={{ color: "#5FA8E8" }}>Palz</span>
+          </div>
+          <div style={{ fontSize: "14px", color: "#7E9BB8", lineHeight: 1.6 }}>
+            Precision in Development, Human in Approach. Training the next
+            generation of tech professionals across the UK and Nigeria.
+          </div>
+        </div>
+
         <div
           style={{
-            fontFamily: "'Space Grotesk',sans-serif",
-            fontWeight: 600,
-            fontSize: "20px",
-            color: "#fff",
-            marginBottom: "8px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
+            gap: "24px",
+            marginBottom: "24px",
+            borderTop: "1px solid rgba(133,183,235,.14)",
+            paddingTop: "22px",
           }}
         >
-          Path<span style={{ color: "#5FA8E8" }}>Palz</span>
-        </div>
-        <div style={{ fontSize: "14px", color: "#7E9BB8", lineHeight: 1.6 }}>
-          Precision in Development, Human in Approach. Training the next
-          generation of tech professionals across the UK and Nigeria.
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))",
-          gap: "24px",
-          marginBottom: "24px",
-          borderTop: "1px solid rgba(133,183,235,.14)",
-          paddingTop: "22px",
-        }}
-      >
-        {COLUMNS.map((col) => (
-          <div key={col.heading}>
-            <div
-              style={{
-                font: "600 11.5px 'IBM Plex Mono',monospace",
-                color: "#5FA8E8",
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-                marginBottom: "12px",
-              }}
-            >
-              {col.heading}
-            </div>
-            {col.links.map((link) => (
-              <span
-                key={link}
-                className="hover:text-white transition-colors duration-150"
+          {COLUMNS.map((col) => (
+            <div key={col.heading}>
+              <div
                 style={{
-                  fontSize: "14px",
-                  color: "#9FB6CE",
-                  display: "block",
-                  marginBottom: "8px",
-                  cursor: "pointer",
+                  font: "600 11.5px 'IBM Plex Mono',monospace",
+                  color: "#5FA8E8",
+                  letterSpacing: ".08em",
+                  textTransform: "uppercase",
+                  marginBottom: "12px",
                 }}
               >
-                {link}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
+                {col.heading}
+              </div>
+              {col.links.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="hover:text-white transition-colors duration-150"
+                  style={{
+                    fontSize: "14px",
+                    color: "#9FB6CE",
+                    display: "block",
+                    marginBottom: "8px",
+                    cursor: "pointer",
+                    textDecoration: "none",
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ))}
+        </div>
 
-      <div
-        style={{
-          borderTop: "1px solid rgba(133,183,235,.14)",
-          paddingTop: "16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          flexWrap: "wrap",
-        }}
-      >
         <div
           style={{
-            font: "500 12.5px 'IBM Plex Mono',monospace",
-            color: "#5F7C99",
+            borderTop: "1px solid rgba(133,183,235,.14)",
+            paddingTop: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            flexWrap: "wrap",
           }}
         >
-          © 2025 PathPalz Limited · Precision in Development, Human in Approach.
-        </div>
-        <div />
-        {/* <div style={{ display: "flex", gap: "16px" }}>
+          <div
+            style={{
+              font: "500 12.5px 'IBM Plex Mono',monospace",
+              color: "#5F7C99",
+            }}
+          >
+            © 2025 PathPalz Limited · Precision in Development, Human in
+            Approach.
+          </div>
+          <div />
+          {/* <div style={{ display: "flex", gap: "16px" }}>
           {["LinkedIn", "GitHub", "Instagram"].map((s) => (
             <span
               key={s}
@@ -122,7 +135,7 @@ export function HomeFooter() {
             </span>
           ))}
         </div> */}
-      </div>
+        </div>
       </div>
     </div>
   );

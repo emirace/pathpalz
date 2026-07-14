@@ -17,6 +17,7 @@ interface SiteTopBarProps {
 const NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "About", href: "/about" },
+  { name: "Solutions", href: "/solutions" },
   { name: "Training", href: "/training" },
   { name: "Contact", href: "/contact" },
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { SECTION_MAX_WIDTH } from "@/utils/layout";
+import { useRouter } from "next/navigation";
 
 interface MotionStyles {
   floatMain: string;
@@ -27,6 +28,7 @@ export function HeroSection({
   motionStyles,
   onOpenModal,
 }: Props) {
+  const router = useRouter();
   return (
     <div
       style={{
@@ -183,7 +185,7 @@ export function HeroSection({
             }}
           >
             <button
-              // onClick={onOpenModal}
+              onClick={() => router.push("/training")}
               className="hover:bg-[#2E74BE] hover:-translate-y-0.5 transition-all duration-150"
               style={{
                 font: "600 15px 'IBM Plex Sans', sans-serif",
@@ -496,7 +498,7 @@ export function HeroSection({
             labelColor: "#F0C88A",
             title: "Up to 40% off every track",
             body: "Secondary school, college or university students get a significantly reduced price. Same curriculum, same cohort, same certificate.",
-            cta: "Check my student price →",
+            cta: "Check student discount →",
             delay: "1s",
           },
           {
@@ -504,7 +506,7 @@ export function HeroSection({
             labelColor: "#8FD3C3",
             title: "16 weeks to change what you do",
             body: "Career-change training, not a course library. Live cohorts, real projects, weekly accountability, and a portfolio that proves what you can build.",
-            cta: "See the full curriculum →",
+            cta: "Get early bird discount →",
             delay: "1.1s",
           },
         ].map((card) => (
@@ -562,6 +564,7 @@ export function HeroSection({
                 alignItems: "center",
                 gap: "5px",
               }}
+              // onClick={() => router.push("/training")}
             >
               {card.cta}
             </div>

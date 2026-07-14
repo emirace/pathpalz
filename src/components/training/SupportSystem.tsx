@@ -28,15 +28,15 @@ const features = [
 
 const photos1 = [
   { src: "/support_1.png", alt: "PathPalz peer partner", aspect: "3/4" },
+  { src: "/support_4.png", alt: "PathPalz support success", aspect: "4/3" },
+];
+const photos2 = [
+  { src: "/support_3.png", alt: "PathPalz code review", aspect: "4/3" },
   {
     src: "/support_2.png",
     alt: "PathPalz accountability manager",
     aspect: "4/3",
   },
-];
-const photos2 = [
-  { src: "/support_3.png", alt: "PathPalz code review", aspect: "4/3" },
-  { src: "/support_4.png", alt: "PathPalz support success", aspect: "4/3" },
 ];
 
 const SupportSystem = () => {
@@ -120,35 +120,35 @@ const SupportSystem = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 lg:gap-6">
-          <div className="flex flex-col gap-4 lg:gap-6 pt-0 lg:pt-10">
+        <div className="grid grid-cols-2 gap-3 lg:gap-4 max-w-[420px] w-full mx-auto">
+          <div className="flex flex-col gap-3 lg:gap-4 pt-0 lg:pt-8">
             {photos1.map((photo, i) => (
               <div
                 key={photo.src}
-                className="relative w-full aspect-4/5 rounded-[20px] overflow-hidden shadow-md"
+                className="relative w-full aspect-[4/3] rounded-[16px] overflow-hidden shadow-md"
               >
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 25vw"
+                  sizes="(max-width: 768px) 45vw, 20vw"
                 />
               </div>
             ))}
           </div>
-          <div className="flex flex-col gap-4 lg:gap-6 pt-0 lg:pt-10">
+          <div className="flex flex-col gap-3 lg:gap-4 pt-0 lg:pt-8">
             {photos2.map((photo, i) => (
               <div
                 key={photo.src}
-                className="relative w-full aspect-4/5 rounded-[20px] overflow-hidden shadow-md"
+                className="relative w-full aspect-4/3 rounded-2xl overflow-hidden shadow-md"
               >
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 25vw"
+                  sizes="(max-width: 768px) 45vw, 20vw"
                 />
               </div>
             ))}

@@ -15,6 +15,7 @@ import { BottomCTA } from "./components/BottomCTA";
 import { HomeFooter } from "./components/HomeFooter";
 import { StickySeatsBar } from "./components/StickySeatsBar";
 import { DiscountModal } from "./components/DiscountModal";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -200,6 +201,7 @@ export default function Home() {
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
+  const router = useRouter();
 
   return (
     <div
@@ -207,10 +209,11 @@ export default function Home() {
       style={{
         width: "100%",
         fontFamily: "'IBM Plex Sans', sans-serif",
+        background: "#ffffff",
       }}
     >
       <div>
-        <HomeAnnouncementBar onOpenModal={() => {}} />
+        <HomeAnnouncementBar onOpenModal={() => router.push("/training")} />
         <HomeNavbar />
         <HeroSection
           typedWord={typedWord}
@@ -224,12 +227,15 @@ export default function Home() {
         <TrainingTracks onOpenModal={openModal} />
         <BuiltInSupport />
         <WhyPathPalz />
-        <FoundingCohortBanner onOpenModal={() => {}} />
-        <BottomCTA onOpenModal={() => {}} />
+        <FoundingCohortBanner onOpenModal={() => router.push("/training")} />
+        <BottomCTA onOpenModal={() => router.push("/training")} />
         <HomeFooter />
       </div>
 
-      <StickySeatsBar seatsRemaining={seatsRemaining} onOpenModal={() => {}} />
+      <StickySeatsBar
+        seatsRemaining={seatsRemaining}
+        onOpenModal={() => router.push("/training")}
+      />
       <DiscountModal
         modalOpen={modalOpen}
         dtype={dtype}
