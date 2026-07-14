@@ -32,7 +32,7 @@ export default function SiteTopBar({
   const router = useRouter();
 
   return (
-    <div>
+    <div className="bg-white">
       {/* Announcement bar */}
       <div
         style={{
@@ -77,7 +77,9 @@ export default function SiteTopBar({
               {mode === "detail" && track
                 ? `August cohort now enrolling — ${track.title}.`
                 : "August cohort enrolling now."}{" "}
-              <span style={{ color: "#B5D4F4" }}>30 seats · closes 28 July.</span>
+              <span style={{ color: "#B5D4F4" }}>
+                30 seats · closes 28 July.
+              </span>
             </span>
           </div>
           <button

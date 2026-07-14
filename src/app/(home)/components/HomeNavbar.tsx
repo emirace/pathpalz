@@ -14,7 +14,7 @@ const navs = [
   },
   {
     label: "Solutions",
-    path: "/#",
+    path: "/solutions",
   },
   {
     label: "About",
