@@ -2,6 +2,7 @@
 
 import React from "react";
 import { X, CreditCard, Banknote, ShieldCheck } from "lucide-react";
+import { useSetting } from "@/states/setting";
 
 interface PaymentGatewayModalProps {
   isOpen: boolean;
@@ -16,12 +17,14 @@ const PaymentGatewayModal = ({
   onSelect,
   isSubmitting = false,
 }: PaymentGatewayModalProps) => {
+  const country = useSetting((state) => state.country);
   if (!isOpen) return null;
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
 
+  console.log(country);
   return (
     <div
       className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-[#00284F]/40 backdrop-blur-sm transition-all duration-300"
@@ -44,48 +47,47 @@ const PaymentGatewayModal = ({
             Select your preferred payment gateway
           </p>
         </div>
-
         {/* Options */}
         <div className="p-8 pt-0 space-y-4">
-          {/* Stripe Option */}
-          <button
-            disabled={isSubmitting}
-            onClick={() => onSelect("stripe")}
-            className="w-full group relative flex items-center p-6 bg-white border-2 border-gray-100 rounded-2xl hover:border-teal hover:bg-teal/2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mr-5 group-hover:bg-violet-100 transition-colors">
-              <CreditCard className="w-6 h-6 text-violet-600" />
-            </div>
-            <div>
-              <h4 className="font-bold text-[#00284F] text-lg">Stripe</h4>
-              <p className="text-xs text-gray-500 font-medium">
-                International Cards & Apple Pay
-              </p>
-            </div>
-            <div className="absolute right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ShieldCheck className="w-5 h-5 text-teal" />
-            </div>
-          </button>
-
-          {/* Paystack Option */}
-          <button
-            disabled={isSubmitting}
-            onClick={() => onSelect("paystack")}
-            className="w-full group relative flex items-center p-6 bg-white border-2 border-gray-100 rounded-2xl hover:border-teal hover:bg-teal/2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center mr-5 group-hover:bg-sky-100 transition-colors">
-              <Banknote className="w-6 h-6 text-sky-600" />
-            </div>
-            <div>
-              <h4 className="font-bold text-[#00284F] text-lg">Paystack</h4>
-              <p className="text-xs text-gray-500 font-medium">
-                Cards, Bank, & Mobile Money
-              </p>
-            </div>
-            <div className="absolute right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-              <ShieldCheck className="w-5 h-5 text-teal" />
-            </div>
-          </button>
+          {country.code === "NG" ? (
+            <button
+              disabled={isSubmitting}
+              onClick={() => onSelect("paystack")}
+              className="w-full group relative flex items-center p-6 bg-white border-2 border-gray-100 rounded-2xl hover:border-teal hover:bg-teal/2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div className="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center mr-5 group-hover:bg-sky-100 transition-colors">
+                <Banknote className="w-6 h-6 text-sky-600" />
+              </div>
+              <div>
+                <h4 className="font-bold text-[#00284F] text-lg">Paystack</h4>
+                <p className="text-xs text-gray-500 font-medium">
+                  Cards, Bank, & Mobile Money
+                </p>
+              </div>
+              <div className="absolute right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ShieldCheck className="w-5 h-5 text-teal" />
+              </div>
+            </button>
+          ) : (
+            <button
+              disabled={isSubmitting}
+              onClick={() => onSelect("stripe")}
+              className="w-full group relative flex items-center p-6 bg-white border-2 border-gray-100 rounded-2xl hover:border-teal hover:bg-teal/2 transition-all duration-200 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <div className="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center mr-5 group-hover:bg-violet-100 transition-colors">
+                <CreditCard className="w-6 h-6 text-violet-600" />
+              </div>
+              <div>
+                <h4 className="font-bold text-[#00284F] text-lg">Stripe</h4>
+                <p className="text-xs text-gray-500 font-medium">
+                  International Cards & Apple Pay
+                </p>
+              </div>
+              <div className="absolute right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ShieldCheck className="w-5 h-5 text-teal" />
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Footer */}

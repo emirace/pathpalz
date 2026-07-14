@@ -54,6 +54,44 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    if (!pasted) return;
+
+    const newOtp = [...otp];
+    pasted.split("").forEach((char, i) => {
+      newOtp[i] = char;
+    });
+    setOtp(newOtp);
+
+    // Focus the last filled box (or the next empty one)
+    const nextIndex = Math.min(pasted.length, 5);
+    inputRefs[nextIndex].current?.focus();
+
+    // Auto-submit if all 6 digits were pasted
+    if (pasted.length === 6) {
+      verifyOtpMutation.mutate(
+        { email, otp: pasted },
+        {
+          onSuccess: () => {
+            onClose();
+            router.push("/dashboard");
+          },
+          onError: (err: any) => {
+            setError(
+              err.response?.data?.message ||
+                "Invalid OTP code. Please try again.",
+            );
+          },
+        },
+      );
+    }
+  };
+
   const handleVerify = async () => {
     const otpValue = otp.join("");
     if (otpValue.length < 6) {
@@ -64,17 +102,9 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
     verifyOtpMutation.mutate(
       { email, otp: otpValue },
       {
-        onSuccess: (data) => {
-          console.log(data);
-          // Assuming data contains tokens based on standard practice
-          if (data.token) {
-            localStorage.setItem("authToken", data.token);
-          }
-          if (data.refresh_token) {
-            localStorage.setItem("refreshToken", data.refresh_token);
-          }
+        onSuccess: () => {
           onClose();
-          router.push("/training");
+          router.push("/dashboard");
         },
         onError: (err: any) => {
           setError(
@@ -127,6 +157,7 @@ const OtpModal = ({ isOpen, onClose, email }: OtpModalProps) => {
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
+              onPaste={handlePaste}
               className="w-14 h-16 text-center text-2xl font-bold bg-gray-50 border border-gray-200 rounded-xl focus:border-[#00677D] focus:ring-1 focus:ring-[#00677D] text-[#00284F] transition-all"
             />
           ))}

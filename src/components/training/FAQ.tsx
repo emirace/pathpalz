@@ -1,83 +1,102 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqs = [
   {
     question: "Do I really need zero experience?",
     answer:
-      "Yes. Our Software Development track is meticulously designed starting from the literal basics. We teach you how to think like a developer before we even write our first line of code.",
+      "Yes. Every Foundation track starts from absolute zero — how to think like a developer before you write a single line of code. No coding test, no maths prerequisites, no prior tech background required.",
   },
   {
-    question: "How are peer partners selected?",
+    question: "When does enrolment close?",
     answer:
-      "We match you based on your time zone, previous experience level (or lack thereof), and learning style. Our goal is to pair you with someone who will challenge you while remaining at a similar pace.",
+      "Enrolment for the August cohort closes 28 July — or earlier if the 30 seats fill before then. The cohort starts 1 August.",
   },
   {
-    question: "Is this a full-time commitment?",
+    question: "How do student discounts work?",
     answer:
-      "No, but it is a consistent one. We recommend at least 12-15 hours per week. Most of our students balance the training with a part-time job or other studies, but you must be able to attend the core live sessions.",
+      'When you click to enrol on any track, a discount step appears. Select "student discount," enter your institution details, and your unique code is generated instantly. You may be asked to show your student ID at your first live session.',
+  },
+  {
+    question: "Is there a money-back guarantee?",
+    answer:
+      "Yes. If the first week isn't what you expected, we refund your full payment — no forms, no arguments. Applies to both professional and student pricing.",
   },
 ];
 
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   return (
-    <section className="py-24 bg-[#F3F3F8]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-extrabold font-manrope text-[#00284F] leading-tight">
-            Frequently Asked <br className="hidden sm:block" /> Questions
-          </h2>
-        </div>
-
-        {/* FAQ List */}
-        <div className="space-y-4">
-          {faqs.map((faq, index) => {
-            const isOpen = openIndex === index;
-            return (
-              <div
-                key={index}
-                className="bg-white rounded-xl overflow-hidden transition-all duration-300 shadow-sm border border-gray-100"
-              >
-                <button
-                  onClick={() => toggleFAQ(index)}
-                  className="w-full flex items-center justify-between p-6 sm:p-8 text-left hover:bg-gray-50/50 transition-colors focus:outline-none"
-                >
-                  <span className="text-lg md:text-xl font-bold font-manrope text-[#00284F]">
-                    {faq.question}
-                  </span>
-                  {isOpen ? (
-                    <ChevronUp className="w-6 h-6 text-[#00284F] shrink-0 ml-4" />
-                  ) : (
-                    <ChevronDown className="w-6 h-6 text-[#00284F] shrink-0 ml-4" />
-                  )}
-                </button>
-
-                <div
-                  className={`transition-all duration-300 ease-in-out ${
-                    isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-                  }`}
-                >
-                  <div className="p-6 sm:p-8 pt-0 sm:pt-0">
-                    <p className="text-[#424750] text-base md:text-lg leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+    <div style={{ marginBottom: "30px" }}>
+      <div
+        style={{
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontWeight: 600,
+          fontSize: "20px",
+          color: "#042C53",
+          marginBottom: "16px",
+        }}
+      >
+        Frequently asked questions
       </div>
-    </section>
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        {faqs.map((faq, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              style={{
+                background: "#fff",
+                border: "1px solid #E7E4DB",
+                borderRadius: "10px",
+                overflow: "hidden",
+              }}
+            >
+              <button
+                onClick={() => toggleFAQ(index)}
+                style={{
+                  padding: "13px 16px",
+                  font: "600 14.5px 'IBM Plex Sans',sans-serif",
+                  color: "#2C2C2A",
+                  cursor: "pointer",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  border: "none",
+                  background: "none",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                <span>{faq.question}</span>
+                <span style={{ color: "#8A8981", fontSize: "13.5px" }}>
+                  {isOpen ? "▲" : "▼"}
+                </span>
+              </button>
+              {isOpen && (
+                <div
+                  style={{
+                    fontSize: "14px",
+                    color: "#5F5E5A",
+                    lineHeight: 1.65,
+                    padding: "0 16px 14px",
+                    borderTop: "1px solid #E7E4DB",
+                  }}
+                >
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

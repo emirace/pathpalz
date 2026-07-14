@@ -3,7 +3,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useLogin } from "@/query/auth";
 import OtpModal from "@/components/auth/OtpModal";
 
@@ -12,6 +20,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginMutation = useLogin();
 
@@ -101,7 +110,7 @@ const LoginPage = () => {
                   Password
                 </label>
                 <Link
-                  href="#"
+                  href="/forgot-password"
                   className="text-[11px] font-bold text-gray-400 hover:text-[#00677D] transition-colors"
                 >
                   Forgot?
@@ -109,14 +118,27 @@ const LoginPage = () => {
               </div>
               <div className="relative group">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   disabled={loginMutation.isPending}
-                  className="w-full h-12 pl-12 pr-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#00677D] focus:ring-1 focus:ring-[#00677D] text-[#00284F] placeholder:text-gray-400 transition-all disabled:opacity-50"
+                  className="w-full h-12 pl-12 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#00677D] focus:ring-1 focus:ring-[#00677D] text-[#00284F] placeholder:text-gray-400 transition-all disabled:opacity-50"
                 />
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#00677D] transition-colors" />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#00677D] transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -176,13 +198,22 @@ const LoginPage = () => {
           </div> */}
 
           {/* Footer */}
-          <p className="mt-8 text-center text-sm text-gray-400">
-            Don't have an account?{" "}
+          {/* <p className="mt-8 text-center text-sm text-gray-400">
+            Don&apos;t have an account?{" "}
             <Link
               href="/signup"
               className="text-[#00677D] font-bold hover:underline underline-offset-4"
             >
               Create account
+            </Link>
+          </p> */}
+          <p className="mt-3 text-center text-sm text-gray-400">
+            By signing in, you agree to our{" "}
+            <Link
+              href="/privacy"
+              className="text-gray-400 font-medium hover:text-[#00677D] hover:underline underline-offset-4 transition-colors"
+            >
+              Privacy Policy
             </Link>
           </p>
         </div>

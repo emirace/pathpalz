@@ -7,11 +7,13 @@ const Hero = () => {
       {/* Background Overlay Image */}
       <div className="absolute inset-0 z-0 opacity-60">
         <Image
-          src="/hero_bakground.png"
+          src="/hero_background.png"
           alt="Technical background pattern"
           fill
           className="object-cover mix-blend-overlay"
           priority
+          sizes="100vw"
+          quality={75}
         />
       </div>
 

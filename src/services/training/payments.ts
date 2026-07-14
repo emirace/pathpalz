@@ -23,8 +23,6 @@ export const checkout = async (
 ): Promise<ICheckoutResponse> => {
   const response = await trainingClient.post("/checkout", {
     ...data,
-    success_url: "http://localhost:3000/training/success",
-    cancel_url: "http://localhost:3000/training/cancel",
   });
   return response.data;
 };

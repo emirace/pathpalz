@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { 
-  checkout, 
-  getPaymentOptionBySlug, 
-  getPaymentOptions, 
-  verifyPayment 
+import {
+  checkout,
+  getPaymentOptionBySlug,
+  getPaymentOptions,
+  verifyPayment,
 } from "@/services/training/payments";
-import { ICheckoutRequest, IVerifyPaymentRequest } from "@/types/training/payments";
+import {
+  ICheckoutRequest,
+  IVerifyPaymentRequest,
+} from "@/types/training/payments";
 
 export const useGetPaymentOptions = () => {
   return useQuery({
@@ -24,7 +27,12 @@ export const useGetPaymentOptionBySlug = (slug: string) => {
 
 export const useCheckout = () => {
   return useMutation({
-    mutationFn: (data: ICheckoutRequest) => checkout(data),
+    mutationFn: (data: ICheckoutRequest) =>
+      checkout({
+        ...data,
+        success_url: `${window.location.origin}/training/success`,
+        cancel_url: `${window.location.origin}/training/success`,
+      }),
   });
 };
 

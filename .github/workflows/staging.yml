@@ -1,0 +1,219 @@
+name: Web staging CI/CD to cPanel
+
+on:
+  push:
+    branches:
+      - pre-prod
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      CACHE_BUST: v2
+
+    steps:
+      # =========================
+      # CHECKOUT
+      # =========================
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # =========================
+      # NODE SETUP
+      # =========================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # =========================
+      # CACHE NPM
+      # =========================
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-node22-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
+          restore-keys: |
+            npm-${{ runner.os }}-node22-
+
+      # =========================
+      # CACHE NEXT.JS
+      # =========================
+      - name: Cache Next.js
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ env.CACHE_BUST }}
+          restore-keys: |
+            next-${{ runner.os }}-
+
+      # =========================
+      # INSTALL + BUILD
+      # =========================
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create build version file
+        run: |
+          echo "{
+            \"branch\": \"${GITHUB_REF_NAME}\",
+            \"sha\": \"${GITHUB_SHA}\",
+            \"run_id\": \"${GITHUB_RUN_ID}\",
+            \"run_number\": \"${GITHUB_RUN_NUMBER}\",
+            \"built_at\": \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"
+          }" > public/version.json
+
+      - name: Configure Next.js static export
+        run: |
+          node -e '
+            const fs = require("fs");
+            const file = fs.existsSync("next.config.ts") ? "next.config.ts" : fs.existsSync("next.config.js") ? "next.config.js" : fs.existsSync("next.config.mjs") ? "next.config.mjs" : null;
+            if (file) {
+              let content = fs.readFileSync(file, "utf8");
+              if (!content.includes("output:")) {
+                content = content.replace(/(nextConfig\s*(:\s*\w+)?\s*=\s*\{|module\.exports\s*=\s*\{|export\s+default\s*\{)/, "$1\n  output: \"export\",");
+                fs.writeFileSync(file, content, "utf8");
+                console.log(`Injected output: "export" into ${file}`);
+              } else {
+                console.log(`output config already exists in ${file}`);
+              }
+            } else {
+              console.log("No next.config file found");
+            }
+          '
+
+      - name: Build Next.js static export
+        run: npm run build
+
+      # =========================
+      # DEPLOY TO CPANEL
+      # =========================
+      - name: Deploy to cPanel (Consolidated & Multiplexed)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.STAGING_CPANEL_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.STAGING_CPANEL_SSH_PASSPHRASE }}
+        run: |
+          set -e
+
+          # 1. Setup SSH (ASKPASS FIX)
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          PORT="${{ secrets.STAGING_CPANEL_SSH_PORT }}"
+          if [ -z "$PORT" ]; then PORT=22; fi
+          SERVER="${{ secrets.STAGING_CPANEL_SSH_USER }}@${{ secrets.STAGING_CPANEL_SSH_HOST }}"
+
+          ssh-keyscan -p "$PORT" -H "${{ secrets.STAGING_CPANEL_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+          eval "$(ssh-agent -s)"
+
+          echo '#!/bin/sh' > ~/.ssh_askpass
+          echo 'echo "$SSH_PASSPHRASE"' >> ~/.ssh_askpass
+
+          chmod +x ~/.ssh_askpass
+
+          export SSH_ASKPASS=~/.ssh_askpass
+          export DISPLAY=:0
+          export SSH_ASKPASS_REQUIRE=force
+
+          setsid ssh-add <(echo "$SSH_PRIVATE_KEY") </dev/null
+
+          # 2. Configure SSH Multiplexing (ControlMaster)
+          mkdir -p ~/.ssh/control
+          cat << 'EOF' > ~/.ssh/config
+          Host *
+            ControlMaster auto
+            ControlPath ~/.ssh/control/conn-%r@%h:%p
+            ControlPersist 10m
+          EOF
+
+          # Start the master persistent connection in background
+          ssh -p "$PORT" -M -N -f "$SERVER"
+
+          # 3. Backup production
+          echo "=============================="
+          echo " RUNNING BACKUP "
+          echo "=============================="
+          ssh -p "$PORT" "$SERVER" '
+            set -e
+
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+            BACKUP_DIR="$APP_DIR/backups"
+            TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+
+            mkdir -p "$BACKUP_DIR"
+
+            if [ -d "$APP_DIR" ]; then
+              zip -r "$BACKUP_DIR/live_$TIMESTAMP.zip" "$APP_DIR" \
+                -x "$APP_DIR/backups/*" >/dev/null 2>&1 || true
+            fi
+
+            # Keep last 2 backups
+            ls -tp "$BACKUP_DIR"/*.zip 2>/dev/null | tail -n +3 | xargs -r rm --
+
+            echo "✅ Backup complete"
+          '
+
+          # 4. Deploy (SCP + swap)
+          echo "=============================="
+          echo " RUNNING DEPLOY "
+          echo "=============================="
+          APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+          STAGING_DIR="${APP_DIR}_staging"
+
+          # Create staging directory
+          ssh -p "$PORT" "$SERVER" "mkdir -p $STAGING_DIR"
+
+          # Upload build to staging
+          scp -P "$PORT" -r out/* "$SERVER:$STAGING_DIR/"
+
+          # Swap staging → live
+          ssh -p "$PORT" "$SERVER" '
+            set -e
+
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+            STAGING_DIR="${APP_DIR}_staging"
+            BACKUP_DIR="$APP_DIR/backups"
+
+            mkdir -p "$BACKUP_DIR"
+
+            # Clean live but protect .htaccess + backups
+            find "$APP_DIR" -mindepth 1 \
+              ! -name "backups" \
+              ! -name ".htaccess" \
+              -exec rm -rf {} +
+
+            # Move staging to live
+            cp -r "$STAGING_DIR/"* "$APP_DIR/"
+
+            # Remove staging
+            rm -rf "$STAGING_DIR"
+
+            echo "✅ Deployment complete"
+          '
+
+          # 5. Verify deployment
+          echo "=============================="
+          echo " VERIFYING DEPLOYMENT "
+          echo "=============================="
+          ssh -p "$PORT" "$SERVER" '
+            set -e
+
+            APP_DIR="${{ secrets.STAGING_CPANEL_TARGET_DIR }}"
+
+            ls -la "$APP_DIR/index.html" || echo "Missing index.html"
+            ls -la "$APP_DIR/.htaccess" || echo "Missing .htaccess"
+
+            echo ""
+            cat "$APP_DIR/version.json" || echo "Missing version.json"
+
+            echo ""
+            echo "=============================="
+            echo "DONE"
+          '
+
+          # 6. Close the master multiplexer connection
+          ssh -p "$PORT" -O exit "$SERVER"
