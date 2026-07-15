@@ -52,7 +52,10 @@ export const getStudentAssignmentsPermodule = async ({
   courseModuleHeaderId,
 }: {
   courseModuleHeaderId: string;
-}) => {
+}): Promise<{
+  success: boolean;
+  data: IAssignment[];
+}> => {
   const response = await trainingClient.get(
     `/student/assignments/${courseModuleHeaderId}`,
   );

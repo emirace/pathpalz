@@ -6,9 +6,10 @@ import {
 } from "@/query/training/student/assignment";
 import AssignmentCard from "./AssignmentCard";
 import { Calendar } from "lucide-react";
+import { IEnrollment } from "@/types/training/enrollments";
 
 type Props = {
-  enrollment: any;
+  enrollment?: IEnrollment;
   courseModuleHeaderId?: string;
 };
 
@@ -70,15 +71,16 @@ export default function AssignmentsOverview({
           )}
 
           <div className="space-y-4">
-            {courseModuleHeaderId
+            {(courseModuleHeaderId
               ? assignmentsPerModule
-              : assignments?.data?.map((a) => (
-                  <AssignmentCard
-                    key={a.id}
-                    assignment={a}
-                    enrollmentId={enrollment.enrollment_id}
-                  />
-                ))}
+              : assignments
+            )?.data?.map((a) => (
+              <AssignmentCard
+                key={a.id}
+                assignment={a}
+                enrollmentId={enrollment?.enrollment_id as unknown as string}
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -27,7 +27,7 @@ export default function AssignmentCard({
       ? new Date(assignment.deadline)
       : null;
 
-  const now = Date.now();
+  const [now] = React.useState(() => Date.now());
 
   // compute time-based flags
   const timeDiff = deadlineDate ? deadlineDate.getTime() - now : null;
@@ -37,7 +37,7 @@ export default function AssignmentCard({
 
   // determine submission state: prefer my_submission.status, fallback to assignment.status
   const submissionState =
-    assignment.my_submission?.status || (assignment as any).status || "to-do";
+    assignment.my_submission?.status || assignment.status || "to-do";
 
   // visual state helpers
   const isGraded = submissionState === "passed" || submissionState === "failed";
@@ -97,7 +97,7 @@ export default function AssignmentCard({
 
   return (
     <div
-      className={`rounded-xl shadow-sm border-gray-600 p-4 flex items-center justify-between ${leftAccent} bg-white`}
+      className={`  rounded-xl shadow-sm border-gray-600 p-4 flex flex-col md:flex-row gap-4 md:items-center justify-between ${leftAccent} bg-white`}
     >
       <div className="flex items-center gap-4 min-w-0">
         <div
@@ -181,12 +181,24 @@ export default function AssignmentCard({
             View Feedback
           </button>
         ) : isSubmitted ? (
-          <button
-            className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-bold"
-            disabled
-          >
-            Submitted
-          </button>
+          <div className="flex flex-row md:flex-row gap-4">
+            <div className="px-4 py-2 rounded-lg italic text-gray-600 text-sm font-bold">
+              Submitted
+            </div>
+            {assignment.multiple_attempts && (
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    `/lms/?enrollmentId=${enrollmentId}&view=submit&assignmentId=${assignment.id}`,
+                  )
+                }
+                className="px-4 py-2 rounded-lg bg-[#00284F] text-white text-sm font-bold flex items-center gap-2"
+              >
+                Submit Again
+              </button>
+            )}
+          </div>
         ) : (
           <button
             type="button"

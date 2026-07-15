@@ -51,6 +51,6 @@ export const useGetStudentAssignmentsPermodule = ({
         courseModuleHeaderId: courseModuleHeaderId || "",
       }),
     enabled: !!courseModuleHeaderId,
-    select: (data) => data.data, // Select only the 'data' property from the response
+    // select: (data) => data.data, // Select only the 'data' property from the response
   });
 };
