@@ -123,7 +123,14 @@ export default function AssignmentCard({
         </div>
 
         <div className="min-w-0">
-          <div className="">
+          <div
+            className="cursor-pointer"
+            onClick={() =>
+              router.push(
+                `/lms/?enrollmentId=${enrollmentId}&assignmentId=${assignment.id}`,
+              )
+            }
+          >
             {badge && <span className={badge.classes}>{badge.text}</span>}
             <h4 className="text-xl capitalize font-bold text-[#00284F] truncate">
               {assignment.title}

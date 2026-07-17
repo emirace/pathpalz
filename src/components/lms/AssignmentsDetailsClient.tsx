@@ -4,20 +4,19 @@ import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Clock, Calendar, FileText, Download, Loader2 } from "lucide-react";
-import { IAssignment, ISubmission } from "@/types/training/assignments";
-import { useGetStudentAssignments } from "@/query/training/student/assignment";
+import { ISubmission } from "@/types/training/assignments";
+import { useGetStudentAssignmentById } from "@/query/training/student/assignment";
 
 type Props = {
   assignmentId: string;
 };
 
 const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
-  const { data: assignments, isLoading } = useGetStudentAssignments();
+  const { data: assignment, isLoading } = useGetStudentAssignmentById({
+    assignmentId,
+  });
 
   const enrollmentId = useSearchParams().get("enrollmentId") || "";
-  const assignment = assignments?.data?.find(
-    (a) => String(a.id) === assignmentId,
-  );
 
   const [selectedSubmission, setSelectedSubmission] =
     useState<ISubmission | null>(null);
@@ -39,6 +38,11 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
   }
 
   const submissions = assignment.submissions || [];
+
+  const submissionState =
+    assignment.my_submission?.status || assignment.status || "to-do";
+  const isGraded = submissionState === "passed" || submissionState === "failed";
+  const isSubmitted = submissionState === "submitted";
 
   const deadlineLabel = assignment.deadline
     ? new Date(assignment.deadline).toLocaleString(undefined, {
@@ -70,13 +74,32 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Link to the dedicated submit page handled by LMSPageContent routing */}
-          <Link
-            href={`/lms/?enrollmentId=${enrollmentId || ""}&view=submit&assignmentId=${assignment.id}`}
-            className="bg-teal text-white px-4 py-2 rounded-lg font-bold"
-          >
-            Submit Assignment
-          </Link>
+          {isGraded ? (
+            <span className="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 text-sm font-bold">
+              Graded
+            </span>
+          ) : isSubmitted ? (
+            <>
+              <span className="px-4 py-2 rounded-lg italic text-gray-600 text-sm font-bold">
+                Submitted
+              </span>
+              {assignment.multiple_attempts && (
+                <Link
+                  href={`/lms/?enrollmentId=${enrollmentId}&view=submit&assignmentId=${assignment.id}`}
+                  className="px-4 py-2 rounded-lg bg-[#00284F] text-white text-sm font-bold"
+                >
+                  Submit Again
+                </Link>
+              )}
+            </>
+          ) : (
+            <Link
+              href={`/lms/?enrollmentId=${enrollmentId}&view=submit&assignmentId=${assignment.id}`}
+              className="px-4 py-2 rounded-lg bg-teal text-white text-sm font-bold"
+            >
+              Submit Assignment
+            </Link>
+          )}
         </div>
       </div>
 

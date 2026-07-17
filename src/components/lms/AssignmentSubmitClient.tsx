@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, FileText, Info, Lightbulb, Loader2 } from "lucide-react";
+import { FileText, Info, Lightbulb, Loader2 } from "lucide-react";
 import {
-  useGetStudentAssignments,
+  useGetStudentAssignmentById,
   useSubmitAssignment,
 } from "@/query/training/student/assignment";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -21,17 +21,14 @@ const formatSize = (bytes: number) => {
 };
 
 const AssignmentSubmitClient: React.FC<Props> = ({ assignmentId }) => {
-  const { data: assignments, isLoading } = useGetStudentAssignments();
+  const { data: assignment, isLoading } = useGetStudentAssignmentById({
+    assignmentId,
+  });
   const router = useRouter();
-  console.log("assignmentId", assignmentId, assignments);
 
   const enrollmentId = useSearchParams().get("enrollmentId");
   const { mutate: submitAssignment, isPending: isSubmittingAssignment } =
     useSubmitAssignment();
-
-  const assignment = assignments?.data?.find(
-    (a) => String(a.id) === assignmentId,
-  );
 
   const [files, setFiles] = useState<File[]>([]);
   const [agree, setAgree] = useState(false);

@@ -1,4 +1,5 @@
 import {
+  getAssignmentById,
   getAssignmentsPerModule,
   getStudentAssignments,
   getStudentAssignmentsPermodule,
@@ -52,5 +53,22 @@ export const useGetStudentAssignmentsPermodule = ({
       }),
     enabled: !!courseModuleHeaderId,
     // select: (data) => data.data, // Select only the 'data' property from the response
+  });
+};
+
+export const useGetStudentAssignmentById = ({
+  assignmentId,
+}: {
+  assignmentId?: string;
+}) => {
+  console.log("queery", assignmentId);
+  return useQuery({
+    queryKey: ["assignment", "one", assignmentId],
+    queryFn: () =>
+      getAssignmentById({
+        assignmentId: assignmentId || "",
+      }),
+    enabled: !!assignmentId,
+    select: (data) => data.data,
   });
 };
