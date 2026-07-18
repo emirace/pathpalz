@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const authService = "https://auth.pathpalz.com/api";
-export const trainingServiceUrl = "https://elearning.pathpalz.com/api/training";
+export const authService = "https://auth.martzync.com/api";
+export const trainingServiceUrl = "https://elearning.martzync.com/api/training";
 
 const setupInterceptors = (instance: any) => {
   instance.interceptors.request.use(
@@ -25,7 +25,11 @@ const setupInterceptors = (instance: any) => {
     },
     async (error: any) => {
       const OriginalRequest = error.config;
-      if (error.response?.status === 401 && !OriginalRequest._retry && typeof window !== "undefined") {
+      if (
+        error.response?.status === 401 &&
+        !OriginalRequest._retry &&
+        typeof window !== "undefined"
+      ) {
         OriginalRequest._retry = true;
         const refresh_token = localStorage.getItem("refreshToken");
         if (refresh_token) {
