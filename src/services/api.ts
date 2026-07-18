@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const authService = "https://auth.martzync.com/api";
-export const trainingServiceUrl = "https://elearning.martzync.com/api/training";
+export const authService = "https://auth.pathpalz.com/api";
+export const trainingServiceUrl = "https://elearning.pathpalz.com/api/training";
 
 const setupInterceptors = (instance: any) => {
   instance.interceptors.request.use(
