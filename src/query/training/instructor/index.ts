@@ -79,6 +79,9 @@ export const useUpdateStudentAttendance = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-student-attendance"] });
       queryClient.invalidateQueries({ queryKey: ["student-attendance"] });
+      queryClient.invalidateQueries({
+        queryKey: ["student-attendance-per-module"],
+      });
     },
   });
 };
@@ -100,7 +103,6 @@ export const useGetSubTypeModules = (subTypeId: number) => {
     select: (response) => response.data,
   });
 };
-
 
 export const useGetAssignmentAnalytics = () => {
   return useQuery({

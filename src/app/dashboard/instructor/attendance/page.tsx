@@ -37,7 +37,9 @@ export default function InstructorAttendancePage() {
   )?.course;
 
   // Flatten all modules from the selected course's structure
-  const modules = (selectedCourse?.course_structure?.flatMap((h) => h.modules) || []) as any[];
+  const modules = (selectedCourse?.course_structure?.flatMap(
+    (h) => h.modules,
+  ) || []) as any[];
 
   const [openHeaders, setOpenHeaders] = useState<Record<number, boolean>>({});
   const toggleHeader = (id: number) => {
@@ -59,8 +61,12 @@ export default function InstructorAttendancePage() {
 
   const isStudentAttended = (student: IStudentAttendace) => {
     if (!selectedModuleId) return false;
-    return Array.isArray(student.attendances) &&
-      student.attendances.some((a: any) => a.course_module_id === selectedModuleId);
+    return (
+      Array.isArray(student.attendances) &&
+      student.attendances.some(
+        (a) => a.course_module_id === selectedModuleId && a.attended,
+      )
+    );
   };
 
   const students = moduleAttendance?.data || [];
@@ -141,50 +147,67 @@ export default function InstructorAttendancePage() {
                 </div>
               ) : (
                 <div className="space-y-3 max-h-125 overflow-y-auto pr-2 custom-scrollbar">
-                  {selectedCourse?.course_structure?.map((header: any, index: number) => (
-                    <div key={header.header_id} className="border border-gray-100 rounded-xl overflow-hidden">
-                      <button
-                        onClick={() => toggleHeader(header.header_id)}
-                        className="w-full flex items-center justify-between p-3 bg-gray-50/50 hover:bg-gray-50 transition-colors text-left"
+                  {selectedCourse?.course_structure?.map(
+                    (header: any, index: number) => (
+                      <div
+                        key={header.header_id}
+                        className="border border-gray-100 rounded-xl overflow-hidden"
                       >
-                        <span className="text-[11px] font-bold text-gray-700 flex items-center gap-1.5 leading-tight">
-                          {openHeaders[header.header_id] ? (
-                            <ChevronDown size={14} className="text-gray-400 shrink-0" />
-                          ) : (
-                            <ChevronRight size={14} className="text-gray-400 shrink-0" />
-                          )}
-                          Mod {index + 1}: {header.title}
-                        </span>
-                      </button>
+                        <button
+                          onClick={() => toggleHeader(header.header_id)}
+                          className="w-full flex items-center justify-between p-3 bg-gray-50/50 hover:bg-gray-50 transition-colors text-left"
+                        >
+                          <span className="text-[11px] font-bold text-gray-700 flex items-center gap-1.5 leading-tight">
+                            {openHeaders[header.header_id] ? (
+                              <ChevronDown
+                                size={14}
+                                className="text-gray-400 shrink-0"
+                              />
+                            ) : (
+                              <ChevronRight
+                                size={14}
+                                className="text-gray-400 shrink-0"
+                              />
+                            )}
+                            Mod {index + 1}: {header.title}
+                          </span>
+                        </button>
 
-                      {openHeaders[header.header_id] && (
-                        <div className="divide-y divide-gray-50 bg-white border-t border-gray-100">
-                          {header.modules.map((module: any) => (
-                            <button
-                              key={module.id}
-                              onClick={() => setSelectedModuleId(module.id)}
-                              className={`w-full text-left p-3 transition-colors flex items-center justify-between group ${selectedModuleId === module.id
-                                ? "bg-teal/5"
-                                : "hover:bg-gray-50/50"
+                        {openHeaders[header.header_id] && (
+                          <div className="divide-y divide-gray-50 bg-white border-t border-gray-100">
+                            {header.modules.map((module: any) => (
+                              <button
+                                key={module.id}
+                                onClick={() => setSelectedModuleId(module.id)}
+                                className={`w-full text-left p-3 transition-colors flex items-center justify-between group ${
+                                  selectedModuleId === module.id
+                                    ? "bg-teal/5"
+                                    : "hover:bg-gray-50/50"
                                 }`}
-                            >
-                              <span className={`text-[11px] font-semibold transition-colors truncate pr-2 ${selectedModuleId === module.id ? "text-teal" : "text-gray-700"}`}>
-                                {module.title}
-                              </span>
-                              {selectedModuleId === module.id && (
-                                <CheckCircle size={12} className="text-teal shrink-0" />
-                              )}
-                            </button>
-                          ))}
-                          {header.modules.length === 0 && (
-                            <div className="p-3 text-[10px] text-gray-400 italic pl-4">
-                              No lessons available.
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                              >
+                                <span
+                                  className={`text-[11px] font-semibold transition-colors truncate pr-2 ${selectedModuleId === module.id ? "text-teal" : "text-gray-700"}`}
+                                >
+                                  {module.title}
+                                </span>
+                                {selectedModuleId === module.id && (
+                                  <CheckCircle
+                                    size={12}
+                                    className="text-teal shrink-0"
+                                  />
+                                )}
+                              </button>
+                            ))}
+                            {header.modules.length === 0 && (
+                              <div className="p-3 text-[10px] text-gray-400 italic pl-4">
+                                No lessons available.
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ),
+                  )}
                 </div>
               )}
             </div>
