@@ -68,7 +68,7 @@ export const getAssignmentById = async ({
   assignmentId: string;
 }): Promise<{ data: IAssignment }> => {
   const response = await trainingClient.get(
-    `/student/assignments/${assignmentId}`,
+    `/student/assignments/byId/${assignmentId}`,
   );
   return response.data;
 };
