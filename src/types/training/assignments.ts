@@ -41,6 +41,20 @@ export interface ICreateAssignmentPayload {
   status: string;
 }
 
+export interface ISubmissionHistory {
+  attempt: number;
+  submission_files: {
+    file_name: string;
+    file_path: string;
+    file_size: number;
+  }[];
+  score: string;
+  feedback?: string;
+  status: string;
+  submitted_at: string;
+  graded_at: string;
+}
+
 export interface ISubmission {
   id: string;
   assignment_id: string;
@@ -68,6 +82,9 @@ export interface ISubmission {
     created_at: string;
     updated_at: string;
   };
+  submission_history?: ISubmissionHistory[];
+  resubmitted_at: string;
+  resubmission_count: number;
 }
 
 export interface ISubmissionResponse {

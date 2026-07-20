@@ -726,7 +726,7 @@ export default function TrackDetailClient() {
                     marginBottom: "18px",
                   }}
                 >
-                  What you'll achieve
+                  What you`&apos;`ll achieve
                 </div>
                 <div
                   style={{
@@ -918,7 +918,14 @@ export default function TrackDetailClient() {
                 pointerEvents: "none",
               }}
             />
-            <div data-reveal="" style={{ position: "relative", maxWidth: SECTION_MAX_WIDTH, marginInline: "auto" }}>
+            <div
+              data-reveal=""
+              style={{
+                position: "relative",
+                maxWidth: SECTION_MAX_WIDTH,
+                marginInline: "auto",
+              }}
+            >
               <div
                 style={{
                   fontFamily: "'Space Grotesk',sans-serif",

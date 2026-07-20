@@ -15,6 +15,8 @@ import {
   Camera,
   X,
   ImagePlus,
+  Globe,
+  Lock,
 } from "lucide-react";
 
 export default function ProfilePage() {
@@ -28,6 +30,7 @@ export default function ProfilePage() {
     phone_number: "",
     bio: "",
     social_media_link: "",
+    is_public: false,
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -38,19 +41,23 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (user) {
-      setFormData({
-        first_name: user.first_name || "",
-        last_name: user.last_name || "",
-        phone_number: user.phone_number || "",
-        bio: user.bio || "",
-        social_media_link: user.social_media_link || "",
-      });
-    }
+    const updateForm = () => {
+      if (user) {
+        setFormData({
+          first_name: user.first_name || "",
+          last_name: user.last_name || "",
+          phone_number: user.phone_number || "",
+          bio: user.bio || "",
+          social_media_link: user.social_media_link || "",
+          is_public: Boolean(user.is_public),
+        });
+      }
+    };
+    updateForm();
   }, [user]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -72,6 +79,7 @@ export default function ProfilePage() {
     data.append("phone_number", formData.phone_number);
     data.append("bio", formData.bio);
     data.append("social_media_link", formData.social_media_link);
+    data.append("is_public", String(formData.is_public));
     if (selectedImage) {
       data.append("profile_image", selectedImage);
     }
@@ -118,6 +126,7 @@ export default function ProfilePage() {
 
   const fullName = `${user.first_name || ""} ${user.last_name || ""}`.trim();
   const socialMediaLink = user.social_media_link || user.social_link || "";
+  const isInstructor = Boolean(user.usertype?.includes("instructor"));
 
   return (
     <div className="mx-auto max-w-4xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -225,15 +234,48 @@ export default function ProfilePage() {
                 </p>
                 <p className="mt-1 font-medium text-gray-900 capitalize">
                   {(() => {
-                    if (!user.usertype || user.usertype.length === 0) return "Standard User";
+                    if (!user.usertype || user.usertype.length === 0)
+                      return "Standard User";
                     const order = ["user", "instructor", "platform"];
-                    const validRoles = user.usertype.filter((r: string) => r.toLowerCase() !== "business" && r.toLowerCase() !== "bussiness");
+                    const validRoles = user.usertype.filter(
+                      (r: string) =>
+                        r.toLowerCase() !== "business" &&
+                        r.toLowerCase() !== "bussiness",
+                    );
                     if (validRoles.length === 0) return "Standard User";
-                    return validRoles.sort((a: string, b: string) => order.indexOf(a.toLowerCase()) - order.indexOf(b.toLowerCase())).pop();
+                    return validRoles
+                      .sort(
+                        (a: string, b: string) =>
+                          order.indexOf(a.toLowerCase()) -
+                          order.indexOf(b.toLowerCase()),
+                      )
+                      .pop();
                   })()}
                 </p>
               </div>
             </div>
+
+            {isInstructor && (
+              <div className="flex items-start gap-4 rounded-xl border border-transparent p-4 transition-all hover:border-gray-100 hover:bg-gray-50 hover:shadow-sm">
+                <div
+                  className={`rounded-full p-3 shadow-inner ${
+                    user.is_public
+                      ? "bg-teal/10 text-teal"
+                      : "bg-gray-100 text-gray-500"
+                  }`}
+                >
+                  {user.is_public ? <Globe size={20} /> : <Lock size={20} />}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">
+                    Profile Visibility
+                  </p>
+                  <p className="mt-1 font-medium text-gray-900">
+                    {user.is_public ? "Public" : "Private"}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -302,10 +344,11 @@ export default function ProfilePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {notification && (
                 <div
-                  className={`mb-2 rounded-md border p-3 text-sm ${notification.type === "success"
+                  className={`mb-2 rounded-md border p-3 text-sm ${
+                    notification.type === "success"
                       ? "bg-green-50 text-green-800 border-green-100"
                       : "bg-red-50 text-red-800 border-red-100"
-                    }`}
+                  }`}
                 >
                   {notification.message}
                 </div>
@@ -425,6 +468,40 @@ export default function ProfilePage() {
                   className="w-full rounded-lg border text-black border-gray-300 px-4 py-2 focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/20"
                 />
               </div>
+
+              {/* Profile Visibility */}
+              {isInstructor && (
+                <div className="flex items-start justify-between gap-4 rounded-lg border border-gray-200 p-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">
+                      Public Profile
+                    </p>
+                    <p className="mt-0.5 text-xs text-gray-500">
+                      Make your profile visible to other users.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={formData.is_public}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        is_public: !prev.is_public,
+                      }))
+                    }
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-navy/20 ${
+                      formData.is_public ? "bg-navy" : "bg-gray-300"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        formData.is_public ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+              )}
 
               <div className="mt-6 flex justify-end gap-3">
                 <button

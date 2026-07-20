@@ -173,7 +173,11 @@ export default function DashboardLayout({
           <nav className="flex-1 px-4 space-y-2">
             {!isAdminPath && !isInstructorPath ? (
               <>
-                {SIDEBAR_ITEMS.map((item) => {
+                {SIDEBAR_ITEMS.filter(
+                  (item) =>
+                    !user?.usertype?.includes("instructor") ||
+                    item.href === "/dashboard/profile"
+                ).map((item) => {
                   const isActive = item.href === "/dashboard" ? pathname === item.href : pathname.startsWith(item.href);
                   return (
                     <Link

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Clock, Calendar, FileText, Download, Loader2 } from "lucide-react";
-import { ISubmission } from "@/types/training/assignments";
+import { ISubmission, ISubmissionHistory } from "@/types/training/assignments";
 import { useGetStudentAssignmentById } from "@/query/training/student/assignment";
 
 type Props = {
@@ -19,7 +19,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
   const enrollmentId = useSearchParams().get("enrollmentId") || "";
 
   const [selectedSubmission, setSelectedSubmission] =
-    useState<ISubmission | null>(null);
+    useState<ISubmissionHistory | null>(null);
 
   if (isLoading) {
     return (
@@ -37,7 +37,7 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
     );
   }
 
-  const submissions = assignment.submissions || [];
+  const submissions = assignment?.my_submission?.submission_history || [];
 
   const submissionState =
     assignment.my_submission?.status || assignment.status || "to-do";
@@ -189,14 +189,12 @@ const AssignmentsDetailsClient: React.FC<Props> = ({ assignmentId }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {submissions.map((s) => (
-                    <tr key={s.id} className="group hover:bg-gray-50/50">
+                  {submissions.map((s, index) => (
+                    <tr key={index} className="group hover:bg-gray-50/50">
                       <td className="px-6 py-4 text-gray-600">
                         {new Date(s.submitted_at).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {assignment.submissions.length}
-                      </td>
+                      <td className="px-6 py-4 text-gray-600">{s.attempt}</td>
                       <td className="px-6 py-4 text-gray-600">
                         {s.score ?? "-"}
                       </td>
